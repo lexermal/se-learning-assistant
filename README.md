@@ -17,3 +17,4 @@ Phunetics cheat sheet: https://upload.wikimedia.org/wikipedia/commons/8/8e/IPA_c
 Another straight SV to something else translation db https://github.com/open-dict-data/wikidict-sv/blob/master/README.md
 
 
+https://www.npmjs.com/package/dictcc
