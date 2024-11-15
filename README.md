@@ -9,6 +9,8 @@ https://www.npmjs.com/package/dictcc
 
 Maybe integrate Lingq https://www.lingq.com/apidocs/
 
+Maybe implement a plugin similar to https://github.com/LuteOrg/lute-v3
+
 A translation can be made with https://readloud.net/
 
 Or it simply uses the unofficiel dict.cc client
