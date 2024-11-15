@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Example Plugin</title>
+</head>
+
+<body>
+    <div id="plugin-root">Loading...</div>
+    <script src="https://cdn.jsdelivr.net/npm/postmate/build/postmate.min.js"></script>
+    <script>
+        // Initialize Postmate Child
+        const plugin = new Postmate.Model({
+            // Expose the height property to the parent window
+            exampleProp: "hello world from me",
+            height: document.height || document.body.offsetHeight,
+            // Expose the setHeight method to the parent window
+            setCards: (data) => {
+                console.log("setting cards ", data);
+            },
+            getCards: () => {
+                return "cards";
+            }
+        });
+
+        plugin.then((parent) => {
+            // Emit a message to the parent window
+            parent.emit('helloFromAlex', 'Hello, World!');
+            document.getElementById("plugin-root").textContent = "Plugin is ready!";
+        });
+    </script>
+</body>
+
+</html>
