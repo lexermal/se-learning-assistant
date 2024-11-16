@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Link } from "react-router-dom";
-import { usePlugin } from './utils/PluginProvider';
+import { usePlugin } from '../utils/PluginProvider';
 
 function App() {
   const [cards, setCards] = React.useState([] as string[]);
@@ -27,7 +27,7 @@ function App() {
           <div key={index}>{card}</div>
         ))
       }
-      <Link to={`test`}>Test page</Link>
+      <Link to={`/test`}>Test page</Link>
     </div>
   );
 }
