@@ -1,17 +1,14 @@
 "use client";
 
-import Postmate from "postmate";
-import { useEffect, useRef, useState } from "react";
-
-interface Plugin {
-  url: string;
-  name: string;
-  description: string;
-}
+import { Plugin } from "./CommunicationHandler";
+import { use, useEffect, useRef, useState } from "react";
+import { createClient } from "@/utils/supabase/client";
+import CommunicationHandler from "./CommunicationHandler";
 
 export default function PluginPage({ params }: any) {
-  const iframeRef = useRef(null);
+  const iframeRef = useRef(null as HTMLDivElement | null);
   const [plugin, setPlugin] = useState(null as Plugin | null);
+  const supabase = createClient();
 
   useEffect(() => {
     params.then(async ({ pluginName }: any) => {
@@ -27,40 +24,22 @@ export default function PluginPage({ params }: any) {
   }, []);
 
   useEffect(() => {
-    if (!iframeRef.current) {
+    if (!iframeRef.current || !plugin) {
       return;
     }
-    let pluginConnection: Postmate;
 
-    // Initialize Postmate Parent
-    const initializePlugin = async () => {
-      pluginConnection = new Postmate({
-        container: iframeRef.current,
-        url: plugin!.url,
-      });
-
-      // Wait for the plugin to be ready
-      const plugin2 = await pluginConnection;
-
-      // Call plugin method and get data
-      plugin2.on("helloFromAlex", (data: any) => {
-        console.log("Plugin says dynamically: ", data);
-      });
-
-      const data = await plugin2.get("exampleProp");
-      console.log("Plugin property: ", data);
-
-      console.log("height:", await plugin2.get("height"))
-    };
-
-    initializePlugin();
-
-    return () => {
-      // Clean up Postmate connection
-      if (pluginConnection) {
-        pluginConnection.then(child => child.destroy());
+    const connection = new CommunicationHandler(supabase, plugin, iframeRef.current);
+    connection.init();
+    connection.subscribe("getCards", () => {
+      connection.emit("setCards", ["card1", "card2"]);
+    });
+    connection.subscribe("heightAdjustment", (height: number) => {
+      if (!iframeRef.current) {
+        return;
       }
-    };
+      console.log("adjusting height", height);
+      (iframeRef.current.children[0] as HTMLIFrameElement).style.height = `${height}px`;
+    });
   }, [plugin]);
 
   if (!plugin) {
@@ -73,6 +52,7 @@ export default function PluginPage({ params }: any) {
       <p>{plugin.description}</p>
       <div
         ref={iframeRef}
+        className="w-full"
         style={{ border: "1px solid #ccc" }}
       ></div>
     </div>
