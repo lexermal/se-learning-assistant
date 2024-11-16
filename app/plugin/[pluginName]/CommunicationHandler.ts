@@ -34,13 +34,14 @@ export default class CommunicationHandler {
         this.parent = await this.pluginConnection;
 
 
-        this.parent.on("db_fetch", async (data: { table: string, select: any }) => {
+        this.parent.on("db_fetch", async (data: { table: string, select: string }) => {
             console.log("Plugin " + this.plugin + " wants to fetch data from: ", data.table);
 
-            let query = await this.supabase.from(data.table).select(data.select);
-
+            let query = await this.supabase.from(`pl_${this.plugin.name}_${data.table}`).select(data.select);
+            console.log("Query: ", query);
             // todo add filter
-            return query;
+            // return query.data;
+            this.parent!.call("db_fetch", query.data);
         });
 
         // insert

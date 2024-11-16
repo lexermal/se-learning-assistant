@@ -8,8 +8,11 @@ export class PluginController {
     private constructor() {
         this.subscriptions.set("pluginName", "flashcards");
         this.plugin = this.getPlugin();
-        this.emit = this.emit.bind(this);
+
         this.on = this.on.bind(this);
+        this.emit = this.emit.bind(this);
+        this.dbFetch = this.dbFetch.bind(this);
+        this.pingPong = this.pingPong.bind(this);
     }
 
     private getPlugin(): Postmate.Model {
@@ -30,5 +33,24 @@ export class PluginController {
     public on(eventName: string, callback: (data: any) => void) {
         this.plugin = this.getPlugin();
         this.subscriptions.set(eventName, callback);
+    }
+
+    private async pingPong(topic: string, data: any) {
+        return await new Promise((resolve) => {
+            let triggered = false;
+
+            this.emit(topic, data);
+
+            this.on(topic, (data: any) => {
+                if (triggered) return;
+                triggered = true;
+
+                resolve(data)
+            })
+        });
+    }
+
+    public async dbFetch(table: string, select = "*"): Promise<any> {
+        return await this.pingPong("db_fetch", { table, select });
     }
 }

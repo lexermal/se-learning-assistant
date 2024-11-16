@@ -27,6 +27,7 @@ export const PluginProvider: React.FC<PluginProviderProps> = ({ children }) => {
         handleResize();
         setTimeout(handleResize, 500);
         window.addEventListener('resize', handleResize);
+        document.getElementById('root')?.addEventListener('resize', handleResize);
 
         return () => window.removeEventListener('resize', handleResize);
     }, []);

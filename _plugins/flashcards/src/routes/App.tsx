@@ -2,32 +2,29 @@ import React, { useEffect } from 'react';
 import { Link } from "react-router-dom";
 import { usePlugin } from '../utils/PluginProvider';
 
+interface Deck {
+  id: number;
+  name: string;
+}
+
 function App() {
-  const [cards, setCards] = React.useState([] as string[]);
-  const { emit, on } = usePlugin();
+  const [decks, setDecks] = React.useState([] as Deck[]);
+  const { emit, on, dbFetch } = usePlugin();
 
   useEffect(() => {
-    on('setCards', (data: string[]) => {
-      console.log("setting cards ", data);
-      setCards(data);
-    }
-    );
-    // Emit a message to the parent window
-    console.log("sending message to parent");
-    emit('getCards');
+    dbFetch("deck", "id, name").then(setDecks);
   }, []);
 
   return (
-    <div className="text-3xl font-bold underline text-center">
-      Simple React Typescript Tailwind Sample
-      Simple React Typescript Tailwind Sample
-      Simple React Typescript Tailwind Sample
+    <div className="mx-auto bg-gray-400 w-72 p-4 rounded-lg">
+      <h1 className='text-4xl mb-3 text-center'>Decks</h1>
       {
-        cards.map((card, index) => (
-          <div key={index}>{card}</div>
+        decks.map((deck, index) => (
+          <div className='cursor-pointer hover:font-bold' key={index}>{deck.name}</div>
         ))
       }
-      <Link to={`/test`}>Test page</Link>
+      <button className='mt-6 block' onClick={() => emit('addDeck', 'New deck')}>Add deck</button>
+      <Link className='mt-6 block' to={`/test`}>Test page</Link>
     </div>
   );
 }
