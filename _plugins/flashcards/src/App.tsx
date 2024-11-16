@@ -1,55 +1,24 @@
-import Postmate from 'postmate';
 import React, { useEffect } from 'react';
-
-let currentHeight = 0;
+import { Link } from "react-router-dom";
+import { usePlugin } from './utils/PluginProvider';
 
 function App() {
   const [cards, setCards] = React.useState([] as string[]);
+  const { emit, on } = usePlugin();
 
   useEffect(() => {
-    const plugin = new Postmate.Model({
-      // Expose the height property to the parent window
-      // exampleProp: "hello world from me",
-      setCards: (data: string[]) => {
-        console.log("setting cards ", data);
-        setCards(data);
-      },
-      getCards: () => {
-        return "cards";
-      }
-    });
-
-    plugin.then((parent) => {
-      // Emit a message to the parent window
-      console.log("sending message to parent");
-      parent.emit('getCards');
-    });
-
-    //resizing
-    const handleResize = () => {
-      const height = document.body.scrollHeight + 3;
-      if (height === currentHeight) return;
-
-      plugin.then(child => child.emit('heightAdjustment', height));
-
-      currentHeight = height;
-    };
-
-    window.addEventListener('resize', handleResize);
-    handleResize();
-    setTimeout(() => {
-      handleResize();
-    }, 500);
-
-    // Cleanup on component unmount
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
+    on('setCards', (data: string[]) => {
+      console.log("setting cards ", data);
+      setCards(data);
+    }
+    );
+    // Emit a message to the parent window
+    console.log("sending message to parent");
+    emit('getCards');
   }, []);
 
-
   return (
-    <h1 className="text-3xl font-bold underline text-red-600 text-center">
+    <div className="text-3xl font-bold underline text-center">
       Simple React Typescript Tailwind Sample
       Simple React Typescript Tailwind Sample
       Simple React Typescript Tailwind Sample
@@ -58,7 +27,8 @@ function App() {
           <div key={index}>{card}</div>
         ))
       }
-    </h1>
+      <Link to={`test`}>Test page</Link>
+    </div>
   );
 }
 
