@@ -27,7 +27,7 @@ function App() {
 
     //resizing
     const handleResize = () => {
-      const height = document.body.scrollHeight;
+      const height = document.body.scrollHeight + 3;
       if (height === currentHeight) return;
 
       plugin.then(child => child.emit('heightAdjustment', height));
@@ -37,6 +37,9 @@ function App() {
 
     window.addEventListener('resize', handleResize);
     handleResize();
+    setTimeout(() => {
+      handleResize();
+    }, 500);
 
     // Cleanup on component unmount
     return () => {

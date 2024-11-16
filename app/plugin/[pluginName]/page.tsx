@@ -1,7 +1,7 @@
 "use client";
 
 import { Plugin } from "./CommunicationHandler";
-import { use, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import CommunicationHandler from "./CommunicationHandler";
 
@@ -11,16 +11,17 @@ export default function PluginPage({ params }: any) {
   const supabase = createClient();
 
   useEffect(() => {
-    params.then(async ({ pluginName }: any) => {
-      const allowedPlugin = await fetch(`/api/plugins`)
-        .then(res => res.json())
-        .then((data) => data.filter((plugin: any) => plugin.name === pluginName));
+    // params.then(async ({ pluginName }: any) => {
+    //   const allowedPlugin = await fetch(`/api/plugins`)
+    //     .then(res => res.json())
+    //     .then((data) => data.filter((plugin: any) => plugin.name === pluginName));
 
-      // Allowed plugins for security
-      if (allowedPlugin.length > 0) {
-        setPlugin(allowedPlugin[0]);
-      }
-    });
+    //   // Allowed plugins for security
+    //   if (allowedPlugin.length > 0) {
+    //     setPlugin(allowedPlugin[0]);
+    //   }
+    // });
+    setPlugin({ name: "flashcards", description: "A sample", url: "http://localhost:3001" });
   }, []);
 
   useEffect(() => {
@@ -38,7 +39,9 @@ export default function PluginPage({ params }: any) {
         return;
       }
       console.log("adjusting height", height);
-      (iframeRef.current.children[0] as HTMLIFrameElement).style.height = `${height}px`;
+      const iframe = (iframeRef.current.children[0] as HTMLIFrameElement);
+      iframe.style.height = `${height}px`;
+      iframe.setAttribute("scrolling", "no");
     });
   }, [plugin]);
 
