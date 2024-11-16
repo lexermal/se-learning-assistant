@@ -25,6 +25,14 @@ export default class CommunicationHandler {
         this.init();
     }
 
+    private call(topic: string, data: any) {
+        this.parent!.call("triggerChild", { topic, data });
+    }
+
+    private getTable(table: string) {
+        return this.supabase.from(`pl_${this.plugin.name}_${table}`);
+    }
+
     async init() {
         if (!this.pluginConnection) {
             return;
@@ -33,15 +41,13 @@ export default class CommunicationHandler {
         // Wait for the plugin to be ready
         this.parent = await this.pluginConnection;
 
-
         this.parent.on("db_fetch", async (data: { table: string, select: string }) => {
             console.log("Plugin " + this.plugin + " wants to fetch data from: ", data.table);
 
-            let query = await this.supabase.from(`pl_${this.plugin.name}_${data.table}`).select(data.select);
+            let query = await this.getTable(data.table).select(data.select);
             console.log("Query: ", query);
             // todo add filter
-            // return query.data;
-            this.parent!.call("db_fetch", query.data);
+            this.call("db_fetch", query.data);
         });
 
         // insert
@@ -50,10 +56,10 @@ export default class CommunicationHandler {
 
             if (data.returnValues) {
                 console.log("Plugin " + this.plugin + " wants to return response after insert");
-                return await this.supabase.from(data.table).insert(data.values).select(data.returnValues);
+                return await this.getTable(data.table).insert(data.values).select(data.returnValues);
             }
 
-            return await this.supabase.from(data.table).insert(data.values);
+            return await this.getTable(data.table).insert(data.values);
         });
 
         // update
@@ -62,31 +68,18 @@ export default class CommunicationHandler {
 
             if (data.returnValues) {
                 console.log("Plugin " + this.plugin + " wants to return response after update");
-                return await this.supabase.from(data.table).update(data.values).match(data.filter).select(data.returnValues);
+                return await this.getTable(data.table).update(data.values).match(data.filter).select(data.returnValues);
             }
 
-            return await this.supabase.from(data.table).update(data.values).match(data.filter);
+            return await this.getTable(data.table).update(data.values).match(data.filter);
         });
 
         // delete
         this.parent.on("db_delete", async (data: { table: string, filter: any }) => {
             console.log("Plugin " + this.plugin + " wants to delete data from: ", data.table);
 
-            return await this.supabase.from(data.table).delete().match(data.filter);
+            return await this.getTable(data.table).delete().match(data.filter);
         });
-
-
-        // -------------old code----------------
-
-        // Call plugin method and get data
-        // plugin.on("helloFromAlex", (data: any) => {
-        //     console.log("Plugin says dynamically: ", data);
-        // });
-
-        // const data = await plugin.get("exampleProp");
-        // console.log("Plugin property: ", data);
-
-        // console.log("height:", await plugin.get("height"))
     }
 
     async subscribe(topic: string, callback: (data: any) => void) {

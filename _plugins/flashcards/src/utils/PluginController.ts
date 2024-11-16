@@ -3,20 +3,22 @@ import Postmate from "postmate";
 export class PluginController {
     private static instance: PluginController;
     private plugin: Postmate.Model | null = null;
-    private subscriptions: Map<string, any> = new Map();
+    private subscriptions: Map<string, any[]> = new Map();
 
     private constructor() {
-        this.subscriptions.set("pluginName", "flashcards");
-        this.plugin = this.getPlugin();
+        this.plugin = new Postmate.Model({
+            pluginName: "flashcards",
+            triggerChild: ({ topic, data }: any) => {
+                console.log("trigger child with topic:" + topic + " and data: ", data);
+                this.subscriptions.get(topic)?.forEach((callback: any) => callback(data));
+                this.subscriptions.set(topic, []);
+            }
+        });
 
         this.on = this.on.bind(this);
         this.emit = this.emit.bind(this);
         this.dbFetch = this.dbFetch.bind(this);
         this.pingPong = this.pingPong.bind(this);
-    }
-
-    private getPlugin(): Postmate.Model {
-        return new Postmate.Model(Object.fromEntries(this.subscriptions));
     }
 
     public static getInstance(): PluginController {
@@ -31,8 +33,11 @@ export class PluginController {
     }
 
     public on(eventName: string, callback: (data: any) => void) {
-        this.plugin = this.getPlugin();
-        this.subscriptions.set(eventName, callback);
+        if (!this.subscriptions.has(eventName)) {
+            this.subscriptions.set(eventName, []);
+        }
+
+        this.subscriptions.get(eventName)?.push(callback);
     }
 
     private async pingPong(topic: string, data: any) {
