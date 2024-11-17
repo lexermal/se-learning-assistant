@@ -3,12 +3,10 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './routes/App';
 import reportWebVitals from './reportWebVitals';
-import {
-  createBrowserRouter,
-  RouterProvider,
-} from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import TestApp from './routes/test/page';
 import { PluginProvider } from './utils/PluginProvider';
+import Training from './routes/deck/Training';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -16,7 +14,8 @@ const root = ReactDOM.createRoot(
 
 const router = createBrowserRouter([
   { path: "/", element: <App />, },
-  { path: "/test", element: <TestApp />, }
+  { path: "/test", element: <TestApp />, },
+  { path: "/deck/:id", element: <Training />, },
 ]);
 
 root.render(
