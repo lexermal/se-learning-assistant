@@ -12,8 +12,6 @@ let currentHeight = 0;
 const plugin = PluginController.getInstance();
 
 export const PluginProvider: React.FC<PluginProviderProps> = ({ children }) => {
-    console.log("plugin created");
-
     //resizing
     useEffect(() => {
         const handleResize = () => {
@@ -26,8 +24,12 @@ export const PluginProvider: React.FC<PluginProviderProps> = ({ children }) => {
 
         handleResize();
         setTimeout(handleResize, 500);
+        
+        const root = document.getElementById('root')
+
+        new ResizeObserver(handleResize).observe(root!);
+        root?.addEventListener('resize', handleResize);
         window.addEventListener('resize', handleResize);
-        document.getElementById('root')?.addEventListener('resize', handleResize);
 
         return () => window.removeEventListener('resize', handleResize);
     }, []);

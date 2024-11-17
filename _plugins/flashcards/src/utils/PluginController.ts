@@ -9,7 +9,7 @@ export class PluginController {
         this.plugin = new Postmate.Model({
             pluginName: "flashcards",
             triggerChild: ({ topic, data }: any) => {
-                console.log("trigger child with topic:" + topic + " and data: ", data);
+                // console.log("trigger child with topic:" + topic + " and data: ", data);
                 this.subscriptions.get(topic)?.forEach((callback: any) => callback(data));
                 this.subscriptions.set(topic, []);
             }

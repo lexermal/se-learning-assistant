@@ -40,6 +40,7 @@ export default function PluginPage({ params }: any) {
       }
       console.log("adjusting height", height);
       const iframe = (iframeRef.current.children[0] as HTMLIFrameElement);
+      iframe.style.minHeight = `calc(100vh - 300px)`;
       iframe.style.height = `${height}px`;
       iframe.setAttribute("scrolling", "no");
     });
