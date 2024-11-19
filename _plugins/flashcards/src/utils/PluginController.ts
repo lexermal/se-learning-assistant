@@ -58,4 +58,20 @@ export class PluginController {
     public async dbFetch(table: string, select = "*"): Promise<any> {
         return await this.pingPong("db_fetch", { table, select });
     }
+
+    public async dbInsert(table: string, values: any | any[], returnValues?: string): Promise<any> {
+        return await this.pingPong("db_insert", { table, values, returnValues });
+    }
+
+    public async dbUpdate(table: string, filter: any, values: any, returnValues?: string): Promise<any> {
+        return await this.pingPong("db_update", { table, values, filter, returnValues });
+    }
+
+    public async dbDelete(table: string, filter: any): Promise<any> {
+        return await this.pingPong("db_delete", { table, filter });
+    }
+
+    public async dbFunctionCall(name: string, data?: any): Promise<any> {
+        return await this.pingPong("db_call", { name, data });
+    }
 }

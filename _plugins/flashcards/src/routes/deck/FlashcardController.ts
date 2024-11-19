@@ -1,11 +1,13 @@
 import { Card, createEmptyCard, FSRS, fsrs, generatorParameters, Grade, RecordLogItem, State, StateType } from "ts-fsrs";
+import { PluginController } from "../../utils/PluginController";
 
 export interface Flashcard extends Omit<Card, "due" | "last_review" | "state"> {
-    cid: string;
+    id: string;
     front: string;
     back: string;
+    deck_id: string;
     state: StateType;
-    due: Date | number;
+    due: Date;
     last_review: Date | null | number;
 }
 
@@ -17,28 +19,36 @@ export interface FlashcardRemaining {
 
 export default class FlashcardController {
     private f: FSRS;
+    private db: PluginController;
     private cards: Flashcard[] = [];
+    private deck_id: string | undefined;
 
-    constructor() {
+    constructor(pluginController: PluginController) {
+        this.db = pluginController;
         this.f = fsrs(generatorParameters({ enable_fuzz: true, enable_short_term: true }));
     }
 
-    async init() {
+    async init(deck_id: string) {
+        this.deck_id = deck_id;
+        // const cards = await this.db.dbFunctionCall("today_cards");
+        // console.log("fetched cards: ", cards);
         //fetch cards from db
         // create function to retrieve 20 new and all others scheduled for the day
 
     }
 
     add(front: string, back: string) {
+        const deck_id = this.deck_id;
         function cardAfterHandler(card: Card): Flashcard {
             return {
                 ...card,
-                cid: "id" + Math.random(),
-                due: card.due.getTime(),
+                id: "id" + Math.random(),
+                due: card.due,
                 state: State[card.state],
                 last_review: card.last_review ?? null,
                 front,
-                back
+                back,
+                deck_id,
             } as Flashcard;
         }
 
@@ -47,33 +57,32 @@ export default class FlashcardController {
         this.cards.push(card);
         this.sortCards();
 
-        this.addToDB(card);
+        this.addToDB({ ...card });
     }
 
-    private addToDB(card: Flashcard) {
-        // add to db
+    private async addToDB(card: Partial<Flashcard>) {
+        const id = card.id!;
+        delete card.id;
 
+        const [response] = await this.db.dbInsert("cards", card, "id");
 
-        const updatedID = "mock_db_updated_id" + card.cid;
-
-        const { index } = this.getCard(card.cid);
-        this.cards[index].cid = updatedID;
+        const { index } = this.getCard(id);
+        this.cards[index].id = response.id;
     }
 
     private getCard(id: string) {
-        const index = this.cards.findIndex(card => card.cid === id);
+        const index = this.cards.findIndex(card => card.id === id);
         return { card: this.cards[index], index };
     }
 
     private sortCards() {
-        this.cards = this.cards.sort((a, b) => a.due as number - (b.due as number));
+        this.cards = this.cards.sort((a, b) => a.due.getTime() - b.due.getTime());
     }
 
     validate(id: string, grade: Grade) {
         function nextAfterHandler({ card }: RecordLogItem) {
             return {
-                ...(card as Card & { cid: string, front: string, back: string }),
-                due: card.due.getTime(),
+                ...(card as Card & { id: string, front: string, back: string, deck_id: string }),
                 state: State[card.state] as StateType,
                 last_review: card.last_review ? card.last_review!.getTime() : null,
             };
@@ -88,12 +97,11 @@ export default class FlashcardController {
     }
 
     private updateInDB(card: Flashcard) {
-        // update in db
+        this.db.dbUpdate("cards", { id: card.id }, card);
     }
 
     private getTodayCards() {
-        // today starting from 23:59:59
-        return this.cards.filter(card => card.due as number <= new Date().setHours(23, 59, 59, 0));
+        return this.cards.filter(card => card.due.getTime() <= new Date().setHours(23, 59, 59, 0));
     }
 
     private remaining(state: StateType) {

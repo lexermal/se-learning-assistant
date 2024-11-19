@@ -30,7 +30,11 @@ export default class CommunicationHandler {
     }
 
     private getTable(table: string) {
-        return this.supabase.from(`pl_${this.plugin.name}_${table}`);
+        return this.supabase.from(this.getTableName(table));
+    }
+
+    private getTableName(table: string) {
+        return `pl_${this.plugin.name}_${table}`;
     }
 
     async init() {
@@ -42,9 +46,9 @@ export default class CommunicationHandler {
         this.parent = await this.pluginConnection;
 
         this.parent.on("db_fetch", async (data: { table: string, select: string }) => {
-            console.log("Plugin " + this.plugin + " wants to fetch data from: ", data.table);
+            console.log("Plugin " + this.plugin.name + " wants to fetch data from: ", data.table);
 
-            let query = await this.getTable(data.table).select(data.select);
+            const query = await this.getTable(data.table).select(data.select);
             console.log("Query: ", query);
             // todo add filter
             this.call("db_fetch", query.data);
@@ -52,33 +56,44 @@ export default class CommunicationHandler {
 
         // insert
         this.parent.on("db_insert", async (data: { table: string, values: any | any[], returnValues?: string }) => {
-            console.log("Plugin " + this.plugin + " wants to insert data into: ", data.table);
+            console.log("Plugin " + this.plugin.name + " wants to insert data into: ", data.table);
 
             if (data.returnValues) {
-                console.log("Plugin " + this.plugin + " wants to return response after insert");
-                return await this.getTable(data.table).insert(data.values).select(data.returnValues);
+                console.log("Plugin " + this.plugin.name + " wants to return response after insert");
+                const date = await this.getTable(data.table).insert(data.values).select(data.returnValues);
+                return this.call("db_insert", date.data);
             }
 
-            return await this.getTable(data.table).insert(data.values);
+            await this.getTable(data.table).insert(data.values);
         });
 
         // update
         this.parent.on("db_update", async (data: { table: string, values: any, filter: any, returnValues?: string }) => {
-            console.log("Plugin " + this.plugin + " wants to update data in: ", data.table);
+            console.log("Plugin " + this.plugin.name + " wants to update data in: ", data.table);
 
             if (data.returnValues) {
-                console.log("Plugin " + this.plugin + " wants to return response after update");
+                console.log("Plugin " + this.plugin.name + " wants to return response after update");
                 return await this.getTable(data.table).update(data.values).match(data.filter).select(data.returnValues);
             }
+
 
             return await this.getTable(data.table).update(data.values).match(data.filter);
         });
 
         // delete
         this.parent.on("db_delete", async (data: { table: string, filter: any }) => {
-            console.log("Plugin " + this.plugin + " wants to delete data from: ", data.table);
+            console.log("Plugin " + this.plugin.name + " wants to delete data from: ", data.table);
 
             return await this.getTable(data.table).delete().match(data.filter);
+        });
+
+        // call function
+        this.parent.on("db_call", async (data: { name: string, data?: any }) => {
+            console.log("Plugin " + this.plugin.name + " wants to call: ", data.name);
+
+            const { data: result } = await this.supabase.rpc(this.getTableName(data.name), data.data);
+
+            return result;
         });
     }
 

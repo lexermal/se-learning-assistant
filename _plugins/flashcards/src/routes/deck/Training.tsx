@@ -1,13 +1,18 @@
 import React from "react";
 import { Grade, Rating } from "ts-fsrs";
 import FlashcardController, { Flashcard } from "./FlashcardController";
+import { usePlugin } from "../../utils/PluginProvider";
+import { useNavigate } from "react-router-dom";
 
 export default function Training() {
+    const plugin = usePlugin();
     const [showAnswer, setShowAnswer] = React.useState(false);
-    const [cardController, setCardController] = React.useState(new FlashcardController());
+    const [cardController, setCardController] = React.useState(new FlashcardController(plugin));
     const [card, setCard] = React.useState<Flashcard | undefined>(undefined);
     const [remaining, setRemaining] = React.useState({ new: 0, learning: 0, due: 0 });
     const [finished, setFinished] = React.useState(false);
+    const navigate = useNavigate();
+    const trainingRef = React.useRef<HTMLDivElement>(null);
 
     const cards = [
         {
@@ -35,7 +40,9 @@ export default function Training() {
     }
 
     React.useEffect(() => {
-        cardController.init();
+        const { pathname } = new URL(window.location.href);
+        cardController.init(pathname.replace('/deck/', ''));
+
         console.log('cards', cards);
         cards.forEach(card => cardController.add(card.front, card.back));
 
@@ -43,13 +50,23 @@ export default function Training() {
     }, []);
 
     return (
-        <div className="pb-40">
+        <div className="pb-40" ref={trainingRef}>
             <div className="flex flex-row border-b-2 border-gray-800">
-                <span className="text-3xl mr-2">Deck xxxx</span>
+                <span className="text-4xl mr-2">Deck xxxx</span>
                 <div className="flex items-end">
                     <span className="mr-2 font-bold text-blue-500">{remaining.new}</span>+
                     <span className="mx-1 font-bold text-red-500">{remaining.learning}</span>+
                     <span className="ml-1 font-bold text-green-600">{remaining.due}</span>
+                </div>
+                <div className="ml-auto gap-1 flex font-normal">
+                    <button className="ml-auto bg-blue-500 text-white p-2 rounded-lg">Add</button>
+                    <button className="ml-auto bg-blue-500 text-white p-2 rounded-lg">Edit</button>
+                    <button className="ml-auto bg-blue-500 text-white p-2 rounded-lg" onClick={_ => {
+                        // @ts-ignore
+                        trainingRef.current?.requestFullscreen() || trainingRef.current?.webkitRequestFullscreen();
+                    }}>Fullscreen</button>
+                    <button className="ml-auto bg-blue-500 text-white p-2 rounded-lg"
+                        onClick={_ => navigate("/")}>Exit</button>
                 </div>
             </div>
             <div className="text-center p-5 text-lg">{card?.front}</div>
@@ -65,7 +82,7 @@ export default function Training() {
                 {(!finished && showAnswer) && renderKnowledgButtons(action => {
                     setShowAnswer(false);
                     if (!card) return;
-                    cardController.validate(card.cid, action);
+                    cardController.validate(card.id, action);
                     getNext();
                 }
                 )}
