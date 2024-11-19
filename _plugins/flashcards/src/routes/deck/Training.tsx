@@ -9,25 +9,10 @@ export default function Training() {
     const [showAnswer, setShowAnswer] = React.useState(false);
     const [cardController, setCardController] = React.useState(new FlashcardController(plugin));
     const [card, setCard] = React.useState<Flashcard | undefined>(undefined);
-    const [remaining, setRemaining] = React.useState({ new: 0, learning: 0, due: 0 });
+    const [remaining, setRemaining] = React.useState({ new: 0, learning: 0, review: 0 });
     const [finished, setFinished] = React.useState(false);
     const navigate = useNavigate();
     const trainingRef = React.useRef<HTMLDivElement>(null);
-
-    const cards = [
-        {
-            front: 'front1',
-            back: 'back1',
-        },
-        {
-            front: 'front2',
-            back: 'back2',
-        },
-        {
-            front: 'front3',
-            back: 'back3',
-        },
-    ];
 
     function getNext() {
         const { card, remaining } = cardController.getNext();
@@ -43,9 +28,6 @@ export default function Training() {
         const { pathname } = new URL(window.location.href);
         cardController.init(pathname.replace('/deck/', ''));
 
-        console.log('cards', cards);
-        cards.forEach(card => cardController.add(card.front, card.back));
-
         getNext();
     }, []);
 
@@ -56,7 +38,7 @@ export default function Training() {
                 <div className="flex items-end">
                     <span className="mr-2 font-bold text-blue-500">{remaining.new}</span>+
                     <span className="mx-1 font-bold text-red-500">{remaining.learning}</span>+
-                    <span className="ml-1 font-bold text-green-600">{remaining.due}</span>
+                    <span className="ml-1 font-bold text-green-600">{remaining.review}</span>
                 </div>
                 <div className="ml-auto gap-1 flex font-normal">
                     <button className="ml-auto bg-blue-500 text-white p-2 rounded-lg">Add</button>

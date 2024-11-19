@@ -92,8 +92,8 @@ export default class CommunicationHandler {
             console.log("Plugin " + this.plugin.name + " wants to call: ", data.name);
 
             const { data: result } = await this.supabase.rpc(this.getTableName(data.name), data.data);
-
-            return result;
+            console.log("db call result: ", result);
+            this.call("db_call", result);
         });
     }
 

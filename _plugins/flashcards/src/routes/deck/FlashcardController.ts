@@ -6,7 +6,7 @@ export interface Flashcard extends Omit<Card, "due" | "last_review" | "state"> {
     front: string;
     back: string;
     deck_id: string;
-    state: StateType;
+    state: State;
     due: Date;
     last_review: Date | null | number;
 }
@@ -14,7 +14,7 @@ export interface Flashcard extends Omit<Card, "due" | "last_review" | "state"> {
 export interface FlashcardRemaining {
     new: number;
     learning: number;
-    due: number;
+    review: number;
 }
 
 export default class FlashcardController {
@@ -30,11 +30,9 @@ export default class FlashcardController {
 
     async init(deck_id: string) {
         this.deck_id = deck_id;
-        // const cards = await this.db.dbFunctionCall("today_cards");
-        // console.log("fetched cards: ", cards);
-        //fetch cards from db
-        // create function to retrieve 20 new and all others scheduled for the day
 
+        this.cards = await this.db.dbFunctionCall("due_today");
+        this.sortCards();
     }
 
     add(front: string, back: string) {
@@ -43,8 +41,6 @@ export default class FlashcardController {
             return {
                 ...card,
                 id: "id" + Math.random(),
-                due: card.due,
-                state: State[card.state],
                 last_review: card.last_review ?? null,
                 front,
                 back,
@@ -80,31 +76,19 @@ export default class FlashcardController {
     }
 
     validate(id: string, grade: Grade) {
-        function nextAfterHandler({ card }: RecordLogItem) {
-            return {
-                ...(card as Card & { id: string, front: string, back: string, deck_id: string }),
-                state: State[card.state] as StateType,
-                last_review: card.last_review ? card.last_review!.getTime() : null,
-            };
-        }
-
         const result = this.getCard(id);
 
-        this.cards[result.index] = this.f.next(result.card, new Date(), grade, nextAfterHandler);
+        this.cards[result.index] = this.f.next(result.card, new Date(), grade, ({ card }) => card as unknown as Flashcard);
+
+        this.db.dbUpdate("cards", { id: result.card.id }, this.cards[result.index]);
         this.sortCards();
-
-        this.updateInDB(result.card);
-    }
-
-    private updateInDB(card: Flashcard) {
-        this.db.dbUpdate("cards", { id: card.id }, card);
     }
 
     private getTodayCards() {
         return this.cards.filter(card => card.due.getTime() <= new Date().setHours(23, 59, 59, 0));
     }
 
-    private remaining(state: StateType) {
+    private remaining(state: State) {
         return this.getTodayCards().filter(card => card.state === state);
     }
 
@@ -112,9 +96,9 @@ export default class FlashcardController {
         return {
             card: this.getTodayCards()[0],
             remaining: {
-                new: this.remaining("New").length,
-                learning: this.remaining("Learning").length,
-                due: this.remaining("Review").length,
+                new: this.remaining(State.New).length,
+                learning: this.remaining(State.Learning).length,
+                review: this.remaining(State.Review).length,
             }
         }
 
