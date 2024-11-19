@@ -31,7 +31,14 @@ export default class FlashcardController {
     async init(deck_id: string) {
         this.deck_id = deck_id;
 
-        this.cards = await this.db.dbFunctionCall("due_today");
+        this.cards = (await this.db.dbFunctionCall("due_today")).map((card: Flashcard) => {
+            return {
+                ...card,
+                due: new Date(card.due),
+                state: Number(card.state) as State,
+                last_review: card.last_review ? new Date(card.last_review) : null,
+            }
+        });
         this.sortCards();
     }
 

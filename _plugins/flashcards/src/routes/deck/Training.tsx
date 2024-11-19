@@ -26,9 +26,9 @@ export default function Training() {
 
     React.useEffect(() => {
         const { pathname } = new URL(window.location.href);
-        cardController.init(pathname.replace('/deck/', ''));
-
-        getNext();
+        cardController.init(pathname.replace('/deck/', '')).then(() => {
+            getNext();
+        });
     }, []);
 
     return (
