@@ -63,6 +63,14 @@ export default class FlashcardController {
         this.addToDB({ ...card });
     }
 
+    edit(front: string, back: string) {
+        this.cards[0].front = front;
+        this.cards[0].back = back;
+
+        this.db.dbUpdate("cards", { id: this.cards[0].id }, this.cards[0]);
+        this.sortCards();
+    }
+
     private async addToDB(card: Partial<Flashcard>) {
         const id = card.id!;
         delete card.id;

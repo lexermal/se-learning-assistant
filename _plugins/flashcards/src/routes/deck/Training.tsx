@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Grade, Rating } from "ts-fsrs";
 import FlashcardController, { Flashcard } from "./FlashcardController";
 import { usePlugin } from "../../utils/PluginProvider";
 import { useNavigate } from "react-router-dom";
+import { CardCRUDModal } from "./CardCRUDModal";
 
 export default function Training() {
     const plugin = usePlugin();
@@ -11,7 +12,6 @@ export default function Training() {
     const [card, setCard] = React.useState<Flashcard | undefined>(undefined);
     const [remaining, setRemaining] = React.useState({ new: 0, learning: 0, review: 0 });
     const [finished, setFinished] = React.useState(false);
-    const [fullscreen, setFullscreen] = React.useState(false);
 
     function getNext() {
         const { card, remaining } = cardController.getNext();
@@ -32,9 +32,7 @@ export default function Training() {
 
     return (
         <div className="pb-40">
-            <TrainingNavbar remaining={remaining}
-                onFullscreen={() => plugin.emitAndWaitResponse("triggerFullscreen", !fullscreen)
-                    .then(({ fullscreen }: any) => setFullscreen(fullscreen))} />
+            <TrainingNavbar card={card} remaining={remaining} cardController={cardController} />
             <div className="text-center p-5 text-lg">{card?.front}</div>
             {finished && <div className="text-center text-2xl text-green-500">
                 You learned all flashcards for today, well done!
@@ -77,8 +75,10 @@ function renderKnowledgButtons(onClick: (action: Grade) => void) {
     );
 }
 
-function TrainingNavbar({ remaining, onFullscreen }: { remaining: { new: number, learning: number, review: number }, onFullscreen: () => void }) {
+function TrainingNavbar({ remaining, cardController, card }: { card?: Flashcard, remaining: { new: number, learning: number, review: number }, cardController: FlashcardController }) {
+    const plugin = usePlugin();
     const navigate = useNavigate();
+    const [fullscreen, setFullscreen] = React.useState(false);
 
     return (
         <div className="flex flex-row border-b-2 border-gray-800">
@@ -89,12 +89,50 @@ function TrainingNavbar({ remaining, onFullscreen }: { remaining: { new: number,
                 <span className="ml-1 font-bold text-green-600">{remaining.review}</span>
             </div>
             <div className="ml-auto gap-1 flex font-normal">
-                <button className="ml-auto bg-blue-500 text-white p-2 rounded-lg">Add</button>
-                <button className="ml-auto bg-blue-500 text-white p-2 rounded-lg">Edit</button>
-                <button className="ml-auto bg-blue-500 text-white p-2 rounded-lg" onClick={onFullscreen}>Fullscreen</button>
+                <CRUDModal buttonText="Add" onComplete={(front, back) => {
+                    cardController.add(front, back);
+                }} />
+                <CRUDModal buttonText="Edit" card={card} onComplete={(front, back) => {
+                    cardController.edit(front, back);
+                }} />
+                <button className="ml-auto bg-blue-500 text-white p-2 rounded-lg" onClick={() => {
+                    plugin.emitAndWaitResponse("triggerFullscreen", !fullscreen)
+                        .then(({ fullscreen }: any) => setFullscreen(fullscreen));
+                }}>Fullscreen</button>
                 <button className="ml-auto bg-blue-500 text-white p-2 rounded-lg"
                     onClick={_ => navigate("/")}>Exit</button>
             </div>
         </div>
     );
+}
+
+function CRUDModal(props: { onComplete: (front: string, back: string) => void, card?: Flashcard, buttonText: string }) {
+    const [front, setFront] = React.useState(props.card?.front || "");
+    const [back, setBack] = React.useState(props.card?.back || "");
+
+    useEffect(() => {
+        setFront(props.card?.front || "");
+        setBack(props.card?.back || "");
+    }, [props.card]);
+
+    return <CardCRUDModal buttonText={props.buttonText} title={props.card ? "Edit card" : "Add card"} actionbuttons={[
+        {
+            text: "Save", onClick: () => {
+                props.onComplete(front, back);
+                setFront("");
+                setBack("");
+            }
+        },
+        {
+            text: "Cancel", onClick: () => {
+                setFront("");
+                setBack("");
+            }
+        },
+    ]}>
+        <div className="flex flex-col gap-4">
+            <input type="text" placeholder="Front" defaultValue={front} onChange={e => setFront(e.target.value)} />
+            <input type="text" placeholder="Back" defaultValue={back} onChange={e => setBack(e.target.value)} />
+        </div>
+    </CardCRUDModal>
 }
