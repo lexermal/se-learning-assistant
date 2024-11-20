@@ -42,7 +42,6 @@ BEGIN
         c1.user_id
       FROM pl_flashcards_cards c1
       WHERE c1.state IN ('2', '1')
-        AND c1.due >= CURRENT_DATE
         AND c1.due < CURRENT_DATE + INTERVAL '1 day'
     ),
     new_cards AS (
@@ -66,7 +65,6 @@ BEGIN
         c2.user_id
       FROM pl_flashcards_cards c2
       WHERE c2.state = '0'
-        AND c2.due >= CURRENT_DATE
         AND c2.due < CURRENT_DATE + INTERVAL '1 day'
       LIMIT 20
     )
