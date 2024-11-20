@@ -18,7 +18,7 @@ export class PluginController {
         this.on = this.on.bind(this);
         this.emit = this.emit.bind(this);
         this.dbFetch = this.dbFetch.bind(this);
-        this.pingPong = this.pingPong.bind(this);
+        this.emitAndWaitResponse = this.emitAndWaitResponse.bind(this);
     }
 
     public static getInstance(): PluginController {
@@ -40,7 +40,7 @@ export class PluginController {
         this.subscriptions.get(eventName)?.push(callback);
     }
 
-    private async pingPong(topic: string, data: any) {
+    async emitAndWaitResponse(topic: string, data: any) {
         return await new Promise((resolve) => {
             let triggered = false;
 
@@ -56,22 +56,22 @@ export class PluginController {
     }
 
     public async dbFetch(table: string, select = "*"): Promise<any> {
-        return await this.pingPong("db_fetch", { table, select });
+        return await this.emitAndWaitResponse("db_fetch", { table, select });
     }
 
     public async dbInsert(table: string, values: any | any[], returnValues?: string): Promise<any> {
-        return await this.pingPong("db_insert", { table, values, returnValues });
+        return await this.emitAndWaitResponse("db_insert", { table, values, returnValues });
     }
 
     public async dbUpdate(table: string, filter: any, values: any, returnValues?: string): Promise<any> {
-        return await this.pingPong("db_update", { table, values, filter, returnValues });
+        return await this.emitAndWaitResponse("db_update", { table, values, filter, returnValues });
     }
 
     public async dbDelete(table: string, filter: any): Promise<any> {
-        return await this.pingPong("db_delete", { table, filter });
+        return await this.emitAndWaitResponse("db_delete", { table, filter });
     }
 
     public async dbFunctionCall(name: string, data?: any): Promise<any> {
-        return await this.pingPong("db_call", { name, data });
+        return await this.emitAndWaitResponse("db_call", { name, data });
     }
 }

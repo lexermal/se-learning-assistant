@@ -11,8 +11,7 @@ export default function Training() {
     const [card, setCard] = React.useState<Flashcard | undefined>(undefined);
     const [remaining, setRemaining] = React.useState({ new: 0, learning: 0, review: 0 });
     const [finished, setFinished] = React.useState(false);
-    const navigate = useNavigate();
-    const trainingRef = React.useRef<HTMLDivElement>(null);
+    const [fullscreen, setFullscreen] = React.useState(false);
 
     function getNext() {
         const { card, remaining } = cardController.getNext();
@@ -32,25 +31,10 @@ export default function Training() {
     }, []);
 
     return (
-        <div className="pb-40" ref={trainingRef}>
-            <div className="flex flex-row border-b-2 border-gray-800">
-                <span className="text-4xl mr-2">Deck xxxx</span>
-                <div className="flex items-end">
-                    <span className="mr-2 font-bold text-blue-500">{remaining.new}</span>+
-                    <span className="mx-1 font-bold text-red-500">{remaining.learning}</span>+
-                    <span className="ml-1 font-bold text-green-600">{remaining.review}</span>
-                </div>
-                <div className="ml-auto gap-1 flex font-normal">
-                    <button className="ml-auto bg-blue-500 text-white p-2 rounded-lg">Add</button>
-                    <button className="ml-auto bg-blue-500 text-white p-2 rounded-lg">Edit</button>
-                    <button className="ml-auto bg-blue-500 text-white p-2 rounded-lg" onClick={_ => {
-                        // @ts-ignore
-                        trainingRef.current?.requestFullscreen() || trainingRef.current?.webkitRequestFullscreen();
-                    }}>Fullscreen</button>
-                    <button className="ml-auto bg-blue-500 text-white p-2 rounded-lg"
-                        onClick={_ => navigate("/")}>Exit</button>
-                </div>
-            </div>
+        <div className="pb-40">
+            <TrainingNavbar remaining={remaining}
+                onFullscreen={() => plugin.emitAndWaitResponse("triggerFullscreen", !fullscreen)
+                    .then(({ fullscreen }: any) => setFullscreen(fullscreen))} />
             <div className="text-center p-5 text-lg">{card?.front}</div>
             {finished && <div className="text-center text-2xl text-green-500">
                 You learned all flashcards for today, well done!
@@ -89,6 +73,28 @@ function renderKnowledgButtons(onClick: (action: Grade) => void) {
             <button onClick={_ => onClick(Rating.Hard)} className="w-1/2 bg-red-900 text-white p-2 rounded-lg">Hard</button>
             <button onClick={_ => onClick(Rating.Good)} className="w-1/2 bg-orange-800 text-white p-2 rounded-lg">Good</button>
             <button onClick={_ => onClick(Rating.Easy)} className="w-1/2 bg-green-800 text-white p-2 rounded-lg">Easy</button>
+        </div>
+    );
+}
+
+function TrainingNavbar({ remaining, onFullscreen }: { remaining: { new: number, learning: number, review: number }, onFullscreen: () => void }) {
+    const navigate = useNavigate();
+
+    return (
+        <div className="flex flex-row border-b-2 border-gray-800">
+            <span className="text-4xl mr-2">Deck xxxx</span>
+            <div className="flex items-end">
+                <span className="mr-2 font-bold text-blue-500">{remaining.new}</span>+
+                <span className="mx-1 font-bold text-red-500">{remaining.learning}</span>+
+                <span className="ml-1 font-bold text-green-600">{remaining.review}</span>
+            </div>
+            <div className="ml-auto gap-1 flex font-normal">
+                <button className="ml-auto bg-blue-500 text-white p-2 rounded-lg">Add</button>
+                <button className="ml-auto bg-blue-500 text-white p-2 rounded-lg">Edit</button>
+                <button className="ml-auto bg-blue-500 text-white p-2 rounded-lg" onClick={onFullscreen}>Fullscreen</button>
+                <button className="ml-auto bg-blue-500 text-white p-2 rounded-lg"
+                    onClick={_ => navigate("/")}>Exit</button>
+            </div>
         </div>
     );
 }

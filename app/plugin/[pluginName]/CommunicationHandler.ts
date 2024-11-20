@@ -95,6 +95,24 @@ export default class CommunicationHandler {
             console.log("db call result: ", result);
             this.call("db_call", result);
         });
+
+        // request fullscreen
+        this.parent.on("triggerFullscreen", async (fullscreen = true) => {
+            console.log(`Plugin ${this.plugin.name} wants to ${fullscreen ? "enter" : "leave"} fullscreen.`);
+            try {
+                const ref = document.querySelector("iframe")!
+                if (fullscreen) {
+                    // @ts-ignore
+                    ref.requestFullscreen() || ref.webkitRequestFullscreen()
+                } else {
+                    // @ts-ignore
+                    document.exitFullscreen() || document.webkitExitFullscreen()
+                }
+                this.call("triggerFullscreen", { fullscreen, success: true });
+            } catch (error) {
+                this.call("triggerFullscreen", { fullscreen, success: false });
+            }
+        });
     }
 
     async subscribe(topic: string, callback: (data: any) => void) {
