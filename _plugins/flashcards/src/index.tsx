@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './routes/App';
 import reportWebVitals from './reportWebVitals';
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, HashRouter, Route, RouterProvider, Routes } from "react-router-dom";
 import TestApp from './routes/test/page';
 import { PluginProvider } from './utils/PluginProvider';
 import Training from './routes/deck/Training';
@@ -12,16 +12,17 @@ const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 
-const router = createBrowserRouter([
-  { path: "/", element: <App />, },
-  { path: "/test", element: <TestApp />, },
-  { path: "/deck/:id", element: <Training />, },
-]);
 
 root.render(
   <React.StrictMode>
     <PluginProvider>
-      <RouterProvider router={router} />
+    <HashRouter>
+        <Routes>
+          <Route path="/" element={<App />} />
+          <Route path="/test" element={<TestApp />} />
+          <Route path="/deck/:id" element={<Training />} />
+        </Routes>
+      </HashRouter>
     </PluginProvider>
   </React.StrictMode>
 );

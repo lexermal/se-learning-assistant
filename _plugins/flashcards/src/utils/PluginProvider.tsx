@@ -24,7 +24,7 @@ export const PluginProvider: React.FC<PluginProviderProps> = ({ children }) => {
 
         handleResize();
         setTimeout(handleResize, 500);
-        
+
         const root = document.getElementById('root')
 
         new ResizeObserver(handleResize).observe(root!);
@@ -32,6 +32,19 @@ export const PluginProvider: React.FC<PluginProviderProps> = ({ children }) => {
         window.addEventListener('resize', handleResize);
 
         return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    //route change
+    useEffect(() => {
+        let lastHash = window.location.hash;
+
+        setInterval(() => {
+            if (lastHash !== window.location.hash) {
+                lastHash = window.location.hash;
+                console.log('Hash changed (polling):', lastHash);
+                plugin.emit('urlChange', window.location.hash);
+            }
+        }, 100);
     }, []);
 
     return (

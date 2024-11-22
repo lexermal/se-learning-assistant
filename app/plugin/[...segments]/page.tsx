@@ -1,27 +1,28 @@
 "use client";
 
-import { Plugin } from "./CommunicationHandler";
+import { Plugin } from "../CommunicationHandler";
 import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
-import CommunicationHandler from "./CommunicationHandler";
+import CommunicationHandler from "../CommunicationHandler";
+import { useRouter } from "next/navigation";
 
-export default function PluginPage({ params }: any) {
+export default function PluginPage({ params }: { params: Promise<{ segments: string[] }> }) {
   const iframeRef = useRef(null as HTMLDivElement | null);
   const [plugin, setPlugin] = useState(null as Plugin | null);
   const supabase = createClient();
+  const router = useRouter();
 
   useEffect(() => {
-    // params.then(async ({ pluginName }: any) => {
-    //   const allowedPlugin = await fetch(`/api/plugins`)
-    //     .then(res => res.json())
-    //     .then((data) => data.filter((plugin: any) => plugin.name === pluginName));
-
-    //   // Allowed plugins for security
-    //   if (allowedPlugin.length > 0) {
-    //     setPlugin(allowedPlugin[0]);
-    //   }
-    // });
-    setPlugin({ name: "flashcards", description: "A sample", url: "http://localhost:3001" });
+    fetch(`/api/plugins`)
+      .then(res => res.json())
+      .then(async data => {
+        const { segments: [pluginName, ...subpath] } = await params;
+        console.log("segments", { pluginName, subpath });
+        const plugins = data.filter((plugin: any) => plugin.name === pluginName);
+        if (plugins.length > 0) {
+          setPlugin(plugins[0]);
+        }
+      });
   }, []);
 
   useEffect(() => {
@@ -29,8 +30,10 @@ export default function PluginPage({ params }: any) {
       return;
     }
 
-    const connection = new CommunicationHandler(supabase, plugin, iframeRef.current);
+    const connection = new CommunicationHandler(supabase, plugin, iframeRef.current,window.location.hash);
+
     connection.init();
+
     connection.subscribe("getCards", () => {
       connection.emit("setCards", ["card1", "card2"]);
     });
@@ -38,11 +41,17 @@ export default function PluginPage({ params }: any) {
       if (!iframeRef.current) {
         return;
       }
-      console.log("adjusting height", height);
       const iframe = (iframeRef.current.children[0] as HTMLIFrameElement);
+
+      // console.log("adjusting height", height);
       iframe.style.minHeight = `calc(100vh - 300px)`;
       iframe.style.height = `${height}px`;
       iframe.setAttribute("scrolling", "no");
+    });
+
+    connection.subscribe("urlChange", async (url: string) => {
+      console.log("urlChange", url);
+      router.push(url);
     });
   }, [plugin]);
 

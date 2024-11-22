@@ -7,9 +7,14 @@ import {
 } from '@supabase/postgrest-js'
 
 export interface Plugin {
-    url: string;
+    id: string;
     name: string;
     description: string;
+    pluginRepo: string;
+    pluginWebsite: string;
+    version: string;
+    author: string;
+    endpoint: string;
 }
 
 export default class CommunicationHandler {
@@ -18,10 +23,10 @@ export default class CommunicationHandler {
     private plugin: Plugin;
     private parent?: Postmate.ParentAPI;
 
-    constructor(supabase: SupabaseClient, plugin: Plugin, ref: any) {
+    constructor(supabase: SupabaseClient, plugin: Plugin, ref: any, hash: string) {
         this.plugin = plugin;
         this.supabase = supabase;
-        this.pluginConnection = new Postmate({ container: ref, url: plugin.url, classListArray: ["w-full"] });
+        this.pluginConnection = new Postmate({ container: ref, url: plugin.endpoint + (hash || ""), classListArray: ["w-full"] });
         this.init();
     }
 
