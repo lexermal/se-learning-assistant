@@ -5,12 +5,15 @@ import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import CommunicationHandler from "../CommunicationHandler";
 import { useRouter } from "next/navigation";
+import ContextMenu, { MenuEntry } from "./components/ContextMenu";
 
 export default function PluginPage({ params }: { params: Promise<{ segments: string[] }> }) {
   const iframeRef = useRef(null as HTMLDivElement | null);
   const [plugin, setPlugin] = useState(null as Plugin | null);
   const supabase = createClient();
   const router = useRouter();
+  const [contextMenu, setContextMenu] = useState({ x: 0, y: 0, open: false });
+  const [constextActions, setContextMenuActions] = useState<MenuEntry[]>([]);
 
   useEffect(() => {
     fetch(`/api/plugins`)
@@ -30,7 +33,7 @@ export default function PluginPage({ params }: { params: Promise<{ segments: str
       return;
     }
 
-    const connection = new CommunicationHandler(supabase, plugin, iframeRef.current,window.location.hash);
+    const connection = new CommunicationHandler(supabase, plugin, iframeRef.current, window.location.hash);
 
     connection.init();
 
@@ -53,6 +56,26 @@ export default function PluginPage({ params }: { params: Promise<{ segments: str
       console.log("urlChange", url);
       router.push(url);
     });
+
+    connection.subscribe("contextMenu", (data: { text: string, x: number, y: number, open: boolean }) => {
+      const rect = iframeRef.current!.getBoundingClientRect();
+      setContextMenu({ x: data.x + rect.left, y: data.y + rect.top, open: data.open });
+
+      setContextMenuActions([
+        {
+          text: "Add to flashcards",
+          onClick: () => {
+            console.log("Add to flashcards:", data.text);
+          }
+        },
+        {
+          text: "Add to notes",
+          onClick: () => {
+            console.log("Add to notes", data.text);
+          }
+        }
+      ]);
+    });
   }, [plugin]);
 
   if (!plugin) {
@@ -61,6 +84,7 @@ export default function PluginPage({ params }: { params: Promise<{ segments: str
 
   return (
     <div>
+      <ContextMenu open={contextMenu.open} x={contextMenu.x} y={contextMenu.y} actions={constextActions} />
       <h1>Plugin: {plugin.name}</h1>
       <p>{plugin.description}</p>
       <div
@@ -68,6 +92,6 @@ export default function PluginPage({ params }: { params: Promise<{ segments: str
         className="w-full"
         style={{ border: "1px solid #ccc" }}
       ></div>
-    </div>
+    </div >
   );
 }

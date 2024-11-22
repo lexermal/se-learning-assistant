@@ -21,7 +21,7 @@ export async function GET() {
             version: "1.0.0",
             author: "lexermal",
             endpoint: "/plugins/flashcards/index.html",
-            endpointDev: "http://localhost:3001",
+            endpointDev: "http://localhost:3001/plugins/flashcards",
             pluginRepo: "https://github.com/lexermal/se-learning-assistant",
             pluginWebsite: "https://lexermal.github.io/se-learning-assistant/",
         },
