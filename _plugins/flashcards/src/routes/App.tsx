@@ -30,8 +30,6 @@ function App() {
       <DeckCrudModal className='mt-6 block' buttonText='Add deck' onComplete={name => {
         dbInsert("deck", { name }, "id, name").then(newDeck => setDecks([...decks, newDeck[0]]));
       }} />
-
-      <Link className='mt-6 block' to={`/test`}>Test page</Link>
     </div>
   );
 }

@@ -1,12 +1,11 @@
-import React, { useEffect } from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
+import React from 'react';
 import App from './routes/App';
-import reportWebVitals from './reportWebVitals';
-import { createBrowserRouter, HashRouter, Route, RouterProvider, Routes } from "react-router-dom";
-import TestApp from './routes/test/page';
-import { PluginProvider } from './utils/PluginProvider';
+import ReactDOM from 'react-dom/client';
 import Training from './routes/deck/Training';
+import reportWebVitals from './reportWebVitals';
+import { PluginProvider } from './utils/PluginProvider';
+import { HashRouter, Route, Routes } from "react-router-dom";
+import './index.css';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -16,10 +15,9 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <PluginProvider>
-    <HashRouter>
+      <HashRouter>
         <Routes>
           <Route path="/" element={<App />} />
-          <Route path="/test" element={<TestApp />} />
           <Route path="/deck/:id" element={<Training />} />
         </Routes>
       </HashRouter>
