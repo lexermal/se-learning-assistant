@@ -7,6 +7,7 @@ import { Button, Modal } from "flowbite-react";
 interface Props {
     title: string;
     buttonText: string;
+    className?: string;
     closeAble?: boolean;
     children: React.ReactNode;
     actionbuttons: ActionButton[];
@@ -19,12 +20,12 @@ interface ActionButton {
     closeModal?: boolean;
 }
 
-export function CardCRUDModal({ actionbuttons, children, title, buttonText, closeAble = true }: Props) {
+export function CRUDModal({ actionbuttons, children, title, buttonText, className, closeAble = true }: Props) {
     const [openModal, setOpenModal] = useState(false);
 
     return (
         <>
-            <button className="ml-auto bg-blue-500 text-white p-2 rounded-lg" onClick={() => setOpenModal(true)}>{buttonText}</button>
+            <button className={className} onClick={() => setOpenModal(true)}>{buttonText}</button>
             <Modal dismissible={closeAble} show={openModal} onClose={() => setOpenModal(false)}>
                 <Modal.Header>{title}</Modal.Header>
                 <Modal.Body>

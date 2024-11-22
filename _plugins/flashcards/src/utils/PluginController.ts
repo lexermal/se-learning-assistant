@@ -18,6 +18,9 @@ export class PluginController {
         this.on = this.on.bind(this);
         this.emit = this.emit.bind(this);
         this.dbFetch = this.dbFetch.bind(this);
+        this.dbInsert = this.dbInsert.bind(this);
+        this.dbUpdate = this.dbUpdate.bind(this);
+        this.dbDelete = this.dbDelete.bind(this);
         this.emitAndWaitResponse = this.emitAndWaitResponse.bind(this);
     }
 

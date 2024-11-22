@@ -3,7 +3,7 @@ import { Grade, Rating } from "ts-fsrs";
 import FlashcardController, { Flashcard } from "./FlashcardController";
 import { usePlugin } from "../../utils/PluginProvider";
 import { useNavigate } from "react-router-dom";
-import { CardCRUDModal } from "./CardCRUDModal";
+import { CRUDModal } from "../../components/CRUDModal";
 
 export default function Training() {
     const plugin = usePlugin();
@@ -89,10 +89,10 @@ function TrainingNavbar({ remaining, cardController, card }: { card?: Flashcard,
                 <span className="ml-1 font-bold text-green-600">{remaining.review}</span>
             </div>
             <div className="ml-auto gap-1 flex font-normal">
-                <CRUDModal buttonText="Add" onComplete={(front, back) => {
+                <CardCRUDModal buttonText="Add" onComplete={(front, back) => {
                     cardController.add(front, back);
                 }} />
-                <CRUDModal buttonText="Edit" card={card} onComplete={(front, back) => {
+                <CardCRUDModal buttonText="Edit" card={card} onComplete={(front, back) => {
                     cardController.edit(front, back);
                 }} />
                 <button className="ml-auto bg-blue-500 text-white p-2 rounded-lg" onClick={() => {
@@ -106,7 +106,7 @@ function TrainingNavbar({ remaining, cardController, card }: { card?: Flashcard,
     );
 }
 
-function CRUDModal(props: { onComplete: (front: string, back: string) => void, card?: Flashcard, buttonText: string }) {
+function CardCRUDModal(props: { onComplete: (front: string, back: string) => void, card?: Flashcard, buttonText: string }) {
     const [front, setFront] = React.useState(props.card?.front || "");
     const [back, setBack] = React.useState(props.card?.back || "");
 
@@ -115,24 +115,28 @@ function CRUDModal(props: { onComplete: (front: string, back: string) => void, c
         setBack(props.card?.back || "");
     }, [props.card]);
 
-    return <CardCRUDModal buttonText={props.buttonText} title={props.card ? "Edit card" : "Add card"} actionbuttons={[
-        {
-            text: "Save", onClick: () => {
-                props.onComplete(front, back);
-                setFront("");
-                setBack("");
-            }
-        },
-        {
-            text: "Cancel", onClick: () => {
-                setFront("");
-                setBack("");
-            }
-        },
-    ]}>
+    return <CRUDModal
+        buttonText={props.buttonText}
+        title={props.card ? "Edit card" : "Add card"}
+        className="ml-auto bg-blue-500 text-white p-2 rounded-lg"
+        actionbuttons={[
+            {
+                text: "Save", onClick: () => {
+                    props.onComplete(front, back);
+                    setFront("");
+                    setBack("");
+                }
+            },
+            {
+                text: "Cancel", onClick: () => {
+                    setFront("");
+                    setBack("");
+                }
+            },
+        ]}>
         <div className="flex flex-col gap-4">
             <input type="text" placeholder="Front" defaultValue={front} onChange={e => setFront(e.target.value)} />
             <input type="text" placeholder="Back" defaultValue={back} onChange={e => setBack(e.target.value)} />
         </div>
-    </CardCRUDModal>
+    </CRUDModal>
 }
