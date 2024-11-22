@@ -54,7 +54,7 @@ export const PluginProvider: React.FC<PluginProviderProps> = ({ children }) => {
             const selection = window.getSelection()?.toString().trim();
             if (selection) {
                 e.preventDefault();
-                console.log('context menu', selection);
+                // console.log('context menu', selection);
                 plugin.emit('contextMenu', { text: selection, x: e.clientX, y: e.clientY, open: true });
                 isOpen = true;
             }

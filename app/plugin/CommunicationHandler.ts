@@ -54,7 +54,7 @@ export default class CommunicationHandler {
             console.log("Plugin " + this.plugin.name + " wants to fetch data from: ", data.table);
 
             const query = await this.getTable(data.table).select(data.select);
-            console.log("Query: ", query);
+            // console.log("Query: ", query);
             // todo add filter
             this.call("db_fetch", query.data);
         });
@@ -97,7 +97,7 @@ export default class CommunicationHandler {
             console.log("Plugin " + this.plugin.name + " wants to call: ", data.name);
 
             const { data: result } = await this.supabase.rpc(this.getTableName(data.name), data.data);
-            console.log("db call result: ", result);
+            // console.log("db call result: ", result);
             this.call("db_call", result);
         });
 

@@ -14,7 +14,7 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <PluginProvider>
-      <HashRouter future={{ v7_startTransition: true }}>
+      <HashRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Routes>
           <Route path="/" element={<App />} />
           <Route path="/deck/:id" element={<Training />} />
