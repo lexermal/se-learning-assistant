@@ -1,8 +1,7 @@
 services:
-  with-docker-multi-env-development:
+  language-app:
     build:
       context: ./
       dockerfile: ./Dockerfile
-    image: with-docker-multi-env-development
     ports:
       - "3001:3000"

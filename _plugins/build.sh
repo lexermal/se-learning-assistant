@@ -24,6 +24,9 @@ for dir in "$SUBDIRECTORY"/*/; do
         
         # Create the destination directory if it doesn't exist
         mkdir -p "$DESTINATION/$APP_NAME"
+
+        # Remove the existing files in the destination directory
+        rm -rf "$DESTINATION/$APP_NAME/"*
         
         # Move the built application to the destination directory
         mv "$dir/build/"* "$DESTINATION/$APP_NAME/"

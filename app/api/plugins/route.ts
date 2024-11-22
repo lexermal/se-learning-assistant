@@ -20,7 +20,7 @@ export async function GET() {
             description: "A plugin to help you memorize things",
             version: "1.0.0",
             author: "lexermal",
-            endpoint: "/plugin/flashcards",
+            endpoint: "/plugins/flashcards/index.html",
             endpointDev: "http://localhost:3001",
             pluginRepo: "https://github.com/lexermal/se-learning-assistant",
             pluginWebsite: "https://lexermal.github.io/se-learning-assistant/",

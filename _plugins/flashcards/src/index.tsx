@@ -11,11 +11,10 @@ const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 
-
 root.render(
   <React.StrictMode>
     <PluginProvider>
-      <HashRouter>
+      <HashRouter future={{ v7_startTransition: true }}>
         <Routes>
           <Route path="/" element={<App />} />
           <Route path="/deck/:id" element={<Training />} />
