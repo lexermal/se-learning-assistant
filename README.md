@@ -1,8 +1,34 @@
 # se-learning-assistant
 
+## Todo
+* Creating decks
+* Project cleanup (title, pages, files)
+
+### Stage 2 - AI story generator based on flahcards
+- New plugin that is based on story feature of Rimori
+- Initial possibility do define the topic of the story
+- 10-20% are new words
+- Rightclick allows adding work as flashcard or to look it up
+- Sidebar do discuss with AI agent about gramatik and look up info about words
+- Reading aloud with speed adjustment
+
+### Stage 3 - Ansagen 
+- where audio plays or where it should be translated
+- AI sidebar to support with tips
+- AI validates result and gives tips on how to fix grammar challenge (from Rimori Story)
+
+### Stage 4 - AI discussions
+- From rimori discussions having discussions about different topics in swedish
+
+### Stage 5 - Pronounciaation 
+- Read text and AI tells how well you did and helps to speak it out the right way
+- Basically it shows the text, the user reads aloud and then the ai shows for every word how to make it better
+- For local dialect the user could maybe change the phonetics of the sentence to add the withed dialect
+- Let user play how it should sound and how the user spoke it out next to each other like "Heeeey" vs "Hej"
+- https://thefluent.me/api/docs#score
+
 ## Core libraries
 https://www.npmjs.com/package/anki-reader
-https://github.com/open-spaced-repetition/ts-fsrs
 https://www.npmjs.com/package/dictcc
 
 ## Notes
@@ -29,25 +55,10 @@ https://www.npmjs.com/package/dictcc
 
 
 
-The above will also clone the Starter kit to your GitHub, you can clone that locally and develop locally.
-
-If you wish to just develop locally and not deploy to Vercel, [follow the steps below](#clone-and-run-locally).
 
 ## Clone and run locally
 
 1. You'll first need a Supabase project which can be made [via the Supabase dashboard](https://database.new)
-
-2. Create a Next.js app using the Supabase Starter template npx command
-
-   ```bash
-   npx create-next-app -e with-supabase
-   ```
-
-3. Use `cd` to change into the app's directory
-
-   ```bash
-   cd name-of-new-app
-   ```
 
 4. Rename `.env.example` to `.env.local` and update the following:
 
@@ -66,6 +77,3 @@ If you wish to just develop locally and not deploy to Vercel, [follow the steps 
 
    The starter kit should now be running on [localhost:3000](http://localhost:3000/).
 
-6. This template comes with the default shadcn/ui style initialized. If you instead want other ui.shadcn styles, delete `components.json` and [re-install shadcn/ui](https://ui.shadcn.com/docs/installation/next)
-
-> Check out [the docs for Local Development](https://supabase.com/docs/guides/getting-started/local-development) to also run Supabase locally.

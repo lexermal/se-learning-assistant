@@ -1,9 +1,9 @@
 const path = require("path");
 
 module.exports = {
-    webpack(config) {
-      config.resolve.alias["plugins"] = path.resolve(__dirname, "plugins");
-      return config;
-    },
-  };
-  
+  output: "standalone",
+  webpack(config) {
+    config.resolve.alias["plugins"] = path.resolve(__dirname, "plugins");
+    return config;
+  },
+};
