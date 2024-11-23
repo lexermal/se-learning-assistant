@@ -3,19 +3,21 @@ import Postmate from "postmate";
 export class PluginController {
     private static instance: PluginController;
     private plugin: Postmate.Model | null = null;
-    private subscriptions: Map<string, any[]> = new Map();
+    private onceListeners: Map<string, any[]> = new Map();
+    private listeners: Map<string, any[]> = new Map();
 
     private constructor() {
         this.plugin = new Postmate.Model({
             pluginName: "flashcards",
             triggerChild: ({ topic, data }: any) => {
                 // console.log("trigger child with topic:" + topic + " and data: ", data);
-                this.subscriptions.get(topic)?.forEach((callback: any) => callback(data));
-                this.subscriptions.set(topic, []);
+                this.onceListeners.get(topic)?.forEach((callback: any) => callback(data));
+                this.onceListeners.set(topic, []);
+                this.listeners.get(topic)?.forEach((callback: any) => callback(data));
             }
         });
 
-        this.on = this.on.bind(this);
+        this.onOnce = this.onOnce.bind(this);
         this.emit = this.emit.bind(this);
         this.dbFetch = this.dbFetch.bind(this);
         this.dbInsert = this.dbInsert.bind(this);
@@ -35,12 +37,20 @@ export class PluginController {
         this.plugin?.then(child => child.emit(eventName, data));
     }
 
-    public on(eventName: string, callback: (data: any) => void) {
-        if (!this.subscriptions.has(eventName)) {
-            this.subscriptions.set(eventName, []);
+    public subscribe(eventName: string, callback: (data: any) => void) {
+        if (!this.listeners.has(eventName)) {
+            this.listeners.set(eventName, []);
         }
 
-        this.subscriptions.get(eventName)?.push(callback);
+        this.listeners.get(eventName)?.push(callback);
+    }
+
+    public onOnce(eventName: string, callback: (data: any) => void) {
+        if (!this.onceListeners.has(eventName)) {
+            this.onceListeners.set(eventName, []);
+        }
+
+        this.onceListeners.get(eventName)?.push(callback);
     }
 
     async emitAndWaitResponse(topic: string, data: any) {
@@ -49,7 +59,7 @@ export class PluginController {
 
             this.emit(topic, data);
 
-            this.on(topic, (data: any) => {
+            this.onOnce(topic, (data: any) => {
                 if (triggered) return;
                 triggered = true;
 

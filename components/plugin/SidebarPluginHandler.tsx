@@ -1,7 +1,7 @@
 "use client";
 
 import { ContextMenuAction, MenuEntry } from "./ContextMenu";
-import { useEffect, useRef, useState } from "react";
+import { use, useEffect, useRef, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { Plugin } from "../../app/plugin/CommunicationHandler";
 import CommunicationHandler from "../../app/plugin/CommunicationHandler";
@@ -10,10 +10,17 @@ import { useEventEmitter } from "@/utils/providers/EventEmitterContext";
 export default function SidebarPluginHandler({ plugin, contextMenuAction }: { plugin: Plugin, contextMenuAction: MenuEntry }) {
     const iframeRef = useRef<HTMLDivElement | null>(null);
     const supabase = createClient();
+    const [parent, setParent] = useState<CommunicationHandler | null>(null);
 
     useEffect(() => {
-        console.log("SidebarPluginHandler", plugin, contextMenuAction);
+        if (parent) {
+            parent.emit("toolAction", { action: contextMenuAction.action, text: contextMenuAction.text });
+        }
+    }, [contextMenuAction]);
+
+    useEffect(() => {
         const parent = new CommunicationHandler(supabase, plugin, iframeRef.current, contextMenuAction.url);
+        setParent(parent);
 
         parent.init().then(() => {
             parent.emit("toolAction", { action: contextMenuAction.action, text: contextMenuAction.text });
@@ -41,11 +48,9 @@ export function PluginSidebar({ plugins }: { plugins: Plugin[] }) {
     const { on } = useEventEmitter();
     const [pluginAction, setPluginAction] = useState<ContextMenuAction | null>(null);
 
-    console.log("PluginSidebar", sidebarPlugin);
-
     useEffect(() => {
         on("contextMenuAction", ({ pluginName, action, text, url }: ContextMenuAction) => {
-            console.log("Trigger context menu action:", pluginName, action, text, url);
+            // console.log("Trigger context menu action:", pluginName, action, text, url);
 
             const result = plugins.filter((p) =>
                 p.isSidebarPlugin &&

@@ -141,6 +141,6 @@ export default class CommunicationHandler {
 
     async emit(topic: string, data: any) {
         await this.init();
-        this.parent!.call(topic, data);
+        this.call(topic, data);
     }
 }

@@ -32,16 +32,11 @@ class EventEmitter {
     const listeners = this.events.get(eventName);
     if (!listeners) return;
 
-    this.events.set(
-      eventName,
-      listeners.filter((l) => l !== listener)
-    );
+    this.events.set(eventName, listeners.filter((l) => l !== listener));
   }
 
   // Emit an event
   emit<T = any>(eventName: string, event: T): void {
-    console.log({ eventName, event });
-    console.log(this.events);
     const listeners = this.events.get(eventName);
     if (!listeners) return;
 

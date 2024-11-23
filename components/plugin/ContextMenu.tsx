@@ -54,8 +54,8 @@ const ContextMenu = ({ actions, contextMenu }: Props) => {
             {actions.map((action, index) => (
                 <MenuEntryItem key={index} icon={action.icon} text={action.text} onClick={() => {
                     setMenuVisibility(false);
-                    console.log("triggering context menu action", action);
-                    emit("contextMenuAction", action);
+                    // console.log("triggering context menu action", action);
+                    emit("contextMenuAction", { ...action, text: contextMenu.text });
                 }} />
             ))}
         </div>

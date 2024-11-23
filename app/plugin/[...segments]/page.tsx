@@ -24,8 +24,6 @@ export default function PluginPage({ params }: { params: Promise<{ segments: str
     return <div>Loading... makr sure you are logged in</div>;
   }
 
-  console.log(plugins);
-
   return (
     <EventEmitterProvider>
       <div>
