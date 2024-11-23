@@ -15,7 +15,6 @@ The application is accessible via port 3000.
 
 - Project cleanup (title, pages, files)
 - Sidebar do discuss with AI agent about gramatik and look up info about words
-- Rightclick allows adding work as flashcard or to look it up
 
 ### Stage 2 - AI story generator based on flahcards
 
