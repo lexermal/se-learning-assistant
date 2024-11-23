@@ -8,7 +8,7 @@ export async function POST(req: Request) {
   const { messages } = await req.json();
 
   const result = generateText({
-    model: openai('gpt-4o-turbo'),
+    model: openai('gpt-4o-mini'),
     messages,
   });
 

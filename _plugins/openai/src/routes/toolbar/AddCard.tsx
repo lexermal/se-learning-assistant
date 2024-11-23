@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { usePlugin } from '../../utils/PluginProvider';
 import FlashcardController from '../deck/FlashcardController';
-import { Deck } from '../App';
+// import { Deck } from '../App';
 import { CRUDModal } from '../../components/CRUDModal';
 
 export default function AddCard() {
-    const [decks, setDecks] = useState<Deck[]>([]);
+    const [decks, setDecks] = useState<any[]>([]);
     const [selectedDeck, setSelectedDeck] = useState('');
     const [question, setQuestion] = useState('');
     const [answer, setAnswer] = useState('');
@@ -33,7 +33,7 @@ export default function AddCard() {
         const [deckName, setDeckName] = useState('');
         return <CRUDModal title="Add Deck" show={true} actionbuttons={[{
             text: "Submit",
-            onClick: () => plugin.dbInsert('deck', { name: deckName }, "id,name").then(([newDeck]: Deck[]) => {
+            onClick: () => plugin.dbInsert('deck', { name: deckName }, "id,name").then(([newDeck]: any[]) => {
                 setDecks([...decks, newDeck]);
                 setSelectedDeck(newDeck.id);
             })
