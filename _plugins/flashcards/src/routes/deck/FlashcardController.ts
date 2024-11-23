@@ -42,8 +42,8 @@ export default class FlashcardController {
         this.sortCards();
     }
 
-    add(front: string, back: string) {
-        const deck_id = this.deck_id;
+    add(front: string, back: string, deckId?: string) {
+        const deck_id = deckId || this.deck_id;
         function cardAfterHandler(card: Card): Flashcard {
             return {
                 ...card,

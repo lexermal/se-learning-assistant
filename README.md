@@ -13,16 +13,15 @@ The application is accessible via port 3000.
 
 ## Todo
 
-- Creating decks
 - Project cleanup (title, pages, files)
+- Sidebar do discuss with AI agent about gramatik and look up info about words
+- Rightclick allows adding work as flashcard or to look it up
 
 ### Stage 2 - AI story generator based on flahcards
 
 - New plugin that is based on story feature of Rimori
 - Initial possibility do define the topic of the story
 - 10-20% are new words
-- Rightclick allows adding work as flashcard or to look it up
-- Sidebar do discuss with AI agent about gramatik and look up info about words
 - Reading aloud with speed adjustment
 
 ### Stage 3 - Ansagen
@@ -42,6 +41,29 @@ The application is accessible via port 3000.
 - For local dialect the user could maybe change the phonetics of the sentence to add the withed dialect
 - Let user play how it should sound and how the user spoke it out next to each other like "Heeeey" vs "Hej"
 - https://thefluent.me/api/docs#score
+
+
+### Additional ideas (notes)
+Based on Anki text you have to write a diktat /text
+
+Sidebar in browser to translate stuff and let it explain stuff for me.
+
+isolated-vm - npm
+https://www.npmjs.com/package/isolated-vm
+
+GitHub - kantord/LibreLingo: 🐢 🌎 📚 a community-owned language-learning platform
+https://github.com/kantord/LibreLingo
+
+Plugin for SFI podd where it scraps the content and shows it as list where you can listen to every and then check it off. Ai sidebar to understand it better and right click to add it to flashcards
+
+Add to dictionary
+Right click explain
+Right click find eselsbrücke
+Right click translate are global plug-ins which plug-ins can configure to allow/forbid
+Add decimated actions like prompt template for highlighted word
+Based on service workers global actions can be added to context menu
+
+Maybe backend api for general plugin data needed. Like when a plugin scraps als Sfi podcasts and adds them to the db.
 
 ## Core libraries
 

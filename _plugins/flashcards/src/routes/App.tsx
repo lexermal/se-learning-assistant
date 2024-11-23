@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { usePlugin } from '../utils/PluginProvider';
 import { CRUDModal } from '../components/CRUDModal';
 
-interface Deck {
+export interface Deck {
   id: string;
   name: string;
 }

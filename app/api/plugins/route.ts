@@ -1,3 +1,4 @@
+import { MenuEntry } from "@/components/plugin/ContextMenu";
 import { NextRequest, NextResponse } from "next/server";
 
 export interface Plugin {
@@ -10,10 +11,13 @@ export interface Plugin {
     author: string;
     endpoint: string;
     endpointDev?: string;
+    contextMenuActions: MenuEntry[];
+    isMainPlugin: boolean;
+    isSidebarPlugin: boolean;
 }
 
 export async function GET() {
-    let plugins = [
+    let plugins: Plugin[] = [
         {
             id: "1",
             name: "flashcards",
@@ -21,11 +25,21 @@ export async function GET() {
             version: "1.0.0",
             author: "lexermal",
             endpoint: "/plugins/flashcards/index.html",
-            endpointDev: "http://localhost:3001/plugins/flashcards",
+            endpointDev: "http://localhost:3001",
             pluginRepo: "https://github.com/lexermal/se-learning-assistant",
             pluginWebsite: "https://lexermal.github.io/se-learning-assistant/",
+            isSidebarPlugin: true,
+            isMainPlugin: true,
+            contextMenuActions: [
+                {
+                    text: "Add to flashcards",
+                    pluginName: "flashcards",
+                    action: "add",
+                    url: "/sidebar/add"
+                },
+            ],
         },
-    ] as Plugin[];
+    ];
 
     console.log("node env", process.env.NODE_ENV);
 

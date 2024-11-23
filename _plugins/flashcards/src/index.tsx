@@ -6,6 +6,7 @@ import reportWebVitals from './reportWebVitals';
 import { PluginProvider } from './utils/PluginProvider';
 import { HashRouter, Route, Routes } from "react-router-dom";
 import './index.css';
+import AddCard from './routes/toolbar/AddCard';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -18,6 +19,7 @@ root.render(
         <Routes>
           <Route path="/" element={<App />} />
           <Route path="/deck/:id" element={<Training />} />
+          <Route path="/sidebar/add" element={<AddCard />} />
         </Routes>
       </HashRouter>
     </PluginProvider>

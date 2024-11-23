@@ -5,6 +5,7 @@ import {
     PostgrestFilterBuilder,
     PostgrestQueryBuilder,
 } from '@supabase/postgrest-js'
+import { MenuEntry } from "../../components/plugin/ContextMenu";
 
 export interface Plugin {
     id: string;
@@ -15,6 +16,9 @@ export interface Plugin {
     version: string;
     author: string;
     endpoint: string;
+    contextMenuActions: MenuEntry[];
+    isMainPlugin: boolean;
+    isSidebarPlugin: boolean;
 }
 
 export default class CommunicationHandler {
@@ -23,10 +27,11 @@ export default class CommunicationHandler {
     private plugin: Plugin;
     private parent?: Postmate.ParentAPI;
 
-    constructor(supabase: SupabaseClient, plugin: Plugin, ref: any, hash: string) {
+    constructor(supabase: SupabaseClient, plugin: Plugin, ref: any, hash?: string) {
+        hash = "#" + (hash || "").replace("#", "");
         this.plugin = plugin;
         this.supabase = supabase;
-        this.pluginConnection = new Postmate({ container: ref, url: plugin.endpoint + (hash || ""), classListArray: ["w-full"] });
+        this.pluginConnection = new Postmate({ container: ref, url: plugin.endpoint + hash, classListArray: ["w-full"] });
         this.init();
     }
 
@@ -42,6 +47,10 @@ export default class CommunicationHandler {
         return `pl_${this.plugin.name}_${table}`;
     }
 
+    async destroy() {
+        (await this.pluginConnection).destroy();
+    }
+
     async init() {
         if (!this.pluginConnection) {
             return;
@@ -51,7 +60,7 @@ export default class CommunicationHandler {
         this.parent = await this.pluginConnection;
 
         this.parent.on("db_fetch", async (data: { table: string, select: string }) => {
-            console.log("Plugin " + this.plugin.name + " wants to fetch data from: ", data.table);
+            console.log(`Plugin ${this.plugin.name} wants to fetch data from: ${data.table}`);
 
             const query = await this.getTable(data.table).select(data.select);
             // console.log("Query: ", query);
