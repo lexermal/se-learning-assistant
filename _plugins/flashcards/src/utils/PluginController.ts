@@ -1,4 +1,5 @@
 import Postmate from "postmate";
+import WhereClauseBuilder from "./WhereClauseBuilder";
 
 export class PluginController {
     private static instance: PluginController;
@@ -68,8 +69,8 @@ export class PluginController {
         });
     }
 
-    public async dbFetch(table: string, select = "*"): Promise<any> {
-        return await this.emitAndWaitResponse("db_fetch", { table, select });
+    public async dbFetch(table: string, select = "*", filter?: WhereClauseBuilder): Promise<any> {
+        return await this.emitAndWaitResponse("db_fetch", { table, select, filter: filter?.build() });
     }
 
     public async dbInsert(table: string, values: any | any[], returnValues?: string): Promise<any> {

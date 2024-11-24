@@ -13,9 +13,57 @@ The application is accessible via port 3000.
 
 ## Todo
 
-- Project cleanup (title, pages, files)
-- Sidebar do discuss with AI agent about gramatik and look up info about words
+- Project cleanup (title, pages, files) in main application
+- Show in navbar all plugins with their actions
+- Remove subpages routing with plugin page /flashcards/ab/dev/ggg
+- Make plugin page only be accessible for logged in users
+- Let decks be deleted
+- Show cards in decks
+- Why does it show in an empty deck 22 cards?
+- Delete flashcards
+- Fix adding flashcard when inside a deck
+- Strg+Enter should submit flashcard no matter when courser in back text area and set focus on first field. Tab makes focus being set to second field when being in first field
 
+### Dictionary lookup sidebar
+- Via right click lookup it triggers sidebar
+- AI agent looking up grammar (see chatgpt window)
+- Pretty display info with button to add as flashcard
+- (optional) Possibility to discuss word with AI agent 
+- Example https://chatgpt.com/c/6741f1a2-5350-8007-8c2e-13d45e2479ef
+
+### Storytelling plugin - Understanding
+- Adjust AI plugin to be called storytelling and embedd as example the default chatwindow page
+- user tells what the story is about
+- Letting AI come up with story and writes out chapter after chapter
+- User read each chapter silently
+- User adds new words as flashcards
+- (optionally) AI can read out the story then (speed adjustment)
+- Example: https://chatgpt.com/c/674330a8-d3a4-8007-80cb-125c1bb9fd1a
+
+### Storytelling plugin - pronounciation
+- AI prints chapter
+- user reads out chapter aloud and corrects him (use api i mentioned below)
+
+### Storytelling plugin - Flexible story development
+- Based on stories in rimori (user defines how story continues)
+- user writes or tells how story should continue (using swedish)
+- Can just be orally or just be written or switches, one-by-one like in Rimori
+
+### Storytelling plugin - small enhancements
+- Adjustment of difficulty
+- Using words already learned in the flashcards
+- Read articles by pasting url
+- Have config parameter for AI backend(model,provider,triggerable frontend tools)
+- Read whole books(ebook or pdf) with this plugin and continue whenever (AI can read out page and shows text in swedish, user simply continues)
+- AI explains a topic based on a topic (eg swedish history or christmas traditions)
+
+### Other enhancements
+- Proper editor for flashcards (add page and toolbar)
+- Listing of cards in a deck
+- Import card from Anki
+
+
+--------------------OLD IDEAS-------------------------------
 ### Stage 2 - AI story generator based on flahcards
 
 - New plugin that is based on story feature of Rimori

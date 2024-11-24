@@ -6,6 +6,7 @@ import {
     PostgrestQueryBuilder,
 } from '@supabase/postgrest-js'
 import { MenuEntry } from "../../components/plugin/ContextMenu";
+import buildSupabaseQuery from "./SelectStatementBuilder";
 
 export interface Plugin {
     id: string;
@@ -59,12 +60,10 @@ export default class CommunicationHandler {
         // Wait for the plugin to be ready
         this.parent = await this.pluginConnection;
 
-        this.parent.on("db_fetch", async (data: { table: string, select: string }) => {
+        this.parent.on("db_fetch", async (data: { table: string, select: string, filter: any }) => {
             console.log(`Plugin ${this.plugin.name} wants to fetch data from: ${data.table}`);
 
-            const query = await this.getTable(data.table).select(data.select);
-            // console.log("Query: ", query);
-            // todo add filter
+            const query = await buildSupabaseQuery(this.supabase, this.getTableName(data.table), data.select, data.filter);
             this.call("db_fetch", query.data);
         });
 
