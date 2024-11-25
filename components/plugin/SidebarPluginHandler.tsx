@@ -3,8 +3,8 @@
 import { ContextMenuAction, MenuEntry } from "./ContextMenu";
 import { use, useEffect, useRef, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
-import { Plugin } from "../../app/plugin/CommunicationHandler";
-import CommunicationHandler from "../../app/plugin/CommunicationHandler";
+import { Plugin } from "../../app/(protected)/plugin/CommunicationHandler";
+import CommunicationHandler from "../../app/(protected)/plugin/CommunicationHandler";
 import { useEventEmitter } from "@/utils/providers/EventEmitterContext";
 
 export default function SidebarPluginHandler({ plugin, contextMenuAction }: { plugin: Plugin, contextMenuAction: MenuEntry }) {

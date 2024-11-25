@@ -5,7 +5,7 @@ import {
     PostgrestFilterBuilder,
     PostgrestQueryBuilder,
 } from '@supabase/postgrest-js'
-import { MenuEntry } from "../../components/plugin/ContextMenu";
+import { MenuEntry } from "../../../components/plugin/ContextMenu";
 import buildSupabaseQuery from "./SelectStatementBuilder";
 
 export interface Plugin {

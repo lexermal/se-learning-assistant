@@ -15,8 +15,6 @@ The application is accessible via port 3000.
 
 - Project cleanup (title, pages, files) in main application
 - Show in navbar all plugins with their actions
-- Remove subpages routing with plugin page /flashcards/ab/dev/ggg
-- Make plugin page only be accessible for logged in users
 - Let decks be deleted
 - Show cards in decks
 - Why does it show in an empty deck 22 cards?
