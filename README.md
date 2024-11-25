@@ -12,12 +12,8 @@ docker compose up --build
 The application is accessible via port 3000.
 
 ## Todo
-
 - Project cleanup (title, pages, files) in main application
 - Show in navbar all plugins with their actions
-- Let decks be deleted
-- Show cards in decks
-- Why does it show in an empty deck 22 cards?
 - Delete flashcards
 - Fix adding flashcard when inside a deck
 - Strg+Enter should submit flashcard no matter when courser in back text area and set focus on first field. Tab makes focus being set to second field when being in first field

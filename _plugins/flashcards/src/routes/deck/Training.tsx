@@ -4,6 +4,7 @@ import FlashcardController, { Flashcard } from "./FlashcardController";
 import { usePlugin } from "../../utils/PluginProvider";
 import { useNavigate } from "react-router-dom";
 import { CRUDModal } from "../../components/CRUDModal";
+import { url } from "inspector";
 
 export default function Training() {
     const plugin = usePlugin();
@@ -24,10 +25,8 @@ export default function Training() {
     }
 
     React.useEffect(() => {
-        const { pathname } = new URL(window.location.href);
-        cardController.init(pathname.replace('/deck/', '')).then(() => {
-            getNext();
-        });
+        const deckId = window.location.hash.replace('#/deck/', '')
+        cardController.init(deckId).then(getNext);
     }, []);
 
     return (

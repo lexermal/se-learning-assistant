@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION pl_flashcards_due_today()
+CREATE OR REPLACE FUNCTION pl_flashcards_due_today(use_deck BIGINT)
 RETURNS TABLE (
   id UUID,
   created_at TIMESTAMP WITH TIME ZONE,
@@ -43,6 +43,7 @@ BEGIN
       FROM pl_flashcards_cards c1
       WHERE c1.state IN ('2', '1')
         AND c1.due < CURRENT_DATE + INTERVAL '1 day'
+        AND c1.deck_id = use_deck
     ),
     new_cards AS (
       -- Fetch up to 20 rows for the "New" state due today
@@ -66,6 +67,7 @@ BEGIN
       FROM pl_flashcards_cards c2
       WHERE c2.state = '0'
         AND c2.due < CURRENT_DATE + INTERVAL '1 day'
+        AND c2.deck_id = use_deck
       LIMIT 20
     )
     -- Combine the results from both CTEs
@@ -77,5 +79,5 @@ END;
 $$ LANGUAGE plpgsql;
 
 
--- Select * from pl_flashcards_due_today();
+-- Select * from pl_flashcards_due_today(1);
 
