@@ -21,12 +21,12 @@ export default function AddCard() {
     }, []);
 
     const handleAddCard = () => {
-        console.log('Adding card:', { selectedDeck, question, answer });
-
+        // console.log('Adding card:', { selectedDeck, question, answer });
         const controller = new FlashcardController(plugin);
-        controller.add(question, answer, selectedDeck);
-        setQuestion('');
+        controller.add(question.trim(), answer.trim(), selectedDeck);
         setAnswer('');
+        setQuestion('');
+        document.getElementById('question-input')?.focus();
     };
 
     const DeckModal = () => {
@@ -63,12 +63,20 @@ export default function AddCard() {
                 placeholder="front"
                 value={question}
                 onChange={e => setQuestion(e.target.value)}
+                id="question-input"
             />
             <textarea
                 className="w-full p-2 mb-4 border border-gray-300 rounded"
                 placeholder="back"
                 value={answer}
                 onChange={e => setAnswer(e.target.value)}
+                onKeyDown={e => {
+                    if (e.key === 'Enter' && e.ctrlKey) {
+                        handleAddCard();
+                        e.preventDefault();
+                        document.getElementById('question-input')?.focus();
+                    }
+                }}
             />
             <button
                 className="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
