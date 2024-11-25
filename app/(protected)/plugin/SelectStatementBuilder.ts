@@ -16,7 +16,6 @@ export default function buildSupabaseQuery(supabaseClient: SupabaseClient, table
     const applyConditions = ({ column, operator, value }: Condition) => {
         switch (operator) {
             case 'eq':
-                console.log('eq', column, value);
                 qb = qb.eq(column, value);
                 break;
             case 'neq':

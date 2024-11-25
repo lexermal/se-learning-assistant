@@ -14,8 +14,6 @@ The application is accessible via port 3000.
 ## Todo
 - Project cleanup (title, pages, files) in main application
 - Show in navbar all plugins with their actions
-- Delete flashcards
-- Fix adding flashcard when inside a deck
 - Strg+Enter should submit flashcard no matter when courser in back text area and set focus on first field. Tab makes focus being set to second field when being in first field
 
 ### Dictionary lookup sidebar

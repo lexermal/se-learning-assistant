@@ -1,5 +1,7 @@
 import { Card, createEmptyCard, FSRS, fsrs, generatorParameters, Grade, RecordLogItem, State, StateType } from "ts-fsrs";
 import { PluginController } from "../../utils/PluginController";
+import WhereClauseBuilder from "../../utils/WhereClauseBuilder";
+import { Deck } from "../App";
 
 export interface Flashcard extends Omit<Card, "due" | "last_review" | "state"> {
     id: string;
@@ -22,6 +24,7 @@ export default class FlashcardController {
     private db: PluginController;
     private cards: Flashcard[] = [];
     private deck_id: string | undefined;
+    private deckName: string | undefined;
 
     constructor(pluginController: PluginController) {
         this.db = pluginController;
@@ -69,6 +72,19 @@ export default class FlashcardController {
 
         this.db.dbUpdate("cards", { id: this.cards[0].id }, this.cards[0]);
         this.sortCards();
+    }
+
+    delete() {
+        this.db.dbDelete("cards", { id: this.cards[0].id });
+        this.cards.shift();
+    }
+
+    async getDeckName(): Promise<string> {
+        if (!this.deckName) {
+            await this.db.dbFetch("deck", "name", new WhereClauseBuilder().eq("id", this.deck_id))
+                .then((deck: Deck) => { this.deckName = deck.name });
+        }
+        return this.deckName!;
     }
 
     private async addToDB(card: Partial<Flashcard>) {
