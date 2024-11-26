@@ -10,15 +10,16 @@ export default function MainPluginHandler({ plugin, globalContextMenuActions }: 
     const [contextMenu, setContextMenu] = useState<ContextMenuInfo>({ x: 0, y: 0, open: false, text: "" });
     const [constextActions, setContextMenuActions] = useState<MenuEntry[]>(globalContextMenuActions);
     const iframeRef = useRef(null as HTMLDivElement | null);
+    const [hash, setHash] = useState<string | null>(null);
     const supabase = createClient();
     const router = useRouter();
 
     useEffect(() => {
-        if (!iframeRef.current || !plugin) {
+        if (!iframeRef.current || !plugin || !hash) {
             return;
         }
 
-        const connection = new CommunicationHandler(supabase, plugin, iframeRef.current, window.location.hash);
+        const connection = new CommunicationHandler(supabase, plugin, iframeRef.current, hash);
         connection.init();
 
         connection.subscribe("heightAdjustment", (height: number) => {
@@ -48,7 +49,21 @@ export default function MainPluginHandler({ plugin, globalContextMenuActions }: 
         });
 
         return () => { connection.destroy() }
-    }, [plugin]);
+    }, [plugin, hash]);
+
+    //url hash changed
+    useEffect(() => {
+        let lastHash = window.location.hash;
+        setHash(lastHash);
+
+        setInterval(() => {
+            if (lastHash !== window.location.hash) {
+                lastHash = window.location.hash;
+                console.log('url changed based on main application navigation changed:', lastHash);
+                setHash(lastHash);
+            }
+        }, 100);
+    }, []);
 
     if (!plugin) {
         return <div>Loading...</div>;

@@ -72,7 +72,7 @@ export function PluginSidebar({ plugins }: { plugins: Plugin[] }) {
     }
 
     return (
-        <div className="flex flex-col">
+        <div className="flex flex-col max-w-[450px] w-1/3">
             <button className="" onClick={() => setSidebarPlugin(null)}>Close</button>
             <SidebarPluginHandler plugin={sidebarPlugin} contextMenuAction={pluginAction} />
         </div>

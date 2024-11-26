@@ -35,7 +35,7 @@ export default function TranslationSidebar() {
                 <p>Look up a word</p>
                 <input placeholder='snö, fog, Baum,....' onSubmit={(e: any) => setWord(e.target.value)} />
             </div>}
-            <div className="flex flex-col w-full max-w-md py-3 mx-auto">
+            <div className="flex flex-col w-full max-w-md py-3 mx-auto pb-24">
                 {messages.length > 2 && <div className="border-b mb-2 mt-1"></div>}
                 {messages.filter((_, i) => i > 1).map(m => (
                     <div key={m.id} className="whitespace-pre-wrap flex flex-row">

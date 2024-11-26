@@ -1,9 +1,12 @@
 import { MenuEntry } from "@/components/plugin/ContextMenu";
 import { NextRequest, NextResponse } from "next/server";
+import { deprecate } from "util";
 
 export interface Plugin {
     id: string;
+    // @deprecate
     name: string;
+    title: string;
     description: string;
     pluginRepo: string;
     pluginWebsite: string;
@@ -14,6 +17,10 @@ export interface Plugin {
     contextMenuActions: MenuEntry[];
     isMainPlugin: boolean;
     isSidebarPlugin: boolean;
+    pluginPages: {
+        name: string;
+        url: string;
+    }[];
 }
 
 export async function GET() {
@@ -21,6 +28,7 @@ export async function GET() {
         {
             id: "1",
             name: "flashcards",
+            title: "Flashcards",
             description: "A plugin to help you memorize things",
             version: "1.0.0",
             author: "lexermal",
@@ -30,6 +38,16 @@ export async function GET() {
             pluginWebsite: "https://lexermal.github.io/se-learning-assistant/",
             isSidebarPlugin: true,
             isMainPlugin: true,
+            pluginPages: [
+                {
+                    name: "Training",
+                    url: "/",
+                },
+                {
+                    name: "Translation",
+                    url: "/sidebar/translate",
+                },
+            ],
             contextMenuActions: [
                 {
                     text: "Add to flashcards",

@@ -10,7 +10,9 @@ import buildSupabaseQuery from "./SelectStatementBuilder";
 
 export interface Plugin {
     id: string;
+    // @deprecated
     name: string;
+    title: string;
     description: string;
     pluginRepo: string;
     pluginWebsite: string;
@@ -20,6 +22,10 @@ export interface Plugin {
     contextMenuActions: MenuEntry[];
     isMainPlugin: boolean;
     isSidebarPlugin: boolean;
+    pluginPages: {
+        name: string;
+        url: string;
+    }[];
 }
 
 export default class CommunicationHandler {

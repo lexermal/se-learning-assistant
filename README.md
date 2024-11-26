@@ -13,7 +13,6 @@ The application is accessible via port 3000.
 
 ## Todo
 - Project cleanup (title, pages, files) in main application
-- Show in navbar all plugins with their actions
 - main application sends the api urls to the plugins (currently hardcoded in flahcards translation page)
 
 ### Storytelling plugin - Understanding
