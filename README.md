@@ -14,6 +14,7 @@ The application is accessible via port 3000.
 ## Todo
 - Project cleanup (title, pages, files) in main application
 - main application sends the api urls to the plugins (currently hardcoded in flahcards translation page)
+- Put plugins in own docker image to isolate them better (subdomain for plugins)
 
 ### Storytelling plugin - Understanding
 - Adjust AI plugin to be called storytelling and embedd as example the default chatwindow page
@@ -99,7 +100,6 @@ Maybe backend api for general plugin data needed. Like when a plugin scraps als 
 ## Core libraries
 
 https://www.npmjs.com/package/anki-reader
-https://www.npmjs.com/package/dictcc
 
 ## Notes
 
@@ -109,17 +109,11 @@ Maybe implement a plugin similar to https://github.com/LuteOrg/lute-v3
 
 A translation can be made with https://readloud.net/
 
-Or it simply uses the unofficiel dict.cc client
-
-https://github.com/naitian/dictcc-js
-
 Getting the swedish phunetics: https://github.com/open-dict-data/ipa-dict/blob/master/data/sv.txt
 
 Phunetics cheat sheet: https://upload.wikimedia.org/wikipedia/commons/8/8e/IPA_chart_2018.pdf
 
 Another straight SV to something else translation db https://github.com/open-dict-data/wikidict-sv/blob/master/README.md
-
-https://www.npmjs.com/package/dictcc
 
 ## Clone and run locally
 
