@@ -6,7 +6,6 @@ import TranslationEntry, { Translation } from './components/TranslationEntry';
 export default function TranslationSidebar() {
     const [translation, setTranslation] = useState<Translation | null>(null);
     const plugin = usePlugin();
-    // const [isLoading, setIsLoading] = useState(false);
     const [word, setWord] = useState("");
 
     const { messages, input, handleInputChange, handleSubmit } = useChat({
@@ -20,22 +19,30 @@ export default function TranslationSidebar() {
     useEffect(() => {
         plugin.subscribe("toolAction", (data: { action: string, text: string }) => {
             if (data.action === 'translate') {
-                // setIsLoading(true);
-                console.log('translate', data.text);
+                // console.log('translate', data.text);
                 setWord(data.text);
             }
         });
     }, []);
 
-
     return (
         <div className='p-1'>
             {word.length > 0 && <TranslationEntry word={word} onTranslationComplete={setTranslation} />}
-            {word.length === 0 && <div>
-                <p>Look up a word</p>
-                <input placeholder='snö, fog, Baum,....' onSubmit={(e: any) => setWord(e.target.value)} />
-            </div>}
-            <div className="flex flex-col w-full max-w-md py-3 mx-auto pb-24">
+            {word.length === 0 &&
+                <div className='mx-auto w-full max-w-96 mt-48'>
+                    <p className='text-4xl text-center mb-3'>Look up a word</p>
+                    <input
+                        className='w-full p-2 border rounded shadow-xl text-center border-gray-500'
+                        placeholder='snö, fog, Baum,....'
+                        onKeyDown={(e: any) => {
+                            if (e.key === 'Enter') {
+                                e.preventDefault();
+                                setWord(e.target.value);
+                            }
+                        }} />
+                </div>
+            }
+            <div className={"flex flex-col w-full max-w-md py-3 mx-auto pb-24 " + (!translation ? "hidden" : "")}>
                 {messages.length > 2 && <div className="border-b mb-2 mt-1"></div>}
                 {messages.filter((_, i) => i > 1).map(m => (
                     <div key={m.id} className="whitespace-pre-wrap flex flex-row">
@@ -46,11 +53,10 @@ export default function TranslationSidebar() {
 
                 <form onSubmit={handleSubmit}>
                     <input
-                        className="fixed bottom-0 w-full max-w-md p-2 mb-4 border border-gray-300 rounded shadow-xl"
                         value={input}
+                        className="fixed bottom-0 w-full max-w-md p-2 mb-4 border border-gray-300 rounded shadow-xl"
                         placeholder="Ask questions..."
-                        onChange={handleInputChange}
-                    />
+                        onChange={handleInputChange} />
                 </form>
             </div>
         </div>
@@ -60,5 +66,3 @@ export default function TranslationSidebar() {
 const supportPrompt = `
             You are a language processing assistant specialized in Swedish vocabulary. The user will ask you questions about Swedish words, and you need to provide the correct translation and explanation in English.
             The user just looked up this word.`;
-
-

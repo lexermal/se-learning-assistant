@@ -33,22 +33,25 @@ export default function TranslationEntry({ onTranslationComplete, word }: { word
     const [t, setTranslation] = useState<Translation | null>(null);
     const [decks, setDecks] = useState<any[]>([]);
     const plugin = usePlugin();
-    console.log(t);
+    // console.log(t);
 
     useEffect(() => {
         plugin.dbFetch('deck', "id, name").then(setDecks);
-        getLookedUpWord(word).then(setTranslation);
+        getLookedUpWord(word).then(translation => {
+            setTranslation(translation);
+            onTranslationComplete(translation);
+        });
     }, []);
 
     if (!t) {
-        return <div className="">
+        return <div className="mx-auto mt-48 w-full max-w-32">
             Loading....
         </div>
     }
 
     return (
         <div className="flex flex-col w-full max-w-md pt-6 mx-auto stretch">
-            <div className="items-end border-b mb-4">
+            <div className="flex flex-wrap items-end border-b mb-4">
                 <div className="mr-1">{t.en_ett_word}</div>
                 <div className="font-bold text-5xl">{t.word}</div>
                 {t.singular && <div className='flex flex-row'>
@@ -70,7 +73,7 @@ export default function TranslationEntry({ onTranslationComplete, word }: { word
                 <div>{t.translation_german.join("/")}</div>
             </div>
 
-            <div className='flex flex-col italic'>
+            <div className='flex flex-col italic mb-2'>
                 <div className="whitespace-pre-wrap">{highlightBoldText(t.example_sentence.swedish)}</div>
                 <div className="whitespace-pre-wrap">{highlightBoldText(t.example_sentence.english)}</div>
                 <div className="whitespace-pre-wrap">{highlightBoldText(t.example_sentence.german)}</div>
@@ -160,19 +163,16 @@ async function getLookedUpWord(word: string) {
             "superlative": "störst"
         }
     }
-
     \`\`\``;
-    // If the word does not exist in english, swedish or german set "The word does not exist in the dictionary." as description and leave all other properties empty.
 
     return await fetch('http://localhost:3000/api/chat', {
         method: 'POST',
-        body: JSON.stringify({ messages: [{ role: 'system', content: prompt }, { role: 'user', content: word }] })
+        body: JSON.stringify({ messages: [{ role: 'system', content: prompt }, { role: 'user', content: "Look uo the word(s): "+word }] })
     })
         .then(r => r.json())
         //remove first and last line
         .then(json => JSON.parse(json.messages[0].content[0].text.split('\n').slice(1, -1).join('\n')));
 }
-
 
 function highlightBoldText(text: string) {
     const parts = text.split('**');

@@ -14,7 +14,6 @@ export default function AuthButton() {
     const supabase = createClient();
 
     supabase.auth.getUser().then(({ data }) => {
-      console.log("setting user", data);
       setUser(data.user);
     });
   }, []);
