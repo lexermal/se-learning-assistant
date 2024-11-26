@@ -14,13 +14,7 @@ The application is accessible via port 3000.
 ## Todo
 - Project cleanup (title, pages, files) in main application
 - Show in navbar all plugins with their actions
-
-### Dictionary lookup sidebar
-- Via right click lookup it triggers sidebar
-- AI agent looking up grammar (see chatgpt window)
-- Pretty display info with button to add as flashcard
-- (optional) Possibility to discuss word with AI agent 
-- Example https://chatgpt.com/c/6741f1a2-5350-8007-8c2e-13d45e2479ef
+- main application sends the api urls to the plugins (currently hardcoded in flahcards translation page)
 
 ### Storytelling plugin - Understanding
 - Adjust AI plugin to be called storytelling and embedd as example the default chatwindow page

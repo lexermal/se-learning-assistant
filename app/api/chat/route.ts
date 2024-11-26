@@ -7,10 +7,10 @@ export const maxDuration = 30;
 export async function POST(req: Request) {
   const { messages } = await req.json();
 
-  const result = generateText({
+  const result = await generateText({
     model: openai('gpt-4o-mini'),
     messages,
   });
 
-  return result;
+  return Response.json({ messages: result.response.messages });
 }

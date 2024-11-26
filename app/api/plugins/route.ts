@@ -37,6 +37,12 @@ export async function GET() {
                     action: "add",
                     url: "/sidebar/add"
                 },
+                {
+                    text: "Translate",
+                    pluginName: "flashcards",
+                    action: "translate",
+                    url: "/sidebar/translate"
+                }
             ],
         },
     ];

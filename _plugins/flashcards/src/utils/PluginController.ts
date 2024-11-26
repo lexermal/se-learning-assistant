@@ -24,6 +24,7 @@ export class PluginController {
         this.dbInsert = this.dbInsert.bind(this);
         this.dbUpdate = this.dbUpdate.bind(this);
         this.dbDelete = this.dbDelete.bind(this);
+        this.subscribe = this.subscribe.bind(this);
         this.dbFunctionCall = this.dbFunctionCall.bind(this);
         this.emitAndWaitResponse = this.emitAndWaitResponse.bind(this);
     }

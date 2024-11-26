@@ -107,7 +107,7 @@ function TrainingNavbar({ deckName, remaining, cardController, card, getNext }: 
                         .then(({ fullscreen }: any) => setFullscreen(fullscreen));
                 }}>Fullscreen</button>
                 <button className="ml-auto bg-blue-500 text-white p-2 rounded-lg"
-                    onClick={_ => navigate("/")}>Exit</button>
+                    onClick={_ => navigate("/")}>Back</button>
             </div>
         </div>
     );

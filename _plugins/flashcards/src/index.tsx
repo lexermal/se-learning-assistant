@@ -7,6 +7,7 @@ import { PluginProvider } from './utils/PluginProvider';
 import { HashRouter, Route, Routes } from "react-router-dom";
 import './index.css';
 import AddCard from './routes/toolbar/AddCard';
+import TranslationSidebar from './routes/toolbar/WordLookup';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -20,6 +21,7 @@ root.render(
           <Route path="/" element={<App />} />
           <Route path="/deck/:id" element={<Training />} />
           <Route path="/sidebar/add" element={<AddCard />} />
+          <Route path="/sidebar/translate" element={<TranslationSidebar />} />
         </Routes>
       </HashRouter>
     </PluginProvider>
