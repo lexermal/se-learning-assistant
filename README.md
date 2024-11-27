@@ -15,6 +15,24 @@ The application is accessible via port 3000.
 - Project cleanup (title, pages, files) in main application
 - main application sends the api urls to the plugins (currently hardcoded in flahcards translation page)
 - Put plugins in own docker image to isolate them better (subdomain for plugins)
+- Add "last_used" field to decks which updates when a card is added or when cards in deck are trained (maybe trigger)
+- New translation button only visible when translation is displayed
+- When clicking NT button set focus on input field
+- After add to flashcard jump to new translation
+- fix that chat history is empty
+- Change schema of how the word gets represented to the chat, it exposes the structure below it
+
+#### Flashcard learning
+- group add/edit/delete
+- learning with pressing key (space,1,2,3,4)
+- delete button triggers next card to show
+- showing time forms of words only if irregular and in next line
+- dark mode with switch to light mode
+- only show second german word if it has a different meaning
+- Steigerungsformen in nächster zeile
+- check if flashcards get added twice
+- in add/edit flashcard dialog enter inside second input field submits form
+
 
 ### Storytelling plugin - Understanding
 - Adjust AI plugin to be called storytelling and embedd as example the default chatwindow page
@@ -37,13 +55,13 @@ The application is accessible via port 3000.
 ### Storytelling plugin - small enhancements
 - Adjustment of difficulty
 - Using words already learned in the flashcards
-- Read articles by pasting url
+- Read articles by pasting url (or copied in text)
 - Have config parameter for AI backend(model,provider,triggerable frontend tools)
 - Read whole books(ebook or pdf) with this plugin and continue whenever (AI can read out page and shows text in swedish, user simply continues)
 - AI explains a topic based on a topic (eg swedish history or christmas traditions)
 
 ### Other enhancements
-- Proper editor for flashcards (add page and toolbar)
+- Proper editor for flashcards (add page and toolbar) Drill.js
 - Listing of cards in a deck
 - Import card from Anki
 

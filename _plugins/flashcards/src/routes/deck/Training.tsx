@@ -37,12 +37,12 @@ export default function Training() {
     return (
         <div className="pb-40">
             <TrainingNavbar deckName={deckName} card={card} remaining={remaining} cardController={cardController} getNext={() => getNext()} />
-            <div className="text-center p-5 text-lg">{card?.front}</div>
+            <div className="text-center p-5 text-3xl">{card?.front}</div>
             {finished && <div className="text-center text-2xl text-green-500">
                 You learned all flashcards for today, well done!
             </div>}
             {showAnswer && (
-                <div className="border-t border-gray-500 text-center pt-5 text-lg">
+                <div className="border-t border-gray-500 text-center pt-5 text-3xl">
                     <span>{card?.back}</span>
                 </div>)}
             <div className="fixed bottom-0 w-full ebg-white p-4">
@@ -69,10 +69,10 @@ function renderShowAnswerButton(onClick: () => void) {
 function renderKnowledgButtons(onClick: (action: Grade) => void) {
     return (
         <div className="flex flex-row justify-evenly gap-2">
-            <button onClick={_ => onClick(Rating.Again)} className="w-1/2 bg-purple-900 text-white p-2 rounded-lg">Again</button>
-            <button onClick={_ => onClick(Rating.Hard)} className="w-1/2 bg-red-900 text-white p-2 rounded-lg">Hard</button>
-            <button onClick={_ => onClick(Rating.Good)} className="w-1/2 bg-orange-800 text-white p-2 rounded-lg">Good</button>
-            <button onClick={_ => onClick(Rating.Easy)} className="w-1/2 bg-green-800 text-white p-2 rounded-lg">Easy</button>
+            <button onClick={_ => onClick(Rating.Again)} className="w-1/2 bg-purple-600 text-white p-2 rounded-lg">Again</button>
+            <button onClick={_ => onClick(Rating.Hard)} className="w-1/2 bg-red-500 text-white p-2 rounded-lg">Hard</button>
+            <button onClick={_ => onClick(Rating.Good)} className="w-1/2 bg-orange-500 text-white p-2 rounded-lg">Good</button>
+            <button onClick={_ => onClick(Rating.Easy)} className="w-1/2 bg-green-500 text-white p-2 rounded-lg">Easy</button>
         </div>
     );
 }

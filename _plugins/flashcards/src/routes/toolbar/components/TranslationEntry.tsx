@@ -88,7 +88,7 @@ export default function TranslationEntry({ onTranslationComplete, word }: { word
                     backPage = `${t.en_ett_word === "ett" ? "ett " : ""}${t.singular} (${t.plural})`;
                 } else if (t.type === "verb") {
                     const { present, past, supine, imperative } = t.tenses!;
-                    backPage = `att ${t.word} (${present}, ${past}, ${supine}, ${imperative})`;
+                    backPage = `${t.word} (${present}, ${past}, ${supine}, ${imperative})`;
                 } else if (t.type === "adjective") {
                     const { comparative, superlative } = t.adjective!;
                     backPage = `${t.word} (${comparative}, ${superlative})`;
