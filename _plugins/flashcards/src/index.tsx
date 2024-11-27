@@ -10,8 +10,10 @@ import AddCard from './routes/toolbar/AddCard';
 import TranslationSidebar from './routes/toolbar/WordLookup';
 
 const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
+  document.getElementById('root') as HTMLElement,
 );
+
+document.documentElement.classList.add('dark', 'bg-black', 'text-gray-300');
 
 root.render(
   <React.StrictMode>

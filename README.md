@@ -19,7 +19,6 @@ The application is accessible via port 3000.
 
 #### Flashcard learning
 - learning with pressing key (space,1,2,3,4)
-- dark mode with switch to light mode
 
 ### Storytelling plugin - pronounciation
 - AI prints chapter
