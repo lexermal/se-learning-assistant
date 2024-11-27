@@ -15,12 +15,8 @@ The application is accessible via port 3000.
 - Project cleanup (title, pages, files) in main application
 - main application sends the api urls to the plugins (currently hardcoded in flahcards translation page, silent-reading audioplayer)
 - Put plugins in own docker image to isolate them better (subdomain for plugins)
+- apis should ckeck the cookies to ensure a logged in user accesses them
 
-- Add "last_used" field to decks which updates when a card is added or when cards in deck are trained (maybe trigger)
-- New translation button only visible when translation is displayed
-- When clicking NT button set focus on input field
-- After add to flashcard jump to new translation
-- fix that chat history is empty
 - Change schema of how the word gets represented to the chat, it exposes the structure below it
 
 #### Flashcard learning

@@ -1,10 +1,9 @@
-import React, { useEffect } from "react";
 import { Grade, Rating } from "ts-fsrs";
-import FlashcardController, { Flashcard } from "./FlashcardController";
-import { usePlugin } from "../../utils/PluginProvider";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { usePlugin } from "../../utils/PluginProvider";
 import { CRUDModal } from "../../components/CRUDModal";
-import { get } from "http";
+import FlashcardController, { Flashcard } from "./FlashcardController";
 
 export default function Training() {
     const plugin = usePlugin();

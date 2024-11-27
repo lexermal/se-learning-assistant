@@ -8,7 +8,7 @@ export default function TranslationSidebar() {
     const [word, setWord] = useState("");
     const plugin = usePlugin();
 
-    const { messages, input, handleInputChange, handleSubmit,setData } = useChat({
+    const { messages, input, handleInputChange, handleSubmit, setMessages } = useChat({
         api: "http://localhost:3000/api/chat/stream",
         initialMessages: [
             { id: '1', role: "system", content: supportPrompt },
@@ -25,20 +25,24 @@ export default function TranslationSidebar() {
         });
     }, []);
 
+    const reset = () => {
+        setWord("");
+        setTranslation(null);
+        setMessages([]);
+        setTimeout(() => document.getElementById("word-lookup")?.focus(), 100);
+    }
+
     return (
         <div className='p-1'>
-            {/* //absolut button top right for new translation resetting the component */}
-            <button className="absolute top-1 right-1 p-2 bg-blue-300 rounded" 
-            onClick={() => {
-                setWord("");
-                setTranslation(null);
-                setData([]);
-            }}>N</button>
-            {word.length > 0 && <TranslationEntry word={word} onTranslationComplete={setTranslation} />}
+            {word.length > 0 && <div>
+                <button className="absolute top-1 right-1 p-2 bg-blue-300 rounded" onClick={() => reset()}>N</button>
+                <TranslationEntry word={word} onTranslationComplete={setTranslation} onAddedToFlashcard={() => reset()} />
+            </div>}
             {word.length === 0 &&
                 <div className='mx-auto w-full max-w-96 mt-48'>
                     <p className='text-4xl text-center mb-3'>Look up a word</p>
                     <input
+                        id="word-lookup"
                         className='w-full p-2 border rounded shadow-xl text-center border-gray-500'
                         placeholder='snö, fog, Baum,....'
                         onKeyDown={(e: any) => {

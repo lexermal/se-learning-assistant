@@ -1,4 +1,4 @@
-import { NextResponse, type NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 
 interface CorsOrigins {
     allowedMethods: string[];
@@ -21,7 +21,7 @@ const corsOptions: CorsOrigins = {
 export async function corsMiddleware(response: NextResponse) {
 
   // Allowed origins check
-  const origin = response.headers.get('origin') ?? '';
+  const origin = response.headers.get('x-middleware-request-origin') ?? '';
   if (corsOptions.allowedOrigins.includes('*') || corsOptions.allowedOrigins.includes(origin)) {
     response.headers.set('Access-Control-Allow-Origin', origin);
   }
@@ -34,7 +34,3 @@ export async function corsMiddleware(response: NextResponse) {
 
   return response;
 }
-
-export const config = {
-  matcher: "/api/:path*",
-};

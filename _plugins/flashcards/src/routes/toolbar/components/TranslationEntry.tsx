@@ -4,7 +4,7 @@ import FlashcardController from "../../deck/FlashcardController";
 import AddToDeckButton from "./DropDownButton";
 
 export interface Translation {
-    word: string;
+    swedish_word: string;
     translation_german: string[];
     translation_german_word_singular: string[];
     example_sentence: {
@@ -30,14 +30,22 @@ export interface Translation {
     }
 }
 
-export default function TranslationEntry({ onTranslationComplete, word }: { word: string, onTranslationComplete: (t: Translation) => void }) {
+interface Props {
+    word: string;
+    onAddedToFlashcard: () => void;
+    onTranslationComplete: (t: Translation) => void;
+}
+
+export default function TranslationEntry({ onTranslationComplete, word, onAddedToFlashcard }: Props) {
     const [t, setTranslation] = useState<Translation | null>(null);
     const [decks, setDecks] = useState<any[]>([]);
     const plugin = usePlugin();
     // console.log(t);
 
     useEffect(() => {
-        plugin.dbFetch('deck', "id, name").then(setDecks);
+        plugin.dbFetch('deck', "id, name, last_used")
+            .then(decks => decks.sort((a: any, b: any) => new Date(b.last_used).getTime() - new Date(a.last_used).getTime())).then(setDecks);
+
         getLookedUpWord(word).then(translation => {
             setTranslation(translation);
             onTranslationComplete(translation);
@@ -54,7 +62,7 @@ export default function TranslationEntry({ onTranslationComplete, word }: { word
         <div className="flex flex-col w-full max-w-md pt-6 mx-auto stretch">
             <div className="flex flex-wrap items-end border-b mb-4">
                 <div className="mr-1">{t.en_ett_word}</div>
-                <div className="font-bold text-5xl">{t.word}</div>
+                <div className="font-bold text-5xl">{t.swedish_word}</div>
                 {t.singular && <div className='flex flex-row'>
                     <div className="text-3xl pl-1">({t.singular}/{t.plural})</div>
                 </div>}
@@ -82,19 +90,20 @@ export default function TranslationEntry({ onTranslationComplete, word }: { word
             <AddToDeckButton options={decks} onSelect={id => {
                 console.log("translation", t);
                 const controller = new FlashcardController(plugin);
-                let backPage = t.word;
+                let backPage = t.swedish_word;
 
                 if (t.type === "noun") {
                     backPage = `${t.en_ett_word === "ett" ? "ett " : ""}${t.singular} (${t.plural})`;
                 } else if (t.type === "verb") {
                     const { present, past, supine, imperative } = t.tenses!;
-                    backPage = `${t.word} (${present}, ${past}, ${supine}, ${imperative})`;
+                    backPage = `${t.swedish_word} (${present}, ${past}, ${supine}, ${imperative})`;
                 } else if (t.type === "adjective") {
                     const { comparative, superlative } = t.adjective!;
-                    backPage = `${t.word} (${comparative}, ${superlative})`;
+                    backPage = `${t.swedish_word} (${comparative}, ${superlative})`;
                 }
                 const germanTranslation = t.translation_german_word_singular || t.translation_german;
                 controller.add(germanTranslation.join(", "), backPage, id);
+                onAddedToFlashcard();
             }} />
         </div>
     );
@@ -129,7 +138,7 @@ async function getLookedUpWord(word: string) {
     ### Example Output:
     \`\`\`json
     {
-        "word": "fjäll",
+        "swedish_word": "fjäll",
         "type": "noun",
         "translation_german": ["Berge", "Gebirge", "Schuppen (bei Tieren)"],
         "translation_german_word_simgular": ["Berg"],   //the singular form of the word in German
@@ -147,7 +156,7 @@ async function getLookedUpWord(word: string) {
     ### Example Output (with additional information for verbs):
     \`\`\`json
     {
-        "word": "springa",
+        "swedish_word": "springa",
         ....
         "tenses": {
             "present": "springer",
@@ -161,7 +170,7 @@ async function getLookedUpWord(word: string) {
     ### Example Output (with additional information for adjectives):
     \`\`\`json
     {
-        "word": "stor",
+        "swedish_word": "stor",
         ....
         "adjective": {
             "comparative": "större",
