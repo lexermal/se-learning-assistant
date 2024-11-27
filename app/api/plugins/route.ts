@@ -63,6 +63,48 @@ export async function GET() {
                 }
             ],
         },
+        {
+            id: "2",
+            name: "storytelling",
+            title: "Storytelling",
+            description: "A plugin to help you write stories",
+            version: "1.0.0",
+            author: "lexermal",
+            endpoint: "/plugins/storytelling/index.html",
+            endpointDev: "http://localhost:3002",
+            pluginRepo: "https://lexermal.github.io/se-learning-assistant/",
+            pluginWebsite: "https://lexermal.github.io/se-learning-assistant/",
+            isSidebarPlugin: true,
+            isMainPlugin: true,
+            pluginPages: [
+                {
+                    name: "Entry page",
+                    url: "/",
+                },
+                {
+                    name: "Silent reading",
+                    url: "/silent-reading",
+                },
+                // {
+                //     name: "Storytelling",
+                //     url: "/sidebar/write",
+                // },
+            ],
+            contextMenuActions: [
+                // {
+                //     text: "Add to story",
+                //     pluginName: "storytelling",
+                //     action: "add",
+                //     url: "/sidebar/add"
+                // },
+                // {
+                //     text: "Write",
+                //     pluginName: "storytelling",
+                //     action: "write",
+                //     url: "/sidebar/write"
+                // }
+            ],
+        },
     ];
 
     console.log("node env", process.env.NODE_ENV);

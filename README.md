@@ -13,8 +13,9 @@ The application is accessible via port 3000.
 
 ## Todo
 - Project cleanup (title, pages, files) in main application
-- main application sends the api urls to the plugins (currently hardcoded in flahcards translation page)
+- main application sends the api urls to the plugins (currently hardcoded in flahcards translation page, silent-reading audioplayer)
 - Put plugins in own docker image to isolate them better (subdomain for plugins)
+
 - Add "last_used" field to decks which updates when a card is added or when cards in deck are trained (maybe trigger)
 - New translation button only visible when translation is displayed
 - When clicking NT button set focus on input field
@@ -33,19 +34,13 @@ The application is accessible via port 3000.
 - check if flashcards get added twice
 - in add/edit flashcard dialog enter inside second input field submits form
 
-
-### Storytelling plugin - Understanding
-- Adjust AI plugin to be called storytelling and embedd as example the default chatwindow page
-- user tells what the story is about
-- Letting AI come up with story and writes out chapter after chapter
-- User read each chapter silently
-- User adds new words as flashcards
-- (optionally) AI can read out the story then (speed adjustment)
-- Example: https://chatgpt.com/c/674330a8-d3a4-8007-80cb-125c1bb9fd1a
+# Storytelling improvements
+- Story length is adjustable
 
 ### Storytelling plugin - pronounciation
 - AI prints chapter
 - user reads out chapter aloud and corrects him (use api i mentioned below)
+- It could be practical to listen to the words(own vs how it should sound) word splitup api from openai https://platform.openai.com/docs/api-reference/audio/createTranscription?lang=curl
 
 ### Storytelling plugin - Flexible story development
 - Based on stories in rimori (user defines how story continues)

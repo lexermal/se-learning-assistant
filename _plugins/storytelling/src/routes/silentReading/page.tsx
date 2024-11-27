@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useState } from 'react';
 import { useChat } from 'ai/react';
 import Markdown from 'react-markdown'
+import AudioPlayer from '../../components/audio/Playbutton';
 
 export default function SilentReading() {
     const [isFinalChapter, setIsFinalChapter] = useState(false);
@@ -26,11 +27,14 @@ export default function SilentReading() {
     }
 
     return (
-        <div className="flex flex-col w-full max-w-xl py-24 mx-auto stretch">
+        <div className="flex flex-col w-full max-w-xl py-8 mx-auto stretch">
             {messages.filter((m, i) => i > 1 && m.role === "assistant").map(m => (
                 <Markdown key={m.id} components={{
                     h1: ({ node, ...props }) => (
-                        <h1 className="text-3xl font-bold text-gray-800 border-b mb-2 pb-1" {...props} />
+                        <div className='border-b mt-8 pb-1 mb-2 flex-row flex items-end'>
+                            <h1 className="text-3xl font-bold text-gray-800 min-w-fit mr-1" {...props} />
+                            <AudioPlayer text={m.content} />
+                        </div>
                     ),
                     p: ({ node, ...props }) => (
                         <p className="text-lg text-gray-600 mb-4" {...props} />
