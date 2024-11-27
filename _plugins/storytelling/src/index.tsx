@@ -7,6 +7,7 @@ import { PluginProvider } from './utils/PluginProvider';
 import { HashRouter, Route, Routes } from "react-router-dom";
 import './index.css';
 import AddCard from './routes/toolbar/AddCard';
+import SilentReading from './routes/silentReading/page';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -18,8 +19,9 @@ root.render(
       <HashRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Routes>
           <Route path="/" element={<App />} />
-          <Route path="/deck/:id" element={<Training />} />
-          <Route path="/sidebar/add" element={<AddCard />} />
+          <Route path="/silent-reading" element={<SilentReading />} />
+          {/* <Route path="/deck/:id" element={<Training />} />
+          <Route path="/sidebar/add" element={<AddCard />} /> */}
         </Routes>
       </HashRouter>
     </PluginProvider>

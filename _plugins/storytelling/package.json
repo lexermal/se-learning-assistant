@@ -2,7 +2,7 @@
   "name": "app",
   "version": "0.1.0",
   "private": true,
-  "homepage": "/plugins/openai",
+  "homepage": "/plugins/storytelling",
   "dependencies": {
     "@ai-sdk/openai": "^1.0.4",
     "ai": "^4.0.3",
@@ -10,6 +10,7 @@
     "postmate": "^1.5.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-markdown": "^9.0.1",
     "react-router-dom": "^6.28.0",
     "react-scripts": "5.0.1",
     "ts-fsrs": "^4.4.3",
@@ -28,7 +29,7 @@
     "@types/react-dom": "^18.3.1"
   },
   "scripts": {
-    "dev": "react-scripts start",
+    "dev": "PORT=3002 react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
