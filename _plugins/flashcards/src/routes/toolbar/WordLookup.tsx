@@ -5,10 +5,10 @@ import TranslationEntry, { Translation } from './components/TranslationEntry';
 
 export default function TranslationSidebar() {
     const [translation, setTranslation] = useState<Translation | null>(null);
-    const plugin = usePlugin();
     const [word, setWord] = useState("");
+    const plugin = usePlugin();
 
-    const { messages, input, handleInputChange, handleSubmit } = useChat({
+    const { messages, input, handleInputChange, handleSubmit,setData } = useChat({
         api: "http://localhost:3000/api/chat/stream",
         initialMessages: [
             { id: '1', role: "system", content: supportPrompt },
@@ -27,6 +27,13 @@ export default function TranslationSidebar() {
 
     return (
         <div className='p-1'>
+            {/* //absolut button top right for new translation resetting the component */}
+            <button className="absolute top-1 right-1 p-2 bg-blue-300 rounded" 
+            onClick={() => {
+                setWord("");
+                setTranslation(null);
+                setData([]);
+            }}>N</button>
             {word.length > 0 && <TranslationEntry word={word} onTranslationComplete={setTranslation} />}
             {word.length === 0 &&
                 <div className='mx-auto w-full max-w-96 mt-48'>

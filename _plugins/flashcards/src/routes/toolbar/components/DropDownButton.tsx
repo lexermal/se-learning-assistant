@@ -19,19 +19,17 @@ const AddToDeckButton = ({ options, onSelect }: { options: Deck[], onSelect: (id
             <div className="flex flex-row items-center">
                 <button
                     onClick={() => onSelect(selectedDeck)}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-l-md shadow border-r border-blue-700 hover:bg-blue-700 focus:outline-none"
-                >Add to {
-                        options.find(option => option.id === selectedDeck)?.name
-                    }</button>
+                    className="px-4 py-2 bg-blue-600 text-white rounded-l-md shadow border-r border-blue-700 hover:bg-blue-700 focus:outline-none">
+                    Add to {options.find(option => option.id === selectedDeck)?.name}
+                </button>
                 <button
                     onClick={toggleDropdown}
-                    className="px-3 py-2 bg-blue-600 text-white rounded-r-md shadow hover:bg-blue-700 focus:outline-none"
-                >
+                    className="px-3 py-2 bg-blue-600 text-white rounded-r-md shadow hover:bg-blue-700 focus:outline-none">
                     O
                 </button>
             </div>
             {isOpen && (
-                <div className="absolute mt-2 w-48 bg-white border rounded-md shadow-lg">
+                <div className="absolute mt-2 w-48 bg-white border rounded-md shadow-lg z-50">
                     <div className="px-4 py-2 text-gray-700 font-semibold border-b">
                         Add to deck
                     </div>
@@ -40,7 +38,7 @@ const AddToDeckButton = ({ options, onSelect }: { options: Deck[], onSelect: (id
                             <li
                                 key={index}
                                 onClick={() => handleOptionClick(option.id)}
-                                className="px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer"                            >
+                                className="px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer">
                                 {option.name}
                             </li>
                         ))}

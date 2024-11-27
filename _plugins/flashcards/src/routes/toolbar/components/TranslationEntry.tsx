@@ -6,6 +6,7 @@ import AddToDeckButton from "./DropDownButton";
 export interface Translation {
     word: string;
     translation_german: string[];
+    translation_german_word_singular: string[];
     example_sentence: {
         swedish: string;
         english: string;
@@ -70,7 +71,7 @@ export default function TranslationEntry({ onTranslationComplete, word }: { word
             </div>
 
             <div className='flex flex-row text-4xl mt-3 mb-3'>
-                <div>{t.translation_german.join("/")}</div>
+                <div>{t.translation_german.join(", ")}</div>
             </div>
 
             <div className='flex flex-col italic mb-2'>
@@ -79,18 +80,21 @@ export default function TranslationEntry({ onTranslationComplete, word }: { word
                 <div className="whitespace-pre-wrap">{highlightBoldText(t.example_sentence.german)}</div>
             </div>
             <AddToDeckButton options={decks} onSelect={id => {
+                console.log("translation", t);
                 const controller = new FlashcardController(plugin);
+                let backPage = t.word;
+
                 if (t.type === "noun") {
-                    controller.add(t.translation_german.join(", "), `${t.en_ett_word === "ett" ? "ett " : ""}${t.singular} (${t.plural})`, id);
+                    backPage = `${t.en_ett_word === "ett" ? "ett " : ""}${t.singular} (${t.plural})`;
                 } else if (t.type === "verb") {
                     const { present, past, supine, imperative } = t.tenses!;
-                    controller.add(t.translation_german.join(", "), `${t.word} (${present}, ${past}, ${supine}, ${imperative})`, id);
+                    backPage = `att ${t.word} (${present}, ${past}, ${supine}, ${imperative})`;
                 } else if (t.type === "adjective") {
                     const { comparative, superlative } = t.adjective!;
-                    controller.add(t.translation_german.join(", "), `${t.word} (${comparative}, ${superlative})`, id);
-                } else {
-                    controller.add(t.translation_german.join(", "), t.word, id);
+                    backPage = `${t.word} (${comparative}, ${superlative})`;
                 }
+                const germanTranslation = t.translation_german_word_singular || t.translation_german;
+                controller.add(germanTranslation.join(", "), backPage, id);
             }} />
         </div>
     );
@@ -128,6 +132,7 @@ async function getLookedUpWord(word: string) {
         "word": "fjäll",
         "type": "noun",
         "translation_german": ["Berge", "Gebirge", "Schuppen (bei Tieren)"],
+        "translation_german_word_simgular": ["Berg"],   //the singular form of the word in German
         "example_sentence": {
             "swedish": "Vi vandrade i **fjällen** i somras.",
             "english": "We hiked in **the mountains** last summer.",
@@ -167,7 +172,7 @@ async function getLookedUpWord(word: string) {
 
     return await fetch('http://localhost:3000/api/chat', {
         method: 'POST',
-        body: JSON.stringify({ messages: [{ role: 'system', content: prompt }, { role: 'user', content: "Look uo the word(s): "+word }] })
+        body: JSON.stringify({ messages: [{ role: 'system', content: prompt }, { role: 'user', content: "Look uo the word(s): " + word }] })
     })
         .then(r => r.json())
         //remove first and last line
