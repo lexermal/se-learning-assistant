@@ -31,6 +31,42 @@ export default function Training() {
         });
     }, []);
 
+    React.useEffect(() => {
+        function handleKeyDown(event: KeyboardEvent) {
+            if (finished) return;
+
+            if (event.key === ' ') {
+                setShowAnswer(true);
+            } else if (showAnswer) {
+                switch (event.key) {
+                    case '1':
+                        handleKnowledgeButtonClick(Rating.Again);
+                        break;
+                    case '2':
+                        handleKnowledgeButtonClick(Rating.Hard);
+                        break;
+                    case '3':
+                        handleKnowledgeButtonClick(Rating.Good);
+                        break;
+                    case '4':
+                        handleKnowledgeButtonClick(Rating.Easy);
+                        break;
+                }
+            }
+        }
+        window.addEventListener('keydown', handleKeyDown);
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [showAnswer, finished]);
+
+    function handleKnowledgeButtonClick(action: Grade) {
+        setShowAnswer(false);
+        if (!card) return;
+        cardController.validate(card.id, action);
+        getNext();
+    }
+
     return (
         <div className="pb-40">
             <TrainingNavbar deckName={deckName} card={card} remaining={remaining} cardController={cardController} getNext={() => getNext()} />
@@ -44,12 +80,7 @@ export default function Training() {
                 </div>)}
             <div className="fixed bottom-0 w-full ebg-white p-4">
                 {(!finished && !showAnswer) && renderShowAnswerButton(() => setShowAnswer(true))}
-                {(!finished && showAnswer) && renderKnowledgButtons(action => {
-                    setShowAnswer(false);
-                    if (!card) return;
-                    cardController.validate(card.id, action);
-                    getNext();
-                })}
+                {(!finished && showAnswer) && renderKnowledgButtons(handleKnowledgeButtonClick)}
             </div>
         </div>
     );

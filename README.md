@@ -17,8 +17,6 @@ The application is accessible via port 3000.
 - Put plugins in own docker image to isolate them better (subdomain for plugins)
 - apis should ckeck the cookies to ensure a logged in user accesses them
 
-#### Flashcard learning
-- learning with pressing key (space,1,2,3,4)
 
 ### Storytelling plugin - pronounciation
 - AI prints chapter
@@ -38,6 +36,7 @@ The application is accessible via port 3000.
 - Read whole books(ebook or pdf) with this plugin and continue whenever (AI can read out page and shows text in swedish, user simply continues)
 - AI explains a topic based on a topic (eg swedish history or christmas traditions)
 - SilentReading: Story length is adjustable
+- Flashcard training: Think about something that keyboard navigation is possible from the beginning for showing cards (setting focus on iframe does not work. Maybe via postmessage or button saying activate keyboard which does nothing but setting the focus on the iframe)
 
 ### Other enhancements
 - Proper editor for flashcards (add page and toolbar) Drill.js
