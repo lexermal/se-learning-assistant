@@ -82,7 +82,7 @@ export default class FlashcardController {
     async getDeckName(): Promise<string> {
         if (!this.deckName) {
             await this.db.dbFetch("deck", "name", new WhereClauseBuilder().eq("id", this.deck_id))
-                .then((deck: Deck) => { this.deckName = deck.name });
+                .then((result: Deck[]) => { this.deckName = result[0].name });
         }
         return this.deckName!;
     }

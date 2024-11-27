@@ -1,6 +1,5 @@
 import { Grade, Rating } from "ts-fsrs";
 import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { usePlugin } from "../../utils/PluginProvider";
 import { CRUDModal } from "../../components/CRUDModal";
 import FlashcardController, { Flashcard } from "./FlashcardController";
@@ -30,7 +29,6 @@ export default function Training() {
             getNext();
             cardController.getDeckName().then(setDeckName);
         });
-
     }, []);
 
     return (
@@ -78,41 +76,40 @@ function renderKnowledgButtons(onClick: (action: Grade) => void) {
 
 function TrainingNavbar({ deckName, remaining, cardController, card, getNext }: { deckName: string, card?: Flashcard, remaining: { new: number, learning: number, review: number }, cardController: FlashcardController, getNext: () => void }) {
     const plugin = usePlugin();
-    const navigate = useNavigate();
     const [fullscreen, setFullscreen] = React.useState(false);
 
     return (
-        <div className="flex flex-row border-b-2 border-gray-800">
+        <div className="flex flex-row border-b-2 border-gray-800 items-end">
             <span className="text-4xl mr-2">{deckName}</span>
             <div className="flex items-end">
                 <span className="mr-2 font-bold text-blue-500">{remaining.new}</span>+
                 <span className="mx-1 font-bold text-red-500">{remaining.learning}</span>+
                 <span className="ml-1 font-bold text-green-600">{remaining.review}</span>
             </div>
-            <div className="ml-auto gap-1 flex font-normal">
-                <CardCRUDModal buttonText="Add" onComplete={(front, back) => {
-                    cardController.add(front, back);
-                }} />
-                <CardCRUDModal buttonText="Edit" card={card} onComplete={(front, back) => {
-                    cardController.edit(front, back);
-                    getNext();
-                }} />
-                <button className="ml-auto bg-blue-500 text-white p-2 rounded-lg" onClick={() => {
-                    cardController.delete();
-                    getNext();
-                }}>Delete</button>
+            <div className="ml-auto gap-1 flex font-normal p-1">
+                <div className="flex flex-row">
+                    <CardCRUDModal className="ml-auto bg-blue-500 text-white p-2 rounded-l-lg" buttonText="Add" onComplete={(front, back) => {
+                        cardController.add(front, back);
+                    }} />
+                    <CardCRUDModal className=" bg-blue-500 text-white p-2 border-l border-r border-blue-700" buttonText="Edit" card={card} onComplete={(front, back) => {
+                        cardController.edit(front, back);
+                        getNext();
+                    }} />
+                    <button className="bg-blue-500 text-white p-2 rounded-r-lg" onClick={() => {
+                        cardController.delete();
+                        getNext();
+                    }}>Delete</button>
+                </div>
                 <button className="ml-auto bg-blue-500 text-white p-2 rounded-lg" onClick={() => {
                     plugin.emitAndWaitResponse("triggerFullscreen", !fullscreen)
                         .then(({ fullscreen }: any) => setFullscreen(fullscreen));
                 }}>Fullscreen</button>
-                <button className="ml-auto bg-blue-500 text-white p-2 rounded-lg"
-                    onClick={_ => navigate("/")}>Back</button>
             </div>
         </div>
     );
 }
 
-function CardCRUDModal(props: { onComplete: (front: string, back: string) => void, card?: Flashcard, buttonText: string }) {
+function CardCRUDModal(props: { onComplete: (front: string, back: string) => void, card?: Flashcard, buttonText: string, className?: string }) {
     const [front, setFront] = React.useState(props.card?.front || "");
     const [back, setBack] = React.useState(props.card?.back || "");
 
@@ -124,7 +121,7 @@ function CardCRUDModal(props: { onComplete: (front: string, back: string) => voi
     return <CRUDModal
         buttonText={props.buttonText}
         title={props.card ? "Edit card" : "Add card"}
-        className="ml-auto bg-blue-500 text-white p-2 rounded-lg"
+        className={props.className}
         actionbuttons={[
             {
                 text: "Save", onClick: () => {

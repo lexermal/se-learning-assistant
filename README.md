@@ -17,17 +17,9 @@ The application is accessible via port 3000.
 - Put plugins in own docker image to isolate them better (subdomain for plugins)
 - apis should ckeck the cookies to ensure a logged in user accesses them
 
-- Change schema of how the word gets represented to the chat, it exposes the structure below it
-
 #### Flashcard learning
-- group add/edit/delete
 - learning with pressing key (space,1,2,3,4)
-- delete button triggers next card to show
 - dark mode with switch to light mode
-- in add/edit flashcard dialog enter inside second input field submits form
-
-# Storytelling improvements
-- Story length is adjustable
 
 ### Storytelling plugin - pronounciation
 - AI prints chapter
@@ -46,6 +38,7 @@ The application is accessible via port 3000.
 - Have config parameter for AI backend(model,provider,triggerable frontend tools)
 - Read whole books(ebook or pdf) with this plugin and continue whenever (AI can read out page and shows text in swedish, user simply continues)
 - AI explains a topic based on a topic (eg swedish history or christmas traditions)
+- SilentReading: Story length is adjustable
 
 ### Other enhancements
 - Proper editor for flashcards (add page and toolbar) Drill.js
