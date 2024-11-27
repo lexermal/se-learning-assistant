@@ -23,11 +23,7 @@ The application is accessible via port 3000.
 - group add/edit/delete
 - learning with pressing key (space,1,2,3,4)
 - delete button triggers next card to show
-- showing time forms of words only if irregular and in next line
 - dark mode with switch to light mode
-- only show second german word if it has a different meaning
-- Steigerungsformen in nächster zeile
-- check if flashcards get added twice
 - in add/edit flashcard dialog enter inside second input field submits form
 
 # Storytelling improvements

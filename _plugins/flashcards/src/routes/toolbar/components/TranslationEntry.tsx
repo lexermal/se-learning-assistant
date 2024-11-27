@@ -6,6 +6,7 @@ import AddToDeckButton from "./DropDownButton";
 export interface Translation {
     swedish_word: string;
     translation_german: string[];
+    alternative_german_meaning?: string;
     translation_german_word_singular: string[];
     example_sentence: {
         swedish: string;
@@ -40,7 +41,7 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
     const [t, setTranslation] = useState<Translation | null>(null);
     const [decks, setDecks] = useState<any[]>([]);
     const plugin = usePlugin();
-    // console.log(t);
+    console.log(t);
 
     useEffect(() => {
         plugin.dbFetch('deck', "id, name, last_used")
@@ -58,15 +59,19 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
         </div>
     }
 
+    if (t.alternative_german_meaning) {
+        t.translation_german.push(t.alternative_german_meaning);
+    }
+
     return (
         <div className="flex flex-col w-full max-w-md pt-6 mx-auto stretch">
-            <div className="flex flex-wrap items-end border-b mb-4">
+            <div className="flex flex-wrap items-end border-b mb-4 pb-1">
                 <div className="mr-1">{t.en_ett_word}</div>
                 <div className="font-bold text-5xl">{t.swedish_word}</div>
                 {t.singular && <div className='flex flex-row'>
                     <div className="text-3xl pl-1">({t.singular}/{t.plural})</div>
                 </div>}
-                {t.tenses && <div className=''>
+                {t.tenses && <div className='flex flex-row flex-wrap items-end'>
                     <div className="text-2xl">({t.tenses.present}, {t.tenses.past}, {t.tenses.supine}, {t.tenses.imperative})</div>
                     {t.irregular && <div className="text-sm">(irregular)</div>}
                 </div>}
@@ -96,13 +101,18 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
                     backPage = `${t.en_ett_word === "ett" ? "ett " : ""}${t.singular} (${t.plural})`;
                 } else if (t.type === "verb") {
                     const { present, past, supine, imperative } = t.tenses!;
-                    backPage = `${t.swedish_word} (${present}, ${past}, ${supine}, ${imperative})`;
+                    if (t.irregular) {
+                        backPage = `
+                        (${present}, ${past}, ${supine}, ${imperative})`;
+                    }
                 } else if (t.type === "adjective") {
                     const { comparative, superlative } = t.adjective!;
-                    backPage = `${t.swedish_word} (${comparative}, ${superlative})`;
+                    backPage = `${t.swedish_word}
+                    (${comparative}, ${superlative})`;
                 }
                 const germanTranslation = t.translation_german_word_singular || t.translation_german;
-                controller.add(germanTranslation.join(", "), backPage, id);
+                const alternativeMeaning = t.alternative_german_meaning ? ` oder ${t.alternative_german_meaning}` : "";
+                controller.add(germanTranslation[0] + alternativeMeaning, backPage, id);
                 onAddedToFlashcard();
             }} />
         </div>
@@ -119,7 +129,8 @@ async function getLookedUpWord(word: string) {
     4. The example sentence translated into both English and German. The word is highlighted in the sentences.
     5. The word's type (e.g., noun, verb, adjective, etc.).
     6. A clear explanation of the word in English.
-    7. Additional information based on the word's type:
+    7. If it has a second meaning, provide an alternative German translation.
+    8. Additional information based on the word's type:
     - **For nouns**:
       - Singular and plural form.
       - Indicate if it is an 'en' or 'ett' word.
@@ -140,7 +151,8 @@ async function getLookedUpWord(word: string) {
     {
         "swedish_word": "fjäll",
         "type": "noun",
-        "translation_german": ["Berge", "Gebirge", "Schuppen (bei Tieren)"],
+        "translation_german": ["Berge", "Gebirge"],
+        "alternative_german_meaning": "Schuppen (bei Tieren)",  // if applicable that the word has a second meaning
         "translation_german_word_simgular": ["Berg"],   //the singular form of the word in German
         "example_sentence": {
             "swedish": "Vi vandrade i **fjällen** i somras.",
