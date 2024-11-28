@@ -15,7 +15,7 @@ export const PluginProvider: React.FC<PluginProviderProps> = ({ children }) => {
     //resizing
     useEffect(() => {
         const handleResize = () => {
-            const height = document.body.scrollHeight + 3;
+            const height = document.body.scrollHeight;
             if (height === currentHeight) return;
             currentHeight = height;
 
@@ -69,6 +69,20 @@ export const PluginProvider: React.FC<PluginProviderProps> = ({ children }) => {
             document.removeEventListener("click", handleClick);
             document.removeEventListener('contextmenu', handleContextMenu);
         };
+    }, []);
+
+    //theme switch
+    useEffect(() => {
+        document.documentElement.classList.add("bg-gray-950");
+
+        plugin.subscribe('themeChange', theme => {
+            console.log('theme change in flashcard plugin', theme);
+            if (theme === 'dark') {
+                document.documentElement.classList.add("dark");
+            } else {
+                document.documentElement.classList.remove("dark");
+            }
+        });
     }, []);
 
     return (

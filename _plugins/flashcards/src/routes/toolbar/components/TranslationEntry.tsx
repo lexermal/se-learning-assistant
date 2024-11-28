@@ -59,12 +59,8 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
         </div>
     }
 
-    if (t.alternative_german_meaning) {
-        t.translation_german.push(t.alternative_german_meaning);
-    }
-
     return (
-        <div className="flex flex-col w-full max-w-md pt-6 mx-auto stretch">
+        <div className="flex flex-col w-full max-w-xl pt-6 mx-auto stretch">
             <div className="flex flex-wrap items-end border-b mb-4 pb-1">
                 <div className="mr-1">{t.en_ett_word}</div>
                 <div className="font-bold text-5xl">{t.swedish_word}</div>
@@ -84,7 +80,7 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
             </div>
 
             <div className='flex flex-row text-4xl mt-3 mb-3'>
-                <div>{t.translation_german.join(", ")}</div>
+                <div>{t.translation_german.join(", ")} oder {t.alternative_german_meaning}</div>
             </div>
 
             <div className='flex flex-col italic mb-2'>
@@ -152,8 +148,8 @@ async function getLookedUpWord(word: string) {
         "swedish_word": "fjäll",
         "type": "noun",
         "translation_german": ["Berge", "Gebirge"],
-        "alternative_german_meaning": "Schuppen (bei Tieren)",  // if applicable that the word has a second meaning
-        "translation_german_word_simgular": ["Berg"],   //the singular form of the word in German
+        "alternative_german_meaning": "Schuppen (bei Tieren)", 
+        "translation_german_word_singular": ["Berg"],   
         "example_sentence": {
             "swedish": "Vi vandrade i **fjällen** i somras.",
             "english": "We hiked in **the mountains** last summer.",
@@ -162,13 +158,14 @@ async function getLookedUpWord(word: string) {
         "explanation": "Can mean a mountain range or fell (in Scandinavia) or scales (on animals).",
         "singular": "fjäll",
         "plural": "fjäll",
-        "en_ett_word": "en"  //empty if not applicable
+        "en_ett_word": "en"  
     }
 
     ### Example Output (with additional information for verbs):
     \`\`\`json
     {
         "swedish_word": "springa",
+        "en_ett_word": ""  
         ....
         "tenses": {
             "present": "springer",
@@ -183,6 +180,7 @@ async function getLookedUpWord(word: string) {
     \`\`\`json
     {
         "swedish_word": "stor",
+        "en_ett_word": ""  
         ....
         "adjective": {
             "comparative": "större",

@@ -17,6 +17,60 @@ The application is accessible via port 3000.
 - Put plugins in own docker image to isolate them better (subdomain for plugins)
 - apis should ckeck the cookies to ensure a logged in user accesses them
 
+#### SilentReading
+- Loader before first chapter starts (is loading)
+- Make audio play pretty
+- Dark theme
+- If one word gets translated and then another it does not show the word
+- Right click translate does not work
+- Let the first chapter disappear when the next one is generated/displayed
+- option to include most difficult words from flashcard from a deck (it is not the topic, rather just words being used somehow in ther)
+
+#### Translator
+- chat does not work WTF
+- Add tts to lookup
+- make translator fixed (it is a toolbar that is needed to work in main plugin better
+- setting where it can be specified what info should be included in "add to flashcard" action (just verb or also additional info,...)
+- make sure same card can not be added twice to same deck
+- "alternative meaning push gets triggered on key press in ask question input
+- Verbs should be displayed in infinitive form (base form) in UI and when getting added as flashcard
+- When adding "blir" to the deck via translator only has the times and not the original word 
+- text at the end of learning should be in center and have celebrating emoji
+
+### Additional todo
+- Saving preferences of user(dont know if in borwser or db)
+- Add event for page scaling iframe to sidebar iframe (it scales its own iframe)
+- change background to a nice dark blue or gray, not black
+- border of iframe just on the left side
+- maybe i really need a webworker plugin system too for headless actions like adding info to flashcards or reading info from db and providing it (eg storytelling wants to use most difficult flashcards of the newest deck)
+
+#### Training
+- Pomodoro 10-5-10-5-10
+- When deleting card it should hide the answer again
+- after edit remove the focus of the edit button
+- displaying info in next line in flashcards does not work (its still in same line)
+- After fullscreen got triggered and left you need to press twice to enter fullscreen again
+- underline flashcard numbers top left which type of card gets displayed
+
+#### Reading articles in Swedish
+- Scrap the web content by browsing page(copying all text, tab title and page name)
+- Let chatgpt extract article by it telling which lines(from-till) belong to the article
+- The copying converts it to markdown
+- Let ai convert it to easy Swedish
+- For now let it be working on pages where all text is wisible
+- Alternatively the user can simply past in the whole page (primary usage for an mvp)
+
+#### Sidebar for notes
+- At the right of the screen are all sidebars with icons visible
+- When clicking on it notes can be added (markdown)
+- Files can be selecteda and in them stuff gets written down
+
+#### chatgpt sidebar
+- blank chat assistant with frontend action of adding something to flashcards/maybe notes
+- one sidebar can trigger another sidebar. Every sidebar is own iframe
+- icon showing which iframes are open
+- or should i close them to save memory and power, i dont know yet
+
 
 ### Storytelling plugin - pronounciation
 - AI prints chapter

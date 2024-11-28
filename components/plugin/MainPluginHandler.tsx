@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import ContextMenu, { ContextMenuInfo, MenuEntry } from "./ContextMenu";
 import CommunicationHandler, { Plugin } from "../../app/(protected)/plugin/CommunicationHandler";
+import { useTheme } from "next-themes";
 
 export default function MainPluginHandler({ plugin, globalContextMenuActions }: { plugin: Plugin, globalContextMenuActions: MenuEntry[] }) {
     const [contextMenu, setContextMenu] = useState<ContextMenuInfo>({ x: 0, y: 0, open: false, text: "" });
@@ -13,6 +14,7 @@ export default function MainPluginHandler({ plugin, globalContextMenuActions }: 
     const [hash, setHash] = useState<string | null>(null);
     const supabase = createClient();
     const router = useRouter();
+    const { theme } = useTheme();
 
     useEffect(() => {
         if (!iframeRef.current || !plugin || !hash) {
@@ -48,6 +50,8 @@ export default function MainPluginHandler({ plugin, globalContextMenuActions }: 
             setContextMenuActions([...actions, ...constextActions]);
         });
 
+        connection.emit("themeChange", theme);
+
         return () => { connection.destroy() }
     }, [plugin, hash]);
 
@@ -72,11 +76,7 @@ export default function MainPluginHandler({ plugin, globalContextMenuActions }: 
     return (
         <div className={`w-full`}>
             <ContextMenu contextMenu={contextMenu} actions={constextActions} />
-            <div
-                ref={iframeRef}
-                className="w-full"
-                style={{ border: "1px solid #ccc" }}
-            ></div>
+            <div ref={iframeRef} className="w-full"></div>
         </div>
     );
 }

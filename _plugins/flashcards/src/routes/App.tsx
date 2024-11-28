@@ -1,7 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { ReactElement, useEffect } from 'react';
 import { Link } from "react-router-dom";
 import { usePlugin } from '../utils/PluginProvider';
 import { CRUDModal } from '../components/CRUDModal';
+import { MdDelete, MdModeEdit } from 'react-icons/md';
 
 export interface Deck {
   id: string;
@@ -23,7 +24,7 @@ function App() {
   }, []);
 
   return (
-    <div className="mx-auto bg-gray-400 w-96 p-4 rounded-lg">
+    <div className="mx-auto bg-gray-800 w-96 p-4 rounded-lg mt-24">
       <h1 className='text-4xl mb-3 text-center'>Decks</h1>
       {
         decks.map((deck, index) => (
@@ -45,7 +46,7 @@ function App() {
 
 function DeckRow(props: { deck: DeckSummary, onEdit: (id: string, name: string) => void, onDelete: (id: string) => void }) {
   return (
-    <div className='group flex flex-row hover:bg-gray-500 hover:font-bold justify-between text-left'>
+    <div className='group flex flex-row hover:bg-gray-600 hover:font-bold justify-between text-left p-1 rounded'>
       <Link to={`/deck/${props.deck.id}`} className='flex-1'>
         <span className='cursor-pointer'>{props.deck.name}</span>
       </Link>
@@ -55,16 +56,16 @@ function DeckRow(props: { deck: DeckSummary, onEdit: (id: string, name: string) 
         <span className='mr-2 text-green-600'>{props.deck.total_review}</span>
       </div>
       <div className='flex-3 flex-row opacity-0 group-hover:opacity-100'>
-        <DeckCrudModal buttonText='Edit' deckName={props.deck.name} onComplete={newName => {
+        <DeckCrudModal buttonText={<MdModeEdit />} deckName={props.deck.name} onComplete={newName => {
           props.onEdit(props.deck.id, newName);
         }} />
-        <button className='ml-2' onClick={() => props.onDelete(props.deck.id)}>Delete</button>
+        <button className='ml-2' onClick={() => props.onDelete(props.deck.id)}><MdDelete /></button>
       </div>
     </div>
   );
 }
 
-function DeckCrudModal(props: { onComplete: (deck: string) => void, deckName?: string, buttonText: string, className?: string }) {
+function DeckCrudModal(props: { onComplete: (deck: string) => void, deckName?: string, buttonText: string | ReactElement, className?: string }) {
   const [deck, setDeck] = React.useState(props.deckName || "");
 
   useEffect(() => {
@@ -85,7 +86,9 @@ function DeckCrudModal(props: { onComplete: (deck: string) => void, deckName?: s
       { text: "Cancel", onClick: () => setDeck("") },
     ]}>
     <div className="flex flex-col gap-4">
-      <input placeholder="Deck name" defaultValue={deck} onChange={e => setDeck(e.target.value)} />
+      <input
+        className="bg-gray-500 rounded p-2 text-white"
+        placeholder="Deck name" defaultValue={deck} onChange={e => setDeck(e.target.value)} />
     </div>
   </CRUDModal>
 }

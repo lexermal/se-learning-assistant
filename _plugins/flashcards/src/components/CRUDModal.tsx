@@ -1,17 +1,17 @@
 
 "use client";
 
+import { Modal } from "flowbite-react";
 import { useEffect, useState } from "react";
-import { Button, Modal } from "flowbite-react";
 
 interface Props {
     title: string;
-    buttonText?: string;
+    show?: boolean;
     className?: string;
     closeAble?: boolean;
     children: React.ReactNode;
     actionbuttons: ActionButton[];
-    show?: boolean;
+    buttonText?: string | React.ReactNode;
 }
 
 interface ActionButton {
@@ -34,16 +34,16 @@ export function CRUDModal({ actionbuttons, children, title, buttonText, classNam
             <Modal dismissible={closeAble} show={openModal} onClose={() => setOpenModal(false)}>
                 <Modal.Header>{title}</Modal.Header>
                 <Modal.Body>
-                    <div className="space-y-6">
-                        {children}
-                    </div>
+                    {children}
                 </Modal.Body>
                 <Modal.Footer>
                     {actionbuttons.map(({ onClick, text, closeModal = true, color = "gray" }, index) => (
-                        <Button key={index} color={color} onClick={() => {
+                        <button key={index} color={color}
+                        className={"border-2 border-"+color+"-900 rounded-md py-2 px-4 bg-"+color+"-900 text-white font-bold"}
+                        onClick={() => {
                             if (closeModal) setOpenModal(false);
                             onClick();
-                        }}>{text}</Button>
+                        }}>{text}</button>
                     ))}
                 </Modal.Footer>
             </Modal>

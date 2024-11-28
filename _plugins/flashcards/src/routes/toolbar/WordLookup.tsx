@@ -1,7 +1,11 @@
 import { useChat } from 'ai/react';
 import { useEffect, useState } from 'react';
+import { IoMdArrowRoundBack } from "react-icons/io";
 import { usePlugin } from '../../utils/PluginProvider';
 import TranslationEntry, { Translation } from './components/TranslationEntry';
+import Markdown from 'react-markdown';
+import { FaUserCircle } from "react-icons/fa";
+import { RiRobot3Fill } from "react-icons/ri";
 
 export default function TranslationSidebar() {
     const [translation, setTranslation] = useState<Translation | null>(null);
@@ -35,15 +39,17 @@ export default function TranslationSidebar() {
     return (
         <div className='p-1'>
             {word.length > 0 && <div>
-                <button className="absolute top-1 right-1 p-2 bg-blue-300 rounded" onClick={() => reset()}>N</button>
+                <button className="absolute top-1 right-1 p-2 text-2xl" onClick={() => reset()}>
+                    <IoMdArrowRoundBack />
+                </button>
                 <TranslationEntry word={word} onTranslationComplete={setTranslation} onAddedToFlashcard={() => reset()} />
             </div>}
             {word.length === 0 &&
-                <div className='mx-auto w-full max-w-96 mt-48'>
+                <div className='mx-auto w-full max-w-96 mt-40'>
                     <p className='text-4xl text-center mb-3'>Look up a word</p>
                     <input
                         id="word-lookup"
-                        className='w-full p-2 border rounded shadow-xl text-center border-gray-500'
+                        className='w-full p-2 rounded-xl shadow-xl text-center bg-gray-600 placeholder-gray-400 mt-1'
                         placeholder='snö, fog, Baum,....'
                         onKeyDown={(e: any) => {
                             if (e.key === 'Enter') {
@@ -53,19 +59,19 @@ export default function TranslationSidebar() {
                         }} />
                 </div>
             }
-            <div className={"flex flex-col w-full max-w-md py-3 mx-auto pb-24 " + (!translation ? "hidden" : "")}>
+            <div className={"flex flex-col w-full max-w-xl py-3 mx-auto pb-16 " + (!translation ? "hidden" : "")}>
                 {messages.length > 2 && <div className="border-b mb-2 mt-1"></div>}
                 {messages.filter((_, i) => i > 1).map(m => (
                     <div key={m.id} className="whitespace-pre-wrap flex flex-row">
-                        <div className="font-bold mr-1">{m.role === 'user' ? 'User' : 'AI'}: </div>
-                        {m.content}
+                        <div className="font-bold mr-1 mt-2">{m.role === 'user' ? <FaUserCircle /> : <RiRobot3Fill />}</div>
+                        <div className='bg-gray-800 mb-1 rounded-lg p-1'><Markdown>{m.content}</Markdown></div>
                     </div>
                 ))}
 
                 <form onSubmit={handleSubmit}>
                     <input
                         value={input}
-                        className="fixed bottom-0 w-full max-w-md p-2 mb-4 border border-gray-300 rounded shadow-xl"
+                        className="fixed bottom-0 w-full max-w-xl p-2 mb-4 bg-gray-600 placeholder-gray-200 rounded-xl shadow-xl"
                         placeholder="Ask questions..."
                         onChange={handleInputChange} />
                 </form>

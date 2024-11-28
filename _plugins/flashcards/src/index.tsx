@@ -13,19 +13,19 @@ const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement,
 );
 
-document.documentElement.classList.add('dark', 'bg-black', 'text-gray-300');
-
 root.render(
   <React.StrictMode>
     <PluginProvider>
-      <HashRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-        <Routes>
-          <Route path="/" element={<App />} />
-          <Route path="/deck/:id" element={<Training />} />
-          <Route path="/sidebar/add" element={<AddCard />} />
-          <Route path="/sidebar/translate" element={<TranslationSidebar />} />
-        </Routes>
-      </HashRouter>
+      <div className='dark:bg-gray-950 bg-white text-gray-900 dark:text-gray-200 min-h-[600px]'>
+        <HashRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          <Routes>
+            <Route path="/" element={<App />} />
+            <Route path="/deck/:id" element={<Training />} />
+            <Route path="/sidebar/add" element={<AddCard />} />
+            <Route path="/sidebar/translate" element={<TranslationSidebar />} />
+          </Routes>
+        </HashRouter>
+      </div>
     </PluginProvider>
   </React.StrictMode>
 );
