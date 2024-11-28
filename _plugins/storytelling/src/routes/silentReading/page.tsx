@@ -31,18 +31,18 @@ export default function SilentReading() {
             {messages.filter((m, i) => i > 1 && m.role === "assistant").map(m => (
                 <Markdown key={m.id} components={{
                     h1: ({ node, ...props }) => (
-                        <div className='border-b mt-8 pb-1 mb-2 flex-row flex items-end'>
-                            <h1 className="text-3xl font-bold text-gray-800 min-w-fit mr-1" {...props} />
+                        <div className='border-b border-gray-600 mt-8 pb-1 mb-2 flex-row flex items-end'>
+                            <h1 className="text-3xl font-bold text-gray-500 min-w-fit mr-1" {...props} />
                             <AudioPlayer text={m.content} />
                         </div>
                     ),
                     p: ({ node, ...props }) => (
-                        <p className="text-lg text-gray-600 mb-4" {...props} />
+                        <p className="text-lg text-gray-[370] mb-4" {...props} />
                     ),
                 }}>{m.content.replace(/\n\n+/g, '\n\n')}</Markdown>
             ))}
 
-            {!isLoading && !isFinalChapter && <button className="p-2 mt-4 bg-blue-300 rounded"
+            {!isLoading && !isFinalChapter && <button className="p-2 mt-4 bg-blue-950 text-gray-300 rounded w-fit px-5"
                 onClick={() => append({ role: 'user', content: "Next chapter" })}
             >Next chapter</button>}
 
@@ -59,10 +59,10 @@ function StartScreen(props: { onStart: (topic: string) => void }) {
         <div className="flex flex-col w-full max-w-md py-24 mx-auto stre7tch">
             <p className="text-4xl text-center mb-8">Storytelling</p>
             <textarea
-                className="w-full max-w-md p-2 min-h-24 border border-gray-300 rounded shadow-xl"
+                className="w-full max-w-md p-2 min-h-24 rounded shadow-xl dark:bg-gray-800 dark:text-gray-100"
                 placeholder="What should the story be about?"
                 onChange={e => setTopic(e.target.value)} />
-            <button className="right-0 p-2 mt-4 bg-blue-300 rounded"
+            <button className="right-0 p-2 mt-4 bg-blue-500 rounded text-xl"
                 onClick={() => props.onStart(topic)}
             >Start</button>
         </div>

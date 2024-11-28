@@ -1,4 +1,6 @@
+import { Spinner } from "flowbite-react";
 import React, { useState, useEffect } from 'react';
+import { FaPlayCircle, FaStopCircle } from "react-icons/fa";
 
 type AudioPlayerProps = {
     text: string;
@@ -54,14 +56,14 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ text, voice = 'alloy' }) => {
     return (
         <div className="group relative">
             <div className='flex flex-row items-end'>
-                <button onClick={togglePlayback} disabled={isLoading}>
-                    {isLoading ? 'Loading' : isPlaying ? 'Pause' : 'Play'}
+                <button className="text-gray-500" onClick={togglePlayback} disabled={isLoading}>
+                    {isLoading ? <Spinner /> : isPlaying ? <FaStopCircle size={"25px"} /> : <FaPlayCircle size={"25px"} />}
                 </button>
-                <div className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-row text-sm text-gray-400">
+                <div className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-row text-sm text-gray-500">
                     <span className='pr-1'>Speed: </span>
                     <select
                         value={speed}
-                        className='appearance-none cursor-pointer pr-0 rounded shadow leading-tight focus:outline-none focus:ring'
+                        className='appearance-none cursor-pointer pr-0 p-0 rounded shadow leading-tight focus:outline-none focus:bg-gray-800 focus:ring bg-transparent border-0'
                         onChange={(e) => setSpeed(parseFloat(e.target.value))}
                         disabled={isLoading}>
                         {speedOptions.map((s) => (

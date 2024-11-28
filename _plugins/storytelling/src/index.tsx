@@ -16,14 +16,16 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <PluginProvider>
-      <HashRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-        <Routes>
-          <Route path="/" element={<App />} />
-          <Route path="/silent-reading" element={<SilentReading />} />
-          {/* <Route path="/deck/:id" element={<Training />} />
+      <div className='dark:bg-gray-950 bg-white text-gray-900 dark:text-gray-200 min-h-[600px]'>
+        <HashRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          <Routes>
+            <Route path="/" element={<App />} />
+            <Route path="/silent-reading" element={<SilentReading />} />
+            {/* <Route path="/deck/:id" element={<Training />} />
           <Route path="/sidebar/add" element={<AddCard />} /> */}
-        </Routes>
-      </HashRouter>
+          </Routes>
+        </HashRouter>
+      </div>
     </PluginProvider>
   </React.StrictMode>
 );

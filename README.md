@@ -19,8 +19,6 @@ The application is accessible via port 3000.
 
 #### SilentReading
 - Loader before first chapter starts (is loading)
-- Make audio play pretty
-- Dark theme
 - If one word gets translated and then another it does not show the word
 - Right click translate does not work
 - Let the first chapter disappear when the next one is generated/displayed
