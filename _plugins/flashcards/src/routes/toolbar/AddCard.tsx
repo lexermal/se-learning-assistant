@@ -44,11 +44,11 @@ export default function AddCard() {
 
     return (
         <div className="p-1 w-full">
-            <h1 className="text-xl font-bold my-5 text-center">Add flashcard</h1>
+            <h1 className="text-xl font-bold my-5 text-center">Add a flashcard</h1>
             {selectedDeck === 'new' && <DeckModal />}
             <select
                 value={selectedDeck}
-                className="w-full p-2 mb-4 border border-gray-300 rounded"
+                className="w-full p-2 mb-4 border-0 rounded bg-gray-800"
                 onChange={e => setSelectedDeck(e.target.value)}>
 
                 {decks.map(deck => (
@@ -59,14 +59,14 @@ export default function AddCard() {
                 <option value="new">Create new deck</option>
             </select>
             <textarea
-                className="w-full p-2 mb-4 border border-gray-300 rounded"
+                className="w-full p-2 mb-3 border-0 bg-gray-800 rounded"
                 placeholder="front"
                 value={question}
                 onChange={e => setQuestion(e.target.value)}
                 id="question-input"
             />
             <textarea
-                className="w-full p-2 mb-4 border border-gray-300 rounded"
+                className="w-full p-2 mb-4 border-0 bg-gray-800 rounded"
                 placeholder="back"
                 value={answer}
                 onChange={e => setAnswer(e.target.value)}
@@ -79,7 +79,7 @@ export default function AddCard() {
                 }}
             />
             <button
-                className="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                className="w-full p-2 bg-blue-800 text-white rounded hover:bg-blue-700"
                 onClick={handleAddCard}>
                 Add Card
             </button>

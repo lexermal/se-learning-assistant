@@ -1,6 +1,5 @@
 import { useChat } from 'ai/react';
 import { useEffect, useState } from 'react';
-import { IoMdArrowRoundBack } from "react-icons/io";
 import { usePlugin } from '../../utils/PluginProvider';
 import TranslationEntry, { Translation } from './components/TranslationEntry';
 import Markdown from 'react-markdown';
@@ -39,8 +38,8 @@ export default function TranslationSidebar() {
     return (
         <div className='p-1'>
             {word.length > 0 && <div>
-                <button className="absolute top-1 right-1 p-2 text-2xl" onClick={() => reset()}>
-                    <IoMdArrowRoundBack />
+                <button className="absolute top-1 right-1 p-1 rounded bg-gray-700 text-gray-200" onClick={() => reset()}>
+                    New Search
                 </button>
                 <TranslationEntry word={word} onTranslationComplete={setTranslation} onAddedToFlashcard={() => reset()} />
             </div>}
@@ -60,18 +59,18 @@ export default function TranslationSidebar() {
                 </div>
             }
             <div className={"flex flex-col w-full max-w-xl py-3 mx-auto pb-16 " + (!translation ? "hidden" : "")}>
-                {messages.length > 2 && <div className="border-b mb-2 mt-1"></div>}
+                {messages.length > 2 && <div className="border-b mb-2 mt-1 border-gray-500"></div>}
                 {messages.filter((_, i) => i > 1).map(m => (
                     <div key={m.id} className="whitespace-pre-wrap flex flex-row">
                         <div className="font-bold mr-1 mt-2">{m.role === 'user' ? <FaUserCircle /> : <RiRobot3Fill />}</div>
-                        <div className='bg-gray-800 mb-1 rounded-lg p-1'><Markdown>{m.content}</Markdown></div>
+                        <div className='bg-gray-800 mb-1 rounded-lg p-1 px-2'><Markdown>{m.content}</Markdown></div>
                     </div>
                 ))}
 
                 <form onSubmit={handleSubmit}>
                     <input
                         value={input}
-                        className="fixed bottom-0 w-full max-w-xl p-2 mb-4 bg-gray-600 placeholder-gray-200 rounded-xl shadow-xl"
+                        className="fixed bottom-0 w-full max-w-xl p-2 py-4 bg-gray-700 placeholder-gray-200 rounded shadow-xl"
                         placeholder="Ask questions..."
                         onChange={handleInputChange} />
                 </form>

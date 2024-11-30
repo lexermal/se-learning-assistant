@@ -20,12 +20,12 @@ const AddToDeckButton = ({ options, onSelect }: { options: Deck[], onSelect: (id
             <div className="flex flex-row items-center">
                 <button
                     onClick={() => onSelect(selectedDeck)}
-                    className="h-12 px-4 py-2 bg-blue-600 text-white rounded-l-md shadow border-r border-blue-700 hover:bg-blue-700 focus:outline-none">
+                    className="h-12 px-4 py-2 bg-blue-700 text-white rounded-l-md shadow border-r hover:bg-blue-600 focus:outline-none border-blue-800">
                     Add to {options.find(option => option.id === selectedDeck)?.name}
                 </button>
                 <button
                     onClick={toggleDropdown}
-                    className="px-3 py-2 bg-blue-600 text-white rounded-r-md shadow hover:bg-blue-700 focus:outline-none h-12">
+                    className="px-3 py-2 bg-blue-700 text-white rounded-r-md shadow hover:bg-blue-600 focus:outline-none h-12">
                     <FaGear />
                 </button>
             </div>

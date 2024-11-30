@@ -76,11 +76,11 @@ export function SidebarPluginHandler({ plugins }: { plugins: Plugin[] }) {
         <div className="flex flex-row">
             <div className="flex flex-col gap-1 w-10">
                 {sidebarPlugins.map(({ plugin, action }, index) => (
-                    <button onClick={() => {
+                    <button key={index} onClick={() => {
                         setOpenPlugin(index === openPlugin ? -1 : index);
                         setSidebarPlugin(plugin);
-                        setPluginAction({ pluginName: plugin.name, action: action.url, text: action.name, url: action.url });
-                    }} className={"flex flex-col items-center rounded-l-lg py-3 bg-gray-" + (index === openPlugin ? "500" : "700")}>
+                        setPluginAction({ pluginName: plugin.name, action: action.url, text: "", url: action.url });
+                    }} className={"flex flex-col items-center rounded-l-lg py-3 bg-gray-" + (index === openPlugin ? "700" : "600")}>
                         <img src={action.iconUrl || plugin.iconUrl} className="w-6 h-6 brightness-75" title={plugin.title + " - " + action.name} />
                     </button>
                 ))}
