@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { usePlugin } from "../../../utils/PluginProvider";
 import FlashcardController from "../../deck/FlashcardController";
+import AudioPlayer from "../../../components/audio/Playbutton";
 import AddToDeckButton from "./DropDownButton";
 
 export interface Translation {
@@ -18,6 +19,7 @@ export interface Translation {
     singular?: string;
     plural?: string;
     en_ett_word?: string;
+    infinitive?: string;
     tenses?: {
         present: string;
         past: string;
@@ -62,11 +64,14 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
         </div>
     }
 
+    const swedishWord = t.infinitive || t.swedish_word;
+    const formattedOtherMeaning = t.alternative_german_meaning ? ` oder ${t.alternative_german_meaning}` : "";
+
     return (
         <div className="flex flex-col w-full max-w-xl pt-6 mx-auto stretch">
             <div className="flex flex-wrap items-end border-b mb-4 pb-1">
                 <div className="mr-1">{t.en_ett_word}</div>
-                <div className="font-bold text-5xl">{t.swedish_word}</div>
+                <div className="font-bold text-5xl">{swedishWord}</div>
                 {t.singular && <div className='flex flex-row'>
                     <div className="text-3xl pl-1">({t.singular}/{t.plural})</div>
                 </div>}
@@ -77,13 +82,14 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
                 {t.adjective && <div className='flex flex-row'>
                     <div className="text-3xl">({t.adjective.comparative}, {t.adjective.superlative})</div>
                 </div>}
+                <AudioPlayer text={swedishWord} />
             </div>
             <div className='flex flex-row'>
                 <div>{t.explanation}</div>
             </div>
 
             <div className='flex flex-row text-4xl mt-3 mb-3'>
-                <div>{t.translation_german.join(", ")} oder {t.alternative_german_meaning}</div>
+                <div>{t.translation_german.join(", ")}{formattedOtherMeaning}</div>
             </div>
 
             <div className='flex flex-col italic mb-2'>
@@ -94,28 +100,32 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
             <AddToDeckButton options={decks} onSelect={id => {
                 console.log("translation", t);
                 const controller = new FlashcardController(plugin);
-                let backPage = t.swedish_word;
 
-                if (t.type === "noun") {
-                    backPage = `${t.en_ett_word === "ett" ? "ett " : ""}${t.singular} (${t.plural})`;
-                } else if (t.type === "verb") {
-                    const { present, past, supine, imperative } = t.tenses!;
-                    if (t.irregular) {
-                        backPage += `
-                        (${present}, ${past}, ${supine}, ${imperative})`;
-                    }
-                } else if (t.type === "adjective") {
-                    const { comparative, superlative } = t.adjective!;
-                    backPage = `${t.swedish_word}
-                    (${comparative}, ${superlative})`;
-                }
                 const germanTranslation = t.translation_german_word_singular || t.translation_german;
-                const alternativeMeaning = t.alternative_german_meaning ? ` oder ${t.alternative_german_meaning}` : "";
-                controller.add(germanTranslation[0] + alternativeMeaning, backPage, id);
+                controller.add(germanTranslation[0] + formattedOtherMeaning, getBackPage(t), id);
                 onAddedToFlashcard();
             }} />
         </div>
     );
+}
+
+function getBackPage(t: Translation) {
+    let backPage = t.infinitive || t.swedish_word;;
+
+    if (t.type === "noun") {
+        backPage = `${t.en_ett_word === "ett" ? "ett " : ""}${t.singular} (${t.plural})`;
+    } else if (t.type === "verb") {
+        const { present, past, supine, imperative } = t.tenses!;
+        if (t.irregular) {
+            backPage += `
+                        (${present}, ${past}, ${supine}, ${imperative})`;
+        }
+        return backPage;
+    } else if (t.type === "adjective") {
+        backPage = `${t.swedish_word}
+                    (${t.adjective!.comparative}, ${t.adjective!.superlative})`;
+    }
+    return backPage;
 }
 
 async function getLookedUpWord(word: string) {
@@ -134,7 +144,8 @@ async function getLookedUpWord(word: string) {
       - Singular and plural form.
       - Indicate if it is an 'en' or 'ett' word.
     - **For verbs**:
-      - All tenses: present, past, supine, and imperative.
+      - All tenses: present, past, supine, and imperative in swedish.
+      - The word's infinitive form in swedish.
       - State whether it is a regular or irregular verb.
     - **For adjectives**:
       - Comparative form.
@@ -167,7 +178,7 @@ async function getLookedUpWord(word: string) {
     ### Example Output (with additional information for verbs):
     \`\`\`json
     {
-        "swedish_word": "springa",
+        "infinitive": "springa",
         "en_ett_word": ""  
         ....
         "tenses": {

@@ -22,15 +22,11 @@ The application is accessible via port 3000.
 - Let the first chapter disappear when the next one is generated/displayed
 - option to include most difficult words from flashcard from a deck (it is not the topic, rather just words being used somehow in ther)
 
-#### Translator !!!!!
-- Add tts to lookup
-- !!!!Verbs should be displayed in infinitive form (base form) in UI and when getting added as flashcard
-- setting where it can be specified what info should be included in "add to flashcard" action (just verb or also additional info,...)
-
 ### Additional todo
 - Saving preferences of user(db)
 - maybe i really need a webworker plugin system too for headless actions like adding info to flashcards or reading info from db and providing it (eg storytelling wants to use most difficult flashcards of the newest deck)
 - Attribute flaticons for their icons
+- Customization of info behind "add to flashcard" action (just verb or also additional info,...)
 
 #### Training !!!!!!
 - Pomodoro 10-5-10-5-10
