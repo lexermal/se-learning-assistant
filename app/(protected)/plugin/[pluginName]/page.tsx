@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Plugin } from "../CommunicationHandler";
 import MainPluginHandler from "../../../../components/plugin/MainPluginHandler";
 import { EventEmitterProvider } from "@/utils/providers/EventEmitterContext";
-import { PluginSidebar } from "../../../../components/plugin/SidebarPluginHandler";
+import { SidebarPluginHandler } from "../../../../components/plugin/SidebarPluginHandler";
 
 export default function PluginPage({ params }: { params: Promise<{ pluginName: string }> }) {
   const [plugins, setPlugins] = useState<Plugin[]>([]);
@@ -26,12 +26,10 @@ export default function PluginPage({ params }: { params: Promise<{ pluginName: s
 
   return (
     <EventEmitterProvider>
-      <div>
-        <div className="flex space-x-4">
-          <MainPluginHandler plugin={plugins[mainPluginIndex]}
-            globalContextMenuActions={plugins.flatMap(p => p.contextMenuActions)} />
-          <PluginSidebar plugins={plugins} />
-        </div>
+      <div className="flex space-x-4">
+        <MainPluginHandler plugin={plugins[mainPluginIndex]}
+          globalContextMenuActions={plugins.flatMap(p => p.contextMenuActions)} />
+        <SidebarPluginHandler plugins={plugins} />
       </div>
     </EventEmitterProvider>
   );

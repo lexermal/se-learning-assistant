@@ -8,10 +8,10 @@ import { Plugin } from "../../app/(protected)/plugin/CommunicationHandler";
 import CommunicationHandler from "../../app/(protected)/plugin/CommunicationHandler";
 import { useTheme } from "next-themes";
 
-export default function SidebarPluginHandler({ plugin, contextMenuAction }: { plugin: Plugin, contextMenuAction: MenuEntry }) {
+function PluginSidebar({ plugin, contextMenuAction }: { plugin: Plugin, contextMenuAction: MenuEntry }) {
     const iframeRef = useRef<HTMLDivElement | null>(null);
-    const supabase = createClient();
     const [parent, setParent] = useState<CommunicationHandler | null>(null);
+    const supabase = createClient();
     const { theme } = useTheme();
 
     useEffect(() => {
@@ -31,26 +31,23 @@ export default function SidebarPluginHandler({ plugin, contextMenuAction }: { pl
             }
             const iframe = (iframeRef.current.children[0] as HTMLIFrameElement);
 
-            // iframe.setAttribute("scrolling", "no");
-            iframe.style.height = `calc(100vh - 150px)`;
+            iframe.style.height = `calc(100vh - 4rem)`;
             parent.emit("themeChange", theme);
-
         });
 
-        return () => {
-            parent.destroy();
-        };
-    }, [plugin]);
+        return () => { parent.destroy() };
+    }, [plugin, contextMenuAction]);
 
     return (
         <div ref={iframeRef} className="w-full h-full"></div>
     );
 }
 
-export function PluginSidebar({ plugins }: { plugins: Plugin[] }) {
+export function SidebarPluginHandler({ plugins }: { plugins: Plugin[] }) {
     const [sidebarPlugin, setSidebarPlugin] = useState<Plugin | null>(null);
+    const [pluginAction, setPluginAction] = useState<ContextMenuAction | undefined>(undefined);
+    const [openPlugin, setOpenPlugin] = useState<number>(-1);
     const { on } = useEventEmitter();
-    const [pluginAction, setPluginAction] = useState<ContextMenuAction | null>(null);
 
     useEffect(() => {
         on("contextMenuAction", ({ pluginName, action, text, url }: ContextMenuAction) => {
@@ -67,20 +64,36 @@ export function PluginSidebar({ plugins }: { plugins: Plugin[] }) {
                 return;
             }
             setSidebarPlugin(result[0]);
+            setOpenPlugin(plugins.indexOf(result[0]));
             setPluginAction({ pluginName, action, text, url });
         });
     }, []);
 
-    if (!plugins || !pluginAction || !sidebarPlugin) {
-        return <div></div>;
-    }
+
+    const sidebarPlugins = plugins.filter(p => p.isSidebarPlugin).map(p => p.sidebarPages.map(sp => ({ plugin: p, action: sp }))).flat();
 
     return (
-        <div className="pl-[500px]">
-            <div className="w-[500px] fixed bottom-0 right-0 top-24">
-                <button className="" onClick={() => setSidebarPlugin(null)}>Close</button>
-                <SidebarPluginHandler plugin={sidebarPlugin} contextMenuAction={pluginAction} />
+        <div className="flex flex-row">
+            <div className="flex flex-col gap-1 w-10">
+                {sidebarPlugins.map(({ plugin, action }, index) => (
+                    <button onClick={() => {
+                        setOpenPlugin(index === openPlugin ? -1 : index);
+                        setSidebarPlugin(plugin);
+                        setPluginAction({ pluginName: plugin.name, action: action.url, text: action.name, url: action.url });
+                    }} className={"flex flex-col items-center rounded-l-lg py-3 bg-gray-" + (index === openPlugin ? "500" : "700")}>
+                        <img src={action.iconUrl || plugin.iconUrl} className="w-6 h-6 brightness-75" title={plugin.title + " - " + action.name} />
+                    </button>
+                ))}
             </div>
+            {openPlugin !== -1 &&
+                <div className="pl-[500px]">
+                    <div className="w-[500px] fixed bottom-0 right-0 top-16 flex flex-col">
+                        {sidebarPlugin && pluginAction &&
+                            <PluginSidebar plugin={sidebarPlugin} contextMenuAction={pluginAction} />
+                        }
+                    </div>
+                </div>
+            }
         </div>
     );
 

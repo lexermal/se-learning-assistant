@@ -1,6 +1,5 @@
 import { MenuEntry } from "@/components/plugin/ContextMenu";
-import { NextRequest, NextResponse } from "next/server";
-import { deprecate } from "util";
+import { NextResponse } from "next/server";
 
 export interface Plugin {
     id: string;
@@ -21,6 +20,12 @@ export interface Plugin {
         name: string;
         url: string;
     }[];
+    sidebarPages: {
+        name: string;
+        url: string;
+        iconUrl?: string;
+    }[];
+    iconUrl: string;
 }
 
 export async function GET() {
@@ -36,6 +41,7 @@ export async function GET() {
             endpointDev: "http://localhost:3001",
             pluginRepo: "https://github.com/lexermal/se-learning-assistant",
             pluginWebsite: "https://lexermal.github.io/se-learning-assistant/",
+            iconUrl: "http://localhost:3001/plugins/flashcards/logo.png",
             isSidebarPlugin: true,
             isMainPlugin: true,
             pluginPages: [
@@ -62,6 +68,17 @@ export async function GET() {
                     url: "/sidebar/translate"
                 }
             ],
+            sidebarPages: [
+                {
+                    name: "Quick add",
+                    url: "/sidebar/add",
+                },
+                {
+                    name: "Translate",
+                    url: "/sidebar/translate",
+                    iconUrl: "http://localhost:3001/plugins/flashcards/translate.png",
+                },
+            ],
         },
         {
             id: "2",
@@ -74,7 +91,8 @@ export async function GET() {
             endpointDev: "http://localhost:3002",
             pluginRepo: "https://lexermal.github.io/se-learning-assistant/",
             pluginWebsite: "https://lexermal.github.io/se-learning-assistant/",
-            isSidebarPlugin: true,
+            iconUrl: "http://localhost:3001/plugins/storytelling/logo.png",
+            isSidebarPlugin: false,
             isMainPlugin: true,
             pluginPages: [
                 {
@@ -104,6 +122,7 @@ export async function GET() {
                 //     url: "/sidebar/write"
                 // }
             ],
+            sidebarPages: []
         },
     ];
 

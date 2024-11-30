@@ -1,10 +1,5 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 import Postmate from "postmate";
-import {
-    PostgrestClient,
-    PostgrestFilterBuilder,
-    PostgrestQueryBuilder,
-} from '@supabase/postgrest-js'
 import { MenuEntry } from "../../../components/plugin/ContextMenu";
 import buildSupabaseQuery from "./SelectStatementBuilder";
 
@@ -16,6 +11,7 @@ export interface Plugin {
     description: string;
     pluginRepo: string;
     pluginWebsite: string;
+    iconUrl: string;
     version: string;
     author: string;
     endpoint: string;
@@ -25,6 +21,11 @@ export interface Plugin {
     pluginPages: {
         name: string;
         url: string;
+    }[];
+    sidebarPages: {
+        name: string;
+        url: string;
+        iconUrl?: string;
     }[];
 }
 

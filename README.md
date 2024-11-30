@@ -33,6 +33,7 @@ The application is accessible via port 3000.
 ### Additional todo
 - Saving preferences of user(db)
 - maybe i really need a webworker plugin system too for headless actions like adding info to flashcards or reading info from db and providing it (eg storytelling wants to use most difficult flashcards of the newest deck)
+- Attribute flaticons for their icons
 
 #### Training !!!!!!
 - Pomodoro 10-5-10-5-10
