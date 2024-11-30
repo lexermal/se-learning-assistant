@@ -1,11 +1,12 @@
+import React from "react";
 import { Grade, Rating } from "ts-fsrs";
-import React, { useEffect } from "react";
 import { IoAddCircleOutline } from "react-icons/io5";
 import { MdDelete, MdModeEdit } from "react-icons/md";
 import { usePlugin } from "../../utils/PluginProvider";
-import { CRUDModal } from "../../components/CRUDModal";
 import { AiOutlineFullscreen, AiOutlineFullscreenExit } from "react-icons/ai";
 import FlashcardController, { Flashcard } from "./FlashcardController";
+import MarkdownEditor from "../toolbar/components/MarkdownEditor";
+import { FaSave } from "react-icons/fa";
 
 export default function Training() {
     const plugin = usePlugin();
@@ -15,6 +16,7 @@ export default function Training() {
     const [remaining, setRemaining] = React.useState({ new: 0, learning: 0, review: 0 });
     const [finished, setFinished] = React.useState(false);
     const [deckName, setDeckName] = React.useState("");
+    const [editedCard, setEditedCard] = React.useState<{ front: string, back: string, new: boolean } | undefined>(undefined);
 
     function getNext() {
         const { card, remaining } = cardController.getNext();
@@ -73,27 +75,51 @@ export default function Training() {
     return (
         <div className="pb-40">
             <TrainingNavbar deckName={deckName} remaining={remaining} />
-            <div className="text-center p-5 text-3xl pt-40 pb-10 text-white">{card?.front}</div>
             {finished && <div className="text-center text-2xl text-green-500 mt-24">
                 You learned all flashcards for today!🎉
             </div>}
-            {showAnswer && (
-                <div className="border-t border-gray-700 text-center pt-5 text-3xl w-fit mx-auto px-24 pt-10 text-white">
-                    <span>{card?.back}</span>
-                </div>)}
+            <div className="pt-40 w-full px-[25%]">
+                <div className="border-l-2 py-4 text-white text-3xl border-gray-700">
+                    {card?.front && <MarkdownEditor className="ml-5" content={editedCard?.new ? "" : card.front} editable={!!editedCard} onUpdate={text => {
+                        setEditedCard({ ...editedCard!, front: text });
+                    }} />}
+                    {showAnswer && (
+                        <div className="border-t text-3xl pt-1 text-white w-full pl-5 border-gray-800">
+                            {card?.back && <MarkdownEditor content={editedCard?.new ? "" : card.back} editable={!!editedCard} onUpdate={text => {
+                                setEditedCard({ ...editedCard!, back: text });
+                            }} />}
+                        </div>)}
+                </div>
+            </div>
             <div className="fixed bottom-0 w-full p-4 flex flex-row justify-between">
-                <CardCRUDModal className="text-2xl rounded-l-lg" buttonText={<IoAddCircleOutline />} onComplete={(front, back) => {
-                    cardController.add(front, back);
-                }} />
+                <button className="text-2xl p-2" onClick={() => {
+                    setEditedCard({ front: "", back: "", new: true });
+                    setShowAnswer(true);
+                }
+                }><IoAddCircleOutline /></button>
                 {(!finished && !showAnswer) && renderShowAnswerButton(() => setShowAnswer(true))}
-                {(!finished && showAnswer) && renderKnowledgButtons(handleKnowledgeButtonClick)}
+                {(!finished && showAnswer && !editedCard) && renderKnowledgButtons(handleKnowledgeButtonClick)}
                 <div className="flex flex-row">
-                    <CardCRUDModal className="text-2xl" buttonText={<MdModeEdit />} card={card} onComplete={(front, back) => {
-                        cardController.edit(front, back);
+                    <button className="text-2xl mr-1" onClick={() => {
+                        if (!editedCard) {
+                            setEditedCard({ front: card?.front || "", back: card?.back || "", new: false });
+                            return;
+                        }
+                        if (editedCard.new) {
+                            console.log("saving new card", editedCard);
+                            cardController.add(editedCard.front, editedCard.back);
+                        } else {
+                            console.log("saving edited card", editedCard);
+                            cardController.edit(editedCard.front, editedCard.back);
+                        }
                         getNext();
-                    }} />
+                        setEditedCard(undefined);
+                    }}>
+                        {!!editedCard ? <FaSave /> : <MdModeEdit />}
+                    </button>
                     <button className="text-2xl" onClick={() => {
                         cardController.delete();
+                        setShowAnswer(false);
                         getNext();
                     }}><MdDelete /></button>
                 </div>
@@ -121,7 +147,7 @@ function renderKnowledgButtons(onClick: (action: Grade) => void) {
     );
 }
 
-function TrainingNavbar({ deckName, remaining}: { deckName: string, remaining: { new: number, learning: number, review: number }}) {
+function TrainingNavbar({ deckName, remaining }: { deckName: string, remaining: { new: number, learning: number, review: number } }) {
     const plugin = usePlugin();
     const [fullscreen, setFullscreen] = React.useState(false);
 
@@ -141,54 +167,4 @@ function TrainingNavbar({ deckName, remaining}: { deckName: string, remaining: {
             </div>
         </div>
     );
-}
-
-interface ModelProps {
-    card?: Flashcard,
-    className?: string
-    buttonText: string | React.ReactNode,
-    onComplete: (front: string, back: string) => void,
-}
-
-function CardCRUDModal(props: ModelProps) {
-    const [front, setFront] = React.useState(props.card?.front || "");
-    const [back, setBack] = React.useState(props.card?.back || "");
-
-    useEffect(() => {
-        setFront(props.card?.front || "");
-        setBack(props.card?.back || "");
-    }, [props.card]);
-
-    return <CRUDModal
-        buttonText={props.buttonText}
-        title={props.card ? "Edit card" : "Add card"}
-        className={props.className}
-        actionbuttons={[
-            {
-                text: "Save", onClick: () => {
-                    props.onComplete(front, back);
-                    setFront("");
-                    setBack("");
-                }
-            },
-            {
-                text: "Cancel", onClick: () => {
-                    setFront("");
-                    setBack("");
-                }
-            },
-        ]}>
-        <div className="flex flex-col gap-4">
-            <input 
-            className="bg-gray-500 rounded p-2 text-white"
-             placeholder="Front" 
-             defaultValue={front} 
-             onChange={e => setFront(e.target.value)} />
-            <input 
-            className="bg-gray-500 rounded p-2 text-white"
-             placeholder="Back"
-              defaultValue={back}
-               onChange={e => setBack(e.target.value)} />
-        </div>
-    </CRUDModal>
 }

@@ -119,13 +119,11 @@ function getBackPage(t: Translation) {
     } else if (t.type === "verb") {
         const { present, past, supine, imperative } = t.tenses!;
         if (t.irregular) {
-            backPage += `
-                        (${present}, ${past}, ${supine}, ${imperative})`;
+            backPage += `  \n(${present}, ${past}, ${supine}, ${imperative})`;
         }
         return backPage;
     } else if (t.type === "adjective") {
-        backPage = `${t.swedish_word}
-                    (${t.adjective!.comparative}, ${t.adjective!.superlative})`;
+        backPage = `${t.swedish_word}  \n(${t.adjective!.comparative}, ${t.adjective!.superlative})`;
     }
     return backPage;
 }

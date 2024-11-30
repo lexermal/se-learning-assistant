@@ -29,11 +29,10 @@ The application is accessible via port 3000.
 
 #### Training !!!!!!
 - Pomodoro 10-5-10-5-10
-- !!!!!When deleting card it should hide the answer again
-- after edit remove the focus of the edit button
 - displaying info in next line in flashcards does not work (its still in same line)
 - After fullscreen got triggered and left you need to press twice to enter fullscreen again
 - underline flashcard numbers top left which type of card gets displayed
+- Add markdown editor to add flashcard sidebar
 
 #### Reading articles in Swedish
 - Scrap the web content by browsing page(copying all text, tab title and page name)
