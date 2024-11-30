@@ -57,8 +57,8 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ text, voice = 'alloy' }) => {
     return (
         <div className="group relative">
             <div className='flex flex-row items-end'>
-                <button className="text-gray-300" onClick={togglePlayback} disabled={isLoading}>
-                    {isLoading ? <Spinner /> : isPlaying ? <FaStopCircle size={"25px"} /> : <FaPlayCircle size={"25px"} />}
+                <button className="text-gray-300 opacity-90" onClick={togglePlayback} disabled={isLoading}>
+                    {isLoading ? <Spinner /> : isPlaying ? <FaStopCircle size={"22px"} /> : <FaPlayCircle size={"22px"} />}
                 </button>
                 {/* <div className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-row text-sm text-gray-500">
                     <span className='pr-1'>Speed: </span>

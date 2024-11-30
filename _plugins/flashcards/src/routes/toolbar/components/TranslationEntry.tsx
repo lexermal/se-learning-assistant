@@ -68,12 +68,15 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
     const formattedOtherMeaning = t.alternative_german_meaning ? ` oder ${t.alternative_german_meaning}` : "";
 
     return (
-        <div className="flex flex-col w-full max-w-xl pt-6 mx-auto stretch">
+        <div className="flex flex-col w-full max-w-xl pt-6 mx-auto stretch text-gray-200">
             <div className="flex flex-wrap items-end border-b mb-4 pb-1">
                 <div className="mr-1">{t.en_ett_word}</div>
-                <div className="font-bold text-5xl">{swedishWord}</div>
+                <div className="font-bold text-5xl text-white">{swedishWord}</div>
+                <div className="ml-1 pb-1">
+                    <AudioPlayer text={swedishWord} />
+                </div>
                 {t.singular && <div className='flex flex-row'>
-                    <div className="text-3xl pl-1">({t.singular}/{t.plural})</div>
+                    <div className="text-2xl pl-1">({t.singular}/{t.plural})</div>
                 </div>}
                 {t.tenses && <div className='flex flex-row flex-wrap items-end'>
                     <div className="text-2xl">({t.tenses.present}, {t.tenses.past}, {t.tenses.supine}, {t.tenses.imperative})</div>
@@ -82,13 +85,12 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
                 {t.adjective && <div className='flex flex-row'>
                     <div className="text-3xl">({t.adjective.comparative}, {t.adjective.superlative})</div>
                 </div>}
-                <AudioPlayer text={swedishWord} />
             </div>
             <div className='flex flex-row'>
                 <div>{t.explanation}</div>
             </div>
 
-            <div className='flex flex-row text-4xl mt-3 mb-3'>
+            <div className='flex flex-row text-4xl mt-3 mb-3 text-white'>
                 <div>{t.translation_german.join(", ")}{formattedOtherMeaning}</div>
             </div>
 
