@@ -71,29 +71,28 @@ export function SidebarPluginHandler({ plugins }: { plugins: Plugin[] }) {
 
 
     const sidebarPlugins = plugins.filter(p => p.isSidebarPlugin).map(p => p.sidebarPages.map(sp => ({ plugin: p, action: sp }))).flat();
+    const width = openPlugin > -1 ? 500 : 40;
 
     return (
         <div className="flex flex-row">
-            <div className="flex flex-col gap-1 w-10">
-                {sidebarPlugins.map(({ plugin, action }, index) => (
-                    <button key={index} onClick={() => {
-                        setOpenPlugin(index === openPlugin ? -1 : index);
-                        setSidebarPlugin(plugin);
-                        setPluginAction({ pluginName: plugin.name, action: action.url, text: "", url: action.url });
-                    }} className={"flex flex-col items-center rounded-l-lg py-3 bg-gray-" + (index === openPlugin ? "700" : "600")}>
-                        <img src={action.iconUrl || plugin.iconUrl} className="w-6 h-6 brightness-75" title={plugin.title + " - " + action.name} />
-                    </button>
-                ))}
-            </div>
-            {openPlugin !== -1 &&
-                <div className="pl-[500px]">
-                    <div className="w-[500px] fixed bottom-0 right-0 top-16 flex flex-col">
-                        {sidebarPlugin && pluginAction &&
-                            <PluginSidebar plugin={sidebarPlugin} contextMenuAction={pluginAction} />
-                        }
+            <div style={{ paddingLeft: width + "px" }} className={`pl-[${width}px]`}>
+                <div style={{ width: width + "px" }} className={`fixed bottom-0 right-0 top-16 flex flex-row`}>
+                    <div className="flex flex-col gap-1 w-10">
+                        {sidebarPlugins.map(({ plugin, action }, index) => (
+                            <button key={index} style={{ background: index === openPlugin ? "rgb(94, 102, 115)" : "rgb(44, 52, 65)" }} onClick={() => {
+                                setOpenPlugin(index === openPlugin ? -1 : index);
+                                setSidebarPlugin(plugin);
+                                setPluginAction({ pluginName: plugin.name, action: action.url, text: "", url: action.url });
+                            }} className={"flex flex-col items-center rounded-l-lg py-3"}>
+                                <img src={action.iconUrl || plugin.iconUrl} className="w-6 h-6 brightness-75" title={plugin.title + " - " + action.name} />
+                            </button>
+                        ))}
                     </div>
+                    {sidebarPlugin && pluginAction && openPlugin > -1 &&
+                        <PluginSidebar plugin={sidebarPlugin} contextMenuAction={pluginAction} />
+                    }
                 </div>
-            }
+            </div>
         </div>
     );
 
