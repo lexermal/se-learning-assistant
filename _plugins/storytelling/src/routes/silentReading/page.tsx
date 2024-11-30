@@ -3,11 +3,12 @@ import { useState } from 'react';
 import { useChat } from 'ai/react';
 import Markdown from 'react-markdown'
 import AudioPlayer from '../../components/audio/Playbutton';
+import { getBackendDomain } from '../../utils/PluginUtils';
 
 export default function SilentReading() {
     const [isFinalChapter, setIsFinalChapter] = useState(false);
     const { messages, append, setMessages, isLoading } = useChat({
-        api: "http://localhost:3000/api/chat/stream",
+        api: getBackendDomain() + "/api/chat/stream",
     });
 
     useEffect(() => {
@@ -28,7 +29,7 @@ export default function SilentReading() {
 
     return (
         <div className="flex flex-col w-full max-w-xl py-8 mx-auto stretch">
-            {messages.filter((m, i) => i > 1 && m.role === "assistant").map((m, i,ms) => (
+            {messages.filter((m, i) => i > 1 && m.role === "assistant").map((m, i, ms) => (
                 <Markdown key={m.id} components={{
                     h1: ({ node, ...props }) => (
                         <div className='border-b border-gray-600 mt-8 pb-1 mb-2 flex-row flex items-end'>

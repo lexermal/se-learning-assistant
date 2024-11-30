@@ -1,10 +1,11 @@
 import { useChat } from 'ai/react';
-import { useEffect, useState } from 'react';
-import { usePlugin } from '../../utils/PluginProvider';
-import TranslationEntry, { Translation } from './components/TranslationEntry';
 import Markdown from 'react-markdown';
-import { FaUserCircle } from "react-icons/fa";
+import { useEffect, useState } from 'react';
 import { RiRobot3Fill } from "react-icons/ri";
+import { FaUserCircle } from "react-icons/fa";
+import { usePlugin } from '../../utils/PluginProvider';
+import { getBackendDomain } from '../../utils/PluginUtils';
+import TranslationEntry, { Translation } from './components/TranslationEntry';
 
 export default function TranslationSidebar() {
     const [translation, setTranslation] = useState<Translation | null>(null);
@@ -12,7 +13,7 @@ export default function TranslationSidebar() {
     const plugin = usePlugin();
 
     const { messages, input, handleInputChange, handleSubmit, setMessages } = useChat({
-        api: "http://localhost:3000/api/chat/stream",
+        api: getBackendDomain() + "/api/chat/stream",
         initialMessages: [
             { id: '1', role: "system", content: supportPrompt },
             { id: '2', role: "assistant", content: "The word that gets currently discussed:" + JSON.stringify(translation) }

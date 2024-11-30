@@ -13,7 +13,6 @@ The application is accessible via port 3000.
 
 ## Todo
 - Project cleanup (title, pages, files) in main application
-- main application sends the api urls to the plugins (currently hardcoded in flahcards translation page, silent-reading audioplayer)
 - Put plugins in own docker image to isolate them better (subdomain for plugins)
 - apis should ckeck the cookies to ensure a logged in user accesses them
 

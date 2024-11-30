@@ -1,6 +1,7 @@
 import { Spinner } from "flowbite-react";
 import React, { useState, useEffect } from 'react';
 import { FaPlayCircle, FaStopCircle } from "react-icons/fa";
+import { getBackendDomain } from "../../utils/PluginUtils";
 
 type AudioPlayerProps = {
     text: string;
@@ -16,7 +17,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ text, voice = 'alloy' }) => {
     // Function to generate audio from text using API
     const generateAudio = async () => {
         setIsLoading(true);
-        const response = await fetch('http://localhost:3000/api/speech', {
+        const response = await fetch(getBackendDomain() + '/api/speech', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ input: text, voice, speed }),
