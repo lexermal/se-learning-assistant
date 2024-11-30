@@ -23,10 +23,7 @@ The application is accessible via port 3000.
 - option to include most difficult words from flashcard from a deck (it is not the topic, rather just words being used somehow in ther)
 
 #### Translator !!!!!
-- chat does not work WTF
 - Add tts to lookup
-- make translator fixed (it is a toolbar that is needed to work in main plugin better
-- make sure same card can not be added twice to same deck
 - !!!!Verbs should be displayed in infinitive form (base form) in UI and when getting added as flashcard
 - setting where it can be specified what info should be included in "add to flashcard" action (just verb or also additional info,...)
 
