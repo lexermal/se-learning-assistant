@@ -6,6 +6,7 @@ export class PluginController {
     private plugin: Postmate.Model | null = null;
     private onceListeners: Map<string, any[]> = new Map();
     private listeners: Map<string, any[]> = new Map();
+    private communicationSecret: string | null = null;
 
     private constructor() {
         this.plugin = new Postmate.Model({
@@ -36,8 +37,19 @@ export class PluginController {
         return PluginController.instance;
     }
 
+    private getSecret() {
+        if (!this.communicationSecret) {
+            const secret = new URLSearchParams(window.location.search).get("secret");
+            if (!secret) {
+                throw new Error("Communication secret not found in URL as query parameter");
+            }
+            this.communicationSecret = secret;
+        }
+        return this.communicationSecret;
+    }
+
     public emit(eventName: string, data?: any) {
-        this.plugin?.then(child => child.emit(eventName, data));
+        this.plugin?.then(child => child.emit(eventName, { data, secret: this.getSecret() }));
     }
 
     public subscribe(eventName: string, callback: (data: any) => void) {

@@ -5,7 +5,6 @@ import buildSupabaseQuery from "./SelectStatementBuilder";
 
 export interface Plugin {
     id: string;
-    // @deprecated
     name: string;
     title: string;
     description: string;
@@ -34,13 +33,15 @@ export default class CommunicationHandler {
     private supabase: SupabaseClient;
     private plugin: Plugin;
     private parent?: Postmate.ParentAPI;
+    private communicationSecret: string | null = null;
 
     constructor(supabase: SupabaseClient, plugin: Plugin, ref: any, hash?: string) {
         hash = "#" + (hash || "").replace("#", "");
         this.plugin = plugin;
         this.supabase = supabase;
-        this.pluginConnection = new Postmate({ container: ref, url: plugin.endpoint + hash, classListArray: ["w-full"] });
-        this.init();
+        this.communicationSecret = Math.random().toString(36).substring(3);
+        this.pluginConnection = new Postmate({ container: ref, url: plugin.endpoint + "?secret=" + this.communicationSecret + hash, classListArray: ["w-full"] });
+        this.init().then(() => this.initSubscribers());
     }
 
     private call(topic: string, data: any) {
@@ -60,14 +61,16 @@ export default class CommunicationHandler {
     }
 
     async init() {
-        if (!this.pluginConnection) {
+        if (!this.pluginConnection || this.parent) {
             return;
         }
 
         // Wait for the plugin to be ready
         this.parent = await this.pluginConnection;
+    }
 
-        this.parent.on("db_fetch", async (data: { table: string, select: string, filter: any }) => {
+    async initSubscribers() {
+        this.subscribe("db_fetch", async (data: { table: string, select: string, filter: any }) => {
             console.log(`Plugin ${this.plugin.name} wants to fetch data from: ${data.table}`);
 
             const query = await buildSupabaseQuery(this.supabase, this.getTableName(data.table), data.select, data.filter);
@@ -75,7 +78,7 @@ export default class CommunicationHandler {
         });
 
         // insert
-        this.parent.on("db_insert", async (data: { table: string, values: any | any[], returnValues?: string }) => {
+        this.subscribe("db_insert", async (data: { table: string, values: any | any[], returnValues?: string }) => {
             console.log("Plugin " + this.plugin.name + " wants to insert data into: ", data.table);
 
             if (data.returnValues) {
@@ -88,7 +91,7 @@ export default class CommunicationHandler {
         });
 
         // update
-        this.parent.on("db_update", async (data: { table: string, values: any, filter: any, returnValues?: string }) => {
+        this.subscribe("db_update", async (data: { table: string, values: any, filter: any, returnValues?: string }) => {
             console.log("Plugin " + this.plugin.name + " wants to update data in: ", data.table);
 
             if (data.returnValues) {
@@ -101,14 +104,14 @@ export default class CommunicationHandler {
         });
 
         // delete
-        this.parent.on("db_delete", async (data: { table: string, filter: any }) => {
+        this.subscribe("db_delete", async (data: { table: string, filter: any }) => {
             console.log("Plugin " + this.plugin.name + " wants to delete data from: ", data.table);
 
             return await this.getTable(data.table).delete().match(data.filter);
         });
 
         // call function
-        this.parent.on("db_call", async (data: { name: string, data?: any }) => {
+        this.subscribe("db_call", async (data: { name: string, data?: any }) => {
             console.log("Plugin " + this.plugin.name + " wants to call: ", data.name);
 
             const { data: result } = await this.supabase.rpc(this.getTableName(data.name), data.data);
@@ -117,7 +120,7 @@ export default class CommunicationHandler {
         });
 
         // request fullscreen
-        this.parent.on("triggerFullscreen", async (fullscreen = true) => {
+        this.subscribe("triggerFullscreen", async (fullscreen = true) => {
             console.log(`Plugin ${this.plugin.name} wants to ${fullscreen ? "enter" : "leave"} fullscreen.`);
             try {
                 const ref = document.querySelector("iframe")!
@@ -136,8 +139,18 @@ export default class CommunicationHandler {
     }
 
     async subscribe(topic: string, callback: (data: any) => void) {
-        await this.init();
-        this.parent!.on(topic, callback);
+        if (!this.parent) {
+            // console.log("Parent not ready, waiting for it to be ready");
+            await this.init();
+        }
+        this.parent!.on(topic, (result: { secret: string, data: any }) => {
+            // console.log("Received data from child", result);
+            if (result.secret === this.communicationSecret) {
+                callback(result.data);
+            } else {
+                console.debug(`The child secret ${result.secret} did not match the parent secret ${this.communicationSecret}. Ignoring the data request.`);
+            }
+        });
     }
 
     async getPluginProperty(prop: string) {
