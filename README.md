@@ -19,32 +19,24 @@ The application is accessible via port 3000.
 
 #### SilentReading
 - Loader before first chapter starts (is loading)
-- If one word gets translated and then another it does not show the word
-- Right click translate does not work
 - Let the first chapter disappear when the next one is generated/displayed
 - option to include most difficult words from flashcard from a deck (it is not the topic, rather just words being used somehow in ther)
 
-#### Translator
+#### Translator !!!!!
 - chat does not work WTF
 - Add tts to lookup
 - make translator fixed (it is a toolbar that is needed to work in main plugin better
-- setting where it can be specified what info should be included in "add to flashcard" action (just verb or also additional info,...)
 - make sure same card can not be added twice to same deck
-- "alternative meaning push gets triggered on key press in ask question input
-- Verbs should be displayed in infinitive form (base form) in UI and when getting added as flashcard
-- When adding "blir" to the deck via translator only has the times and not the original word 
-- text at the end of learning should be in center and have celebrating emoji
+- !!!!Verbs should be displayed in infinitive form (base form) in UI and when getting added as flashcard
+- setting where it can be specified what info should be included in "add to flashcard" action (just verb or also additional info,...)
 
 ### Additional todo
-- Saving preferences of user(dont know if in borwser or db)
-- Add event for page scaling iframe to sidebar iframe (it scales its own iframe)
-- change background to a nice dark blue or gray, not black
-- border of iframe just on the left side
+- Saving preferences of user(db)
 - maybe i really need a webworker plugin system too for headless actions like adding info to flashcards or reading info from db and providing it (eg storytelling wants to use most difficult flashcards of the newest deck)
 
-#### Training
+#### Training !!!!!!
 - Pomodoro 10-5-10-5-10
-- When deleting card it should hide the answer again
+- !!!!!When deleting card it should hide the answer again
 - after edit remove the focus of the edit button
 - displaying info in next line in flashcards does not work (its still in same line)
 - After fullscreen got triggered and left you need to press twice to enter fullscreen again
@@ -99,10 +91,7 @@ The application is accessible via port 3000.
 --------------------OLD IDEAS-------------------------------
 ### Stage 2 - AI story generator based on flahcards
 
-- New plugin that is based on story feature of Rimori
-- Initial possibility do define the topic of the story
 - 10-20% are new words
-- Reading aloud with speed adjustment
 
 ### Stage 3 - Ansagen
 
@@ -125,8 +114,6 @@ The application is accessible via port 3000.
 
 ### Additional ideas (notes)
 Based on Anki text you have to write a diktat /text
-
-Sidebar in browser to translate stuff and let it explain stuff for me.
 
 isolated-vm - npm
 https://www.npmjs.com/package/isolated-vm

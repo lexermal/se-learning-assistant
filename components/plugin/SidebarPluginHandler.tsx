@@ -1,16 +1,18 @@
 "use client";
 
-import { ContextMenuAction, MenuEntry } from "./ContextMenu";
-import { use, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
+import { ContextMenuAction, MenuEntry } from "./ContextMenu";
+import { useEventEmitter } from "@/utils/providers/EventEmitterContext";
 import { Plugin } from "../../app/(protected)/plugin/CommunicationHandler";
 import CommunicationHandler from "../../app/(protected)/plugin/CommunicationHandler";
-import { useEventEmitter } from "@/utils/providers/EventEmitterContext";
+import { useTheme } from "next-themes";
 
 export default function SidebarPluginHandler({ plugin, contextMenuAction }: { plugin: Plugin, contextMenuAction: MenuEntry }) {
     const iframeRef = useRef<HTMLDivElement | null>(null);
     const supabase = createClient();
     const [parent, setParent] = useState<CommunicationHandler | null>(null);
+    const { theme } = useTheme();
 
     useEffect(() => {
         if (parent) {
@@ -30,7 +32,9 @@ export default function SidebarPluginHandler({ plugin, contextMenuAction }: { pl
             const iframe = (iframeRef.current.children[0] as HTMLIFrameElement);
 
             // iframe.setAttribute("scrolling", "no");
-            iframe.style.minHeight = `calc(100vh - 324px)`;
+            iframe.style.height = `calc(100vh - 150px)`;
+            parent.emit("themeChange", theme);
+
         });
 
         return () => {
@@ -39,7 +43,7 @@ export default function SidebarPluginHandler({ plugin, contextMenuAction }: { pl
     }, [plugin]);
 
     return (
-        <div ref={iframeRef} className="w-full" style={{ border: "1px solid #ccc" }}></div>
+        <div ref={iframeRef} className="w-full h-full"></div>
     );
 }
 
@@ -72,9 +76,11 @@ export function PluginSidebar({ plugins }: { plugins: Plugin[] }) {
     }
 
     return (
-        <div className="flex flex-col max-w-[450px] w-1/3">
-            <button className="" onClick={() => setSidebarPlugin(null)}>Close</button>
-            <SidebarPluginHandler plugin={sidebarPlugin} contextMenuAction={pluginAction} />
+        <div className="pl-[500px]">
+            <div className="w-[500px] fixed bottom-0 right-0 top-24">
+                <button className="" onClick={() => setSidebarPlugin(null)}>Close</button>
+                <SidebarPluginHandler plugin={sidebarPlugin} contextMenuAction={pluginAction} />
+            </div>
         </div>
     );
 

@@ -46,12 +46,15 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
     useEffect(() => {
         plugin.dbFetch('deck', "id, name, last_used")
             .then(decks => decks.sort((a: any, b: any) => new Date(b.last_used).getTime() - new Date(a.last_used).getTime())).then(setDecks);
+    }, []);
 
+    useEffect(() => {
+        setTranslation(null);
         getLookedUpWord(word).then(translation => {
             setTranslation(translation);
             onTranslationComplete(translation);
         });
-    }, []);
+    }, [word]);
 
     if (!t) {
         return <div className="mx-auto mt-48 w-full max-w-32">
@@ -98,7 +101,7 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
                 } else if (t.type === "verb") {
                     const { present, past, supine, imperative } = t.tenses!;
                     if (t.irregular) {
-                        backPage = `
+                        backPage += `
                         (${present}, ${past}, ${supine}, ${imperative})`;
                     }
                 } else if (t.type === "adjective") {

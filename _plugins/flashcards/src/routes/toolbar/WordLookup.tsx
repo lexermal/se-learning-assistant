@@ -23,7 +23,7 @@ export default function TranslationSidebar() {
     useEffect(() => {
         plugin.subscribe("toolAction", (data: { action: string, text: string }) => {
             if (data.action === 'translate') {
-                // console.log('translate', data.text);
+                console.log('translate', data.text);
                 setWord(data.text);
             }
         });

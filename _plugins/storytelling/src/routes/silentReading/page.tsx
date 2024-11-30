@@ -28,12 +28,12 @@ export default function SilentReading() {
 
     return (
         <div className="flex flex-col w-full max-w-xl py-8 mx-auto stretch">
-            {messages.filter((m, i) => i > 1 && m.role === "assistant").map(m => (
+            {messages.filter((m, i) => i > 1 && m.role === "assistant").map((m, i,ms) => (
                 <Markdown key={m.id} components={{
                     h1: ({ node, ...props }) => (
                         <div className='border-b border-gray-600 mt-8 pb-1 mb-2 flex-row flex items-end'>
                             <h1 className="text-3xl font-bold text-gray-500 min-w-fit mr-1" {...props} />
-                            <AudioPlayer text={m.content} />
+                            {!(isLoading && i === ms.length - 1) && <AudioPlayer text={m.content} />}
                         </div>
                     ),
                     p: ({ node, ...props }) => (
@@ -46,7 +46,7 @@ export default function SilentReading() {
                 onClick={() => append({ role: 'user', content: "Next chapter" })}
             >Next chapter</button>}
 
-            {!isLoading && isFinalChapter && <button className="p-2 mt-4 bg-blue-300 rounded"
+            {!isLoading && isFinalChapter && <button className="p-2 mt-4 bg-blue-950 text-gray-300 rounded"
                 onClick={() => setMessages([])}
             >New story</button>}
         </div>
