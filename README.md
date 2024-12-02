@@ -54,8 +54,6 @@ The application is accessible via port 3000.
 
 #### Training !!!!!!
 
-- displaying info in next line in flashcards does not work (its still in same line)
-- After fullscreen got triggered and left you need to press twice to enter fullscreen again
 - underline flashcard numbers top left which type of card gets displayed
 - Add markdown editor to add flashcard sidebar
 

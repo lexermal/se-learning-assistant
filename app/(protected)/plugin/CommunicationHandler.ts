@@ -120,20 +120,25 @@ export default class CommunicationHandler {
         });
 
         // request fullscreen
-        this.subscribe("triggerFullscreen", async (fullscreen = true) => {
-            console.log(`Plugin ${this.plugin.name} wants to ${fullscreen ? "enter" : "leave"} fullscreen.`);
+        let isFullscreen = false;
+        document.addEventListener("fullscreenchange", () => {
+            isFullscreen = !!document.fullscreenElement;
+            this.call("triggerFullscreen", isFullscreen);
+        });
+
+        this.subscribe("triggerFullscreen", async () => {
+            console.log(`Plugin ${this.plugin.name} wants to ${!isFullscreen ? "enter" : "leave"} fullscreen.`);
             try {
                 const ref = document.querySelector("iframe")!
-                if (fullscreen) {
+                if (!isFullscreen) {
                     // @ts-ignore
                     ref.requestFullscreen() || ref.webkitRequestFullscreen()
                 } else {
                     // @ts-ignore
                     document.exitFullscreen() || document.webkitExitFullscreen()
                 }
-                this.call("triggerFullscreen", { fullscreen, success: true });
-            } catch (error) {
-                this.call("triggerFullscreen", { fullscreen, success: false });
+            } catch (error: any) {
+                console.error("Failed to enter fullscreen", error.message);
             }
         });
     }

@@ -182,6 +182,10 @@ function TrainingNavbar({ deckName, remaining }: { deckName: string, remaining: 
     const plugin = usePlugin();
     const [fullscreen, setFullscreen] = React.useState(false);
 
+    useEffect(() => {
+        plugin.subscribe("triggerFullscreen", setFullscreen);
+    }, []);
+
     return (
         <div className="flex flex-row border-b-2 border-gray-700 items-end justify-between">
             <div className="flex flex-row max-w-1/3 w-1/3">
@@ -198,7 +202,7 @@ function TrainingNavbar({ deckName, remaining }: { deckName: string, remaining: 
             <div className="gap-1 flex font-normal p-1 w-1/3 flex-row-reverse">
                 <div className="mr-1 text-3xl cursor-pointer" onClick={() => {
                     plugin.emitAndWaitResponse("triggerFullscreen", !fullscreen)
-                        .then(({ fullscreen }: any) => setFullscreen(fullscreen));
+                    // .then(() => setFullscreen(!fullscreen));
                 }}>{fullscreen ? <AiOutlineFullscreenExit /> : <AiOutlineFullscreen />}</div>
             </div>
         </div>
