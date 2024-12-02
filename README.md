@@ -30,15 +30,6 @@ The application is accessible via port 3000.
 - Project cleanup (title, pages, files) in main application
 - Put plugins in own docker image to isolate them better (subdomain for plugins)
 - apis should ckeck the cookies to ensure a logged in user accesses them
-- a feature for writing text about a topic and correcting it bz having hints, like at SFI homework.
-
-### Translator
-
-- Make it wider
-- more space before add button
-- Move new search button somewhere else, maybe same line as heading (test it on sidebar too)
-- If a search is triggered and then the new search button is pressed while searching is going on, it shows the "ask wuestions" input
-- If second word is N/A or the same as the first skip it
 
 ### Flashcard training
 

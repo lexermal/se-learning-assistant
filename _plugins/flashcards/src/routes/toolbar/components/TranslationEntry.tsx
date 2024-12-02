@@ -65,26 +65,37 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
     }
 
     const swedishWord = t.infinitive || t.swedish_word;
-    const formattedOtherMeaning = t.alternative_german_meaning ? ` oder ${t.alternative_german_meaning}` : "";
+    let alt = (t.alternative_german_meaning || "").replace("(in einem anderen Kontext)", "");
+
+    if (t.translation_german.includes(alt) || alt.toLowerCase() === "n/a") {
+        alt = "";
+    }
+
+    const formattedOtherMeaning = alt ? ` oder ${alt}` : "";
 
     return (
-        <div className="flex flex-col w-full max-w-xl pt-6 mx-auto stretch text-gray-200">
-            <div className="flex flex-wrap items-end border-b mb-4 pb-1">
-                <div className="mr-1">{t.en_ett_word}</div>
-                <div className="font-bold text-5xl text-white">{swedishWord}</div>
-                <div className="ml-1 pb-1">
-                    <AudioPlayer text={swedishWord} />
+        <div className="flex flex-col w-full max-w-3xl pt-6 mx-auto stretch text-gray-200">
+            <div className="flex flex-row items-end w-full border-b mb-4 pb-1">
+                <div className="flex-1 flex flex-wrap items-end">
+                    <div className="mr-1">{t.en_ett_word}</div>
+                    <div className="font-bold text-5xl text-white">{swedishWord}</div>
+                    <div className="ml-1 pb-1">
+                        <AudioPlayer text={swedishWord+"(swedish)"} />
+                    </div>
+                    {t.singular && <div className='flex flex-row'>
+                        <div className="text-2xl pl-1">({t.singular}/{t.plural})</div>
+                    </div>}
+                    {t.tenses && <div className='flex flex-row flex-wrap items-end'>
+                        <div className="text-2xl">({t.tenses.present}, {t.tenses.past}, {t.tenses.supine}, {t.tenses.imperative})</div>
+                        {t.irregular && <div className="text-sm">(irregular)</div>}
+                    </div>}
+                    {t.adjective && <div className='flex flex-row'>
+                        <div className="text-3xl">({t.adjective.comparative}, {t.adjective.superlative})</div>
+                    </div>}
                 </div>
-                {t.singular && <div className='flex flex-row'>
-                    <div className="text-2xl pl-1">({t.singular}/{t.plural})</div>
-                </div>}
-                {t.tenses && <div className='flex flex-row flex-wrap items-end'>
-                    <div className="text-2xl">({t.tenses.present}, {t.tenses.past}, {t.tenses.supine}, {t.tenses.imperative})</div>
-                    {t.irregular && <div className="text-sm">(irregular)</div>}
-                </div>}
-                {t.adjective && <div className='flex flex-row'>
-                    <div className="text-3xl">({t.adjective.comparative}, {t.adjective.superlative})</div>
-                </div>}
+                <button className="bg-gray-800 p-1 rounded" onClick={() => onAddedToFlashcard()}>
+                    New Search
+                </button>
             </div>
             <div className='flex flex-row'>
                 <div>{t.explanation}</div>
@@ -94,7 +105,7 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
                 <div>{t.translation_german.join(", ")}{formattedOtherMeaning}</div>
             </div>
 
-            <div className='flex flex-col italic mb-2'>
+            <div className='flex flex-col italic mb-3'>
                 <div className="whitespace-pre-wrap">{highlightBoldText(t.example_sentence.swedish)}</div>
                 <div className="whitespace-pre-wrap">{highlightBoldText(t.example_sentence.english)}</div>
                 <div className="whitespace-pre-wrap">{highlightBoldText(t.example_sentence.german)}</div>

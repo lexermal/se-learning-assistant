@@ -30,16 +30,16 @@ const AddToDeckButton = ({ options, onSelect }: { options: Deck[], onSelect: (id
                 </button>
             </div>
             {isOpen && (
-                <div className="absolute mt-2 w-48 bg-white border rounded-md shadow-lg z-50">
-                    <div className="px-4 py-2 text-gray-700 font-semibold border-b">
-                        Add to deck
+                <div className="absolute mt-2 w-48 bg-gray-800 border rounded-md shadow-lg z-50 border-gray-700">
+                    <div className="px-4 py-2 text-gray-100 font-semibold border-b border-gray-700">
+                        Add to deck:
                     </div>
                     <ul className="py-1">
                         {options.map((option: Deck, index: number) => (
                             <li
                                 key={index}
                                 onClick={() => handleOptionClick(option.id)}
-                                className="px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer">
+                                className="px-4 py-2 text-gray-100 hover:bg-gray-100 cursor-pointer">
                                 {option.name}
                             </li>
                         ))}

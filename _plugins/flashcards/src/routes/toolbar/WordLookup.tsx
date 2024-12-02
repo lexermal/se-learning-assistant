@@ -39,9 +39,6 @@ export default function TranslationSidebar() {
     return (
         <div className='p-1'>
             {word.length > 0 && <div>
-                <button className="absolute top-1 right-1 p-1 rounded bg-gray-700 text-gray-200" onClick={() => reset()}>
-                    New Search
-                </button>
                 <TranslationEntry word={word} onTranslationComplete={setTranslation} onAddedToFlashcard={() => reset()} />
             </div>}
             {word.length === 0 &&
@@ -59,7 +56,7 @@ export default function TranslationSidebar() {
                         }} />
                 </div>
             }
-            <div className={"flex flex-col w-full max-w-xl py-3 mx-auto pb-16 " + (!translation ? "hidden" : "")}>
+            <div className={"flex flex-col w-full max-w-3xl py-3 mx-auto pb-16 " + (!translation ? "hidden" : "")}>
                 {messages.length > 2 && <div className="border-b mb-2 mt-1 border-gray-500"></div>}
                 {messages.filter((_, i) => i > 1).map(m => (
                     <div key={m.id} className="whitespace-pre-wrap flex flex-row">
@@ -71,7 +68,7 @@ export default function TranslationSidebar() {
                 <form onSubmit={handleSubmit}>
                     <input
                         value={input}
-                        className="fixed bottom-0 w-full max-w-xl p-2 py-4 bg-gray-700 placeholder-gray-200 rounded shadow-xl"
+                        className="fixed bottom-0 w-full max-w-3xl p-2 py-4 bg-gray-800 placeholder-gray-300 rounded shadow-xl outline-none"
                         placeholder="Ask questions..."
                         onChange={handleInputChange} />
                 </form>
