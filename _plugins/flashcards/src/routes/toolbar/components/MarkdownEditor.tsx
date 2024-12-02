@@ -24,28 +24,28 @@ const EditorButton = ({ action, isActive, label, disabled }: EditorButtonProps) 
         return null;
     }
 
+    if (action.includes("heading")) {
+        const level = parseInt(action[action.length - 1]);
+        return (
+            <button
+                onClick={() => editor.chain().focus().toggleHeading({ level: level }).run()}
+                className={`pl-2 ${isActive ? "is-active" : ""}`}
+            >
+                {label}
+            </button>
+        );
+    }
+
     return (
         <button
             onClick={() => editor.chain().focus()[action]().run()}
             disabled={disabled ? !editor.can().chain().focus()[action]().run() : false}
-            className={`px-2 py-1 text-sm font-medium text-gray-800 ${isActive ? "is-active" : ""}`}
+            className={`pl-2 ${isActive ? "is-active" : ""}`}
         >
             {label}
         </button>
     );
 };
-
-function HeadingButton({ level, icon, isActive }: { level: 1 | 2 | 3, icon: React.ReactNode, isActive: boolean }) {
-    const { editor } = useCurrentEditor();
-    if (!editor) {
-        return null;
-    }
-
-    return <button
-        onClick={() => editor.chain().focus().toggleHeading({ level: level }).run()}
-        className={`px-2 py-1 text-sm font-medium text-gray-800 ${isActive ? "is-active" : ""}`}
-    >{icon}</button>
-}
 
 const MenuBar = () => {
     const { editor } = useCurrentEditor();
@@ -55,19 +55,19 @@ const MenuBar = () => {
     }
 
     return (
-        <div className="bg-gray-500">
+        <div className="bg-gray-800 text-white text-lg flex flex-row flex-wrap items-center py-1">
             <EditorButton action="toggleBold" isActive={editor.isActive("bold")} label={<FaBold />} disabled />
             <EditorButton action="toggleItalic" isActive={editor.isActive("italic")} label={<FaItalic />} disabled />
             <EditorButton action="toggleStrike" isActive={editor.isActive("strike")} label={<FaStrikethrough />} disabled />
             <EditorButton action="toggleCode" isActive={editor.isActive("code")} label={<FaCode />} disabled />
             <EditorButton action="setParagraph" isActive={editor.isActive("paragraph")} label={<FaParagraph />} />
-            <HeadingButton level={1} icon={<LuHeading1 />} isActive={editor.isActive("heading", { level: 1 })} />
-            <HeadingButton level={2} icon={<LuHeading2 />} isActive={editor.isActive("heading", { level: 2 })} />
-            <HeadingButton level={3} icon={<LuHeading3 />} isActive={editor.isActive("heading", { level: 3 })} />
-            <EditorButton action="toggleBulletList" isActive={editor.isActive("bulletList")} label={<AiOutlineUnorderedList />} />
-            <EditorButton action="toggleOrderedList" isActive={editor.isActive("orderedList")} label={<GoListOrdered />} />
-            <EditorButton action="toggleCodeBlock" isActive={editor.isActive("codeBlock")} label={<PiCodeBlock />} />
-            <EditorButton action="toggleBlockquote" isActive={editor.isActive("blockquote")} label={<TbBlockquote />} />
+            <EditorButton action='setHeading1' isActive={editor.isActive("heading", { level: 1 })} label={<LuHeading1 size={"24px"} />} />
+            <EditorButton action='setHeading2' isActive={editor.isActive("heading", { level: 2 })} label={<LuHeading2 size={"24px"} />} />
+            <EditorButton action='setHeading3' isActive={editor.isActive("heading", { level: 3 })} label={<LuHeading3 size={"24px"} />} />
+            <EditorButton action="toggleBulletList" isActive={editor.isActive("bulletList")} label={<AiOutlineUnorderedList size={"24px"} />} />
+            <EditorButton action="toggleOrderedList" isActive={editor.isActive("orderedList")} label={<GoListOrdered size={"24px"} />} />
+            <EditorButton action="toggleCodeBlock" isActive={editor.isActive("codeBlock")} label={<PiCodeBlock size={"24px"} />} />
+            <EditorButton action="toggleBlockquote" isActive={editor.isActive("blockquote")} label={<TbBlockquote size={"24px"} />} />
         </div>
     );
 };
@@ -95,9 +95,9 @@ interface Props {
 
 export const MarkdownEditor = (props: Props) => {
     return (
-        <div className={"text-md border " + props.className} style={{ borderWidth: props.editable ? 1 : 0 }}>
+        <div className={"text-md border border-gray-800 " + props.className} style={{ borderWidth: props.editable ? 1 : 0 }}>
             <EditorProvider
-                key={props.editable ? "editable" : "readonly"}
+                key={(props.editable ? "editable" : "readonly") + props.content}
                 slotBefore={props.editable ? <MenuBar /> : null}
                 extensions={extensions}
                 content={props.content}

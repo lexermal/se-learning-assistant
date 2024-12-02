@@ -8,6 +8,7 @@ import { HashRouter, Route, Routes } from "react-router-dom";
 import './index.css';
 import AddCard from './routes/toolbar/AddCard';
 import TranslationSidebar from './routes/toolbar/WordLookup';
+import { EventEmitterProvider } from './utils/providers/EventEmitterContext';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement,
@@ -17,14 +18,16 @@ root.render(
   <React.StrictMode>
     <PluginProvider>
       <div className='dark:bg-gray-950 bg-white text-gray-900 dark:text-gray-200 min-h-[600px]'>
-        <HashRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-          <Routes>
-            <Route path="/" element={<App />} />
-            <Route path="/deck/:id" element={<Training />} />
-            <Route path="/sidebar/add" element={<AddCard />} />
-            <Route path="/sidebar/translate" element={<TranslationSidebar />} />
-          </Routes>
-        </HashRouter>
+        <EventEmitterProvider>
+          <HashRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <Routes>
+              <Route path="/" element={<App />} />
+              <Route path="/deck/:id" element={<Training />} />
+              <Route path="/sidebar/add" element={<AddCard />} />
+              <Route path="/sidebar/translate" element={<TranslationSidebar />} />
+            </Routes>
+          </HashRouter>
+        </EventEmitterProvider>
       </div>
     </PluginProvider>
   </React.StrictMode>

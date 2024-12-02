@@ -4,6 +4,7 @@
 
 .tiptap {
   padding-top: 5px;
+  padding-left: 7px;
   /* min-height: 300px; */
 
   &:focus-visible {
@@ -77,12 +78,11 @@
   }
 
   code {
-    @apply bg-gray-200 px-1 py-0.5 rounded;
     font-family: monospace;
   }
 
   pre {
-    @apply bg-gray-800 text-white p-4 rounded-lg overflow-x-auto;
+    @apply bg-gray-800 text-gray-500 p-4 rounded-lg overflow-x-auto;
     font-family: monospace;
     white-space: pre-wrap;
     word-wrap: break-word;
@@ -102,11 +102,11 @@
   }
 
   th {
-    @apply bg-gray-200 font-semibold;
+    @apply bg-gray-500 font-semibold;
   }
 
   tr:nth-child(even) {
-    @apply bg-gray-100;
+    @apply bg-gray-400;
   }
 
   @media (max-width: 768px) {

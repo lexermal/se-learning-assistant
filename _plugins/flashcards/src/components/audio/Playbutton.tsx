@@ -14,6 +14,13 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ text, voice = 'alloy' }) => {
     const [isPlaying, setIsPlaying] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
+    //reset on word change
+    useEffect(() => {
+        setAudioUrl(null);
+        setIsPlaying(false);
+        setIsLoading(false);
+    }, [text]);
+
     // Function to generate audio from text using API
     const generateAudio = async () => {
         setIsLoading(true);

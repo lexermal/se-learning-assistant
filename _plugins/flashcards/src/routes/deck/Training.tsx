@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Grade, Rating } from "ts-fsrs";
 import { IoAddCircleOutline } from "react-icons/io5";
 import { MdDelete, MdModeEdit } from "react-icons/md";
@@ -7,6 +7,15 @@ import { AiOutlineFullscreen, AiOutlineFullscreenExit } from "react-icons/ai";
 import FlashcardController, { Flashcard } from "./FlashcardController";
 import MarkdownEditor from "../toolbar/components/MarkdownEditor";
 import { FaSave } from "react-icons/fa";
+import Pomodoro from "./Polodoro";
+import { useEventEmitter } from "../../utils/providers/EventEmitterContext";
+import AudioPlayer from "../../components/audio/Playbutton";
+
+interface FlashcardEdit {
+    front: string,
+    back: string,
+    new: boolean
+}
 
 export default function Training() {
     const plugin = usePlugin();
@@ -16,7 +25,8 @@ export default function Training() {
     const [remaining, setRemaining] = React.useState({ new: 0, learning: 0, review: 0 });
     const [finished, setFinished] = React.useState(false);
     const [deckName, setDeckName] = React.useState("");
-    const [editedCard, setEditedCard] = React.useState<{ front: string, back: string, new: boolean } | undefined>(undefined);
+    const [editedCard, setEditedCard] = React.useState<FlashcardEdit | undefined>(undefined);
+    const { emit } = useEventEmitter();
 
     function getNext() {
         const { card, remaining } = cardController.getNext();
@@ -65,6 +75,11 @@ export default function Training() {
         };
     }, [showAnswer, finished]);
 
+
+    useEffect(() => {
+        emit("pomodoro_start", "");
+    }, [showAnswer]);
+
     function handleKnowledgeButtonClick(action: Grade) {
         setShowAnswer(false);
         if (!card) return;
@@ -75,57 +90,73 @@ export default function Training() {
     return (
         <div className="pb-40">
             <TrainingNavbar deckName={deckName} remaining={remaining} />
-            {finished && <div className="text-center text-2xl text-green-500 mt-24">
+            {finished && <div className="text-center text-3xl text-green-500 mt-[25vh]">
                 You learned all flashcards for today!🎉
             </div>}
-            <div className="pt-40 w-full px-[25%]">
-                <div className="border-l-2 py-4 text-white text-3xl border-gray-700">
-                    {card?.front && <MarkdownEditor className="ml-5" content={editedCard?.new ? "" : card.front} editable={!!editedCard} onUpdate={text => {
-                        setEditedCard({ ...editedCard!, front: text });
-                    }} />}
-                    {showAnswer && (
-                        <div className="border-t text-3xl pt-1 text-white w-full pl-5 border-gray-800">
-                            {card?.back && <MarkdownEditor content={editedCard?.new ? "" : card.back} editable={!!editedCard} onUpdate={text => {
-                                setEditedCard({ ...editedCard!, back: text });
-                            }} />}
-                        </div>)}
-                </div>
-            </div>
-            <div className="fixed bottom-0 w-full p-4 flex flex-row justify-between">
-                <button className="text-2xl p-2" onClick={() => {
+            {!finished && card && <RenderFlashcard
+                card={card}
+                showAnswer={showAnswer}
+                editedCard={editedCard}
+                setEditedCard={setEditedCard} />}
+            <div className="fixed bottom-0 w-full p-4 flex flex-row justify-between items-center">
+                <div className="text-2xl p-2 cursor-pointer" onClick={() => {
                     setEditedCard({ front: "", back: "", new: true });
                     setShowAnswer(true);
                 }
-                }><IoAddCircleOutline /></button>
+                }><IoAddCircleOutline /></div>
                 {(!finished && !showAnswer) && renderShowAnswerButton(() => setShowAnswer(true))}
                 {(!finished && showAnswer && !editedCard) && renderKnowledgButtons(handleKnowledgeButtonClick)}
-                <div className="flex flex-row">
-                    <button className="text-2xl mr-1" onClick={() => {
+                <div className="flex flex-row items-end">
+                    <div className="text-2xl mr-1 cursor-pointer" onClick={() => {
                         if (!editedCard) {
                             setEditedCard({ front: card?.front || "", back: card?.back || "", new: false });
                             return;
                         }
                         if (editedCard.new) {
-                            console.log("saving new card", editedCard);
                             cardController.add(editedCard.front, editedCard.back);
                         } else {
-                            console.log("saving edited card", editedCard);
                             cardController.edit(editedCard.front, editedCard.back);
                         }
                         getNext();
                         setEditedCard(undefined);
                     }}>
                         {!!editedCard ? <FaSave /> : <MdModeEdit />}
-                    </button>
-                    <button className="text-2xl" onClick={() => {
+                    </div>
+                    <div className="text-2xl cursor-pointer" onClick={() => {
                         cardController.delete();
                         setShowAnswer(false);
                         getNext();
-                    }}><MdDelete /></button>
+                    }}><MdDelete /></div>
                 </div>
             </div>
         </div>
     );
+}
+
+function RenderFlashcard(props: { card: Flashcard, showAnswer: boolean, editedCard?: FlashcardEdit, setEditedCard: (editedCard: FlashcardEdit) => void }) {
+    const { card, showAnswer, editedCard, setEditedCard } = props;
+
+    return <div className="pt-[25vh] w-full px-[29%]">
+        <div className={"border-l-2 py-4 text-white text-3xl border-gray-700"}>
+            <div className="flex flex-row items-center ml-4 group">
+                <MarkdownEditor content={editedCard?.new ? "" : card.front} editable={!!editedCard} onUpdate={text => {
+                    setEditedCard({ ...editedCard!, front: text });
+                }} />
+                {!editedCard && <div className="ml-2 opacity-0 group-hover:opacity-100"><AudioPlayer text={card.front} /></div>}
+            </div>
+            {showAnswer && (
+                <div className="border-t text-3xl pt-1 text-white w-full pl-4 border-gray-800 group flex flex-row items-center">
+                    <MarkdownEditor content={editedCard?.new ? "" : card.back} editable={!!editedCard} onUpdate={text => {
+                        setEditedCard({ ...editedCard!, back: text });
+                    }} />
+                    {!editedCard && <div className="ml-2 opacity-0 group-hover:opacity-100"><AudioPlayer text={card.back} /></div>}
+
+                    {/* {card?.back && <MarkdownEditor content={editedCard?.new ? "" : card.back} editable={!!editedCard} onUpdate={text => {
+                        setEditedCard({ ...editedCard!, back: text });
+                    }} />} */}
+                </div>)}
+        </div>
+    </div>
 }
 
 function renderShowAnswerButton(onClick: () => void) {
@@ -138,10 +169,10 @@ function renderShowAnswerButton(onClick: () => void) {
 
 function renderKnowledgButtons(onClick: (action: Grade) => void) {
     return (
-        <div className="flex flex-row justify-evenly gap-2 w-1/3 mx-auto">
+        <div className="flex flex-row justify-evenly gap-2 w-1/3 mx-auto" style={{ padding: "1px 0" }}>
             <button onClick={_ => onClick(Rating.Again)} className="w-1/2 text-purple-700 border border-gray-800 p-2 rounded-lg">Again</button>
             <button onClick={_ => onClick(Rating.Hard)} className="w-1/2 text-red-600 border border-gray-800 p-2 rounded-lg">Hard</button>
-            <button onClick={_ => onClick(Rating.Good)} className="w-1/2 text-orange-600 border border-gray-800 p-2 rounded-lg">Good</button>
+            <button onClick={_ => onClick(Rating.Good)} className="w-1/2 text-yellow-600 border border-gray-800 p-2 rounded-lg">Good</button>
             <button onClick={_ => onClick(Rating.Easy)} className="w-1/2 text-green-600 border border-gray-800 p-2 rounded-lg">Easy</button>
         </div>
     );
@@ -152,18 +183,23 @@ function TrainingNavbar({ deckName, remaining }: { deckName: string, remaining: 
     const [fullscreen, setFullscreen] = React.useState(false);
 
     return (
-        <div className="flex flex-row border-b-2 border-gray-700 items-end">
-            <span className="text-4xl mr-2 pl-2 pt-1 text-gray-300">{deckName}</span>
-            <div className="flex items-end">
-                <span className="mr-2 font-bold text-blue-500">{remaining.new}</span>+
-                <span className="mx-1 font-bold text-red-500">{remaining.learning}</span>+
-                <span className="ml-1 font-bold text-green-600">{remaining.review}</span>
+        <div className="flex flex-row border-b-2 border-gray-700 items-end justify-between">
+            <div className="flex flex-row max-w-1/3 w-1/3">
+                <span className="text-4xl mr-2 pl-2 pt-1 text-gray-300">{deckName}</span>
+                <div className="flex items-end">
+                    <span className="mr-2 font-bold text-blue-500">{remaining.new}</span>+
+                    <span className="mx-1 font-bold text-red-500">{remaining.learning}</span>+
+                    <span className="ml-1 font-bold text-green-600">{remaining.review}</span>
+                </div>
             </div>
-            <div className="ml-auto gap-1 flex font-normal p-1">
-                <button className="mr-1 text-3xl" onClick={() => {
+            <div>
+                <Pomodoro />
+            </div>
+            <div className="gap-1 flex font-normal p-1 w-1/3 flex-row-reverse">
+                <div className="mr-1 text-3xl cursor-pointer" onClick={() => {
                     plugin.emitAndWaitResponse("triggerFullscreen", !fullscreen)
                         .then(({ fullscreen }: any) => setFullscreen(fullscreen));
-                }}>{fullscreen ? <AiOutlineFullscreenExit /> : <AiOutlineFullscreen />}</button>
+                }}>{fullscreen ? <AiOutlineFullscreenExit /> : <AiOutlineFullscreen />}</div>
             </div>
         </div>
     );
