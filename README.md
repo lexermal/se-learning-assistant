@@ -55,7 +55,6 @@ The application is accessible via port 3000.
 #### Training !!!!!!
 
 - underline flashcard numbers top left which type of card gets displayed
-- Add markdown editor to add flashcard sidebar
 
 #### Reading articles in Swedish
 

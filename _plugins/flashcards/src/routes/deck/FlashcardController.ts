@@ -104,6 +104,7 @@ export default class FlashcardController {
 
     private sortCards() {
         this.cards = this.cards.sort((a, b) => a.due.getTime() - b.due.getTime());
+        console.log("Sorting cards", this.cards);
     }
 
     validate(id: string, grade: Grade) {

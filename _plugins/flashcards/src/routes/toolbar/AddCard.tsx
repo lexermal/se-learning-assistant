@@ -1,14 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { usePlugin } from '../../utils/PluginProvider';
-import FlashcardController from '../deck/FlashcardController';
 import { Deck } from '../App';
+import { useState, useEffect } from 'react';
+import { usePlugin } from '../../utils/PluginProvider';
 import { CRUDModal } from '../../components/CRUDModal';
+import MarkdownEditor from './components/MarkdownEditor';
+import FlashcardController from '../deck/FlashcardController';
 
 export default function AddCard() {
     const [decks, setDecks] = useState<Deck[]>([]);
     const [selectedDeck, setSelectedDeck] = useState('');
     const [question, setQuestion] = useState('');
     const [answer, setAnswer] = useState('');
+    const [initValue, setInitValue] = useState("");
+    const [initValueBack, setInitValueBack] = useState("");
     const plugin = usePlugin();
 
     useEffect(() => {
@@ -16,7 +19,7 @@ export default function AddCard() {
         plugin.dbFetch('deck').then(setDecks);
         plugin.subscribe("toolAction", (data: { action: string, text: string }) => {
             // console.log("data received from parent:", data);
-            setQuestion(data.text);
+            setInitValue(data.text);
         });
     }, []);
 
@@ -26,7 +29,8 @@ export default function AddCard() {
         controller.add(question.trim(), answer.trim(), selectedDeck);
         setAnswer('');
         setQuestion('');
-        document.getElementById('question-input')?.focus();
+        setInitValue('');
+        setInitValueBack('');
     };
 
     const DeckModal = () => {
@@ -58,26 +62,14 @@ export default function AddCard() {
                 ))}
                 <option value="new">Create new deck</option>
             </select>
-            <textarea
-                className="w-full p-2 mb-3 border-0 bg-gray-800 rounded"
-                placeholder="front"
-                value={question}
-                onChange={e => setQuestion(e.target.value)}
-                id="question-input"
-            />
-            <textarea
-                className="w-full p-2 mb-4 border-0 bg-gray-800 rounded"
-                placeholder="back"
-                value={answer}
-                onChange={e => setAnswer(e.target.value)}
-                onKeyDown={e => {
-                    if (e.key === 'Enter' && e.ctrlKey) {
-                        handleAddCard();
-                        e.preventDefault();
-                        document.getElementById('question-input')?.focus();
-                    }
-                }}
-            />
+            <p className="text-gray-400">Front</p>
+            <MarkdownEditor
+                className="w-full mb-3 bg-gray-900 rounded"
+                content={initValue} editable={true} onUpdate={setQuestion} />
+            <p className="text-gray-400">Back</p>
+            <MarkdownEditor
+                className="w-full mb-3 bg-gray-900 rounded"
+                content={initValueBack} editable={true} onUpdate={setAnswer} />
             <button
                 className="w-full p-2 bg-blue-800 text-white rounded hover:bg-blue-700"
                 onClick={handleAddCard}>
