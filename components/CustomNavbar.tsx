@@ -32,7 +32,7 @@ export default function CustomNavbar() {
         { name: "Logout", onClick: () => signOutAction() }
     ] as MenuItem[];
 
-    return <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
+    return <nav className="w-full flex justify-center border-b border-b-gray-500 h-16">
         <div className="w-full max-w-5xl flex justify-between items-center p-3 px-5 text-sm">
             <div className="flex gap-5 items-center font-semibold">
                 <div className="text-xl cursor-pointer" onClick={() => router.push("/")}>World Tree</div>
