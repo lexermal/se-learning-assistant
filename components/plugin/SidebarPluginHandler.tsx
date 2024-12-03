@@ -21,25 +21,24 @@ function PluginSidebar({ plugin, contextMenuAction }: { plugin: Plugin, contextM
     }, [contextMenuAction]);
 
     useEffect(() => {
-        const parent = new CommunicationHandler(supabase, plugin, iframeRef.current, contextMenuAction.url);
+        iframeRef.current!.style.opacity = "0";
+
+        const parent = new CommunicationHandler(supabase, plugin, iframeRef.current, contextMenuAction.url, ["h-full", "bg-gray-920"], new Map([["applicationMode", "sidebar"], ["theme", theme || "system"]]));
         setParent(parent);
 
         parent.init().then(() => {
             parent.emit("toolAction", { action: contextMenuAction.action, text: contextMenuAction.text });
-            if (!iframeRef.current) {
-                return;
-            }
-            const iframe = (iframeRef.current.children[0] as HTMLIFrameElement);
 
-            iframe.style.height = `calc(100vh - 4rem)`;
-            parent.emit("themeChange", theme);
+            iframeRef.current!.style.opacity = "1";
         });
 
         return () => { parent.destroy() };
     }, [plugin, contextMenuAction]);
 
     return (
-        <div ref={iframeRef} className="w-full h-full border-l border-gray-600"></div>
+        <div className="dark:bg-gray-920 w-full h-full border-l border-gray-600">
+            <div ref={iframeRef} className="w-full h-full" style={{ opacity: 0 }}></div>
+        </div>
     );
 }
 
@@ -77,7 +76,7 @@ export function SidebarPluginHandler({ plugins }: { plugins: Plugin[] }) {
         <div className="flex flex-row">
             <div style={{ paddingLeft: width + "px" }} className={`pl-[${width}px]`}>
                 <div style={{ width: width + "px" }} className={`fixed bottom-0 right-0 top-16 flex flex-row`}>
-                    <div className="flex flex-col gap-1 w-10">
+                    <div className="flex flex-col gap-1 w-10 pt-1">
                         {sidebarPlugins.map(({ plugin, action }, index) => (
                             <button key={index} style={{ background: index === openPlugin ? "rgb(94, 102, 115)" : "rgb(44, 52, 65)" }} onClick={() => {
                                 setOpenPlugin(index === openPlugin ? -1 : index);

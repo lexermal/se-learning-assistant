@@ -71,20 +71,6 @@ export const PluginProvider: React.FC<PluginProviderProps> = ({ children }) => {
         };
     }, []);
 
-      //theme switch
-      useEffect(() => {
-        document.documentElement.classList.add("bg-gray-950");
-
-        plugin.subscribe('themeChange', theme => {
-            console.log('theme change in storytelling plugin', theme);
-            if (theme === 'dark') {
-                document.documentElement.classList.add("dark");
-            } else {
-                document.documentElement.classList.remove("dark");
-            }
-        });
-    }, []);
-
     return (
         <PluginContext.Provider value={plugin}>
             {children}

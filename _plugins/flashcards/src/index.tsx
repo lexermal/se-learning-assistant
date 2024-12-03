@@ -9,6 +9,9 @@ import './index.css';
 import AddCard from './routes/toolbar/AddCard';
 import TranslationSidebar from './routes/toolbar/WordLookup';
 import { EventEmitterProvider } from './utils/providers/EventEmitterContext';
+import setTheme from './utils/ThemeSetter';
+
+setTheme();
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement,
@@ -17,7 +20,7 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <PluginProvider>
-      <div className='dark:bg-gray-950 bg-white text-gray-900 dark:text-gray-200 min-h-[600px]'>
+      <div className='text-gray-800 dark:text-gray-200 min-h-[600px]'>
         <EventEmitterProvider>
           <HashRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
             <Routes>

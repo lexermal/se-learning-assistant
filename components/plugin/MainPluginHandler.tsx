@@ -50,8 +50,6 @@ export default function MainPluginHandler({ plugin, globalContextMenuActions }: 
             setContextMenuActions([...actions, ...constextActions]);
         });
 
-        connection.emit("themeChange", theme);
-
         return () => { connection.destroy() }
     }, [plugin, hash]);
 

@@ -36,13 +36,31 @@ export default class CommunicationHandler {
     private parent?: Postmate.ParentAPI;
     private communicationSecret: string | null = null;
 
-    constructor(supabase: SupabaseClient, plugin: Plugin, ref: any, hash?: string) {
+    constructor(supabase: SupabaseClient, plugin: Plugin, ref: any, hash?: string, classListArray?: string[], queryParams?: Map<string, string>) {
         hash = "#" + (hash || "").replace("#", "");
         this.plugin = plugin;
         this.supabase = supabase;
         this.communicationSecret = Math.random().toString(36).substring(3);
-        this.pluginConnection = new Postmate({ container: ref, url: plugin.endpoint + "?secret=" + this.communicationSecret + hash, classListArray: ["w-full"] });
+
+        const url = this.getUrl(plugin.endpoint, hash, queryParams);
+
+        this.pluginConnection = new Postmate({ container: ref, url: url, classListArray: [...(classListArray || []), "w-full"] });
         this.init().then(() => this.initSubscribers());
+    }
+
+    private getUrl(endpoint: string, hash: string, queryParams?: Map<string, string>) {
+        const url = new URL(endpoint);
+
+        url.hash = hash;
+        url.searchParams.append("secret", this.communicationSecret!);
+
+        if (queryParams) {
+            queryParams.forEach((value, key) => {
+                url.searchParams.append(key, value);
+            });
+        }
+
+        return url.toString();
     }
 
     private call(topic: string, data: any) {

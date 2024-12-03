@@ -22,7 +22,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={GeistSans.className} suppressHydrationWarning>
-      <body className="bg-background text-foreground">
+      <body>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -30,19 +30,12 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <EventEmitterProvider>
-            <main className="min-h-screen flex flex-col items-center">
+            <main className="min-h-screen flex flex-col items-center dark:bg-gray-950">
               <div className="flex-1 w-full flex flex-col gap-5 items-center">
                 <CustomNavbar />
                 <div className="pl-5 w-full">
                   {children}
                 </div>
-
-                {/* <footer className="w-full flex items-center justify-center border-t mx-auto text-center text-xs gap-8 py-16">
-                  <p>
-                    Powered by Lexermal
-                  </p>
-                  <ThemeSwitcher />
-                </footer> */}
               </div>
             </main>
           </EventEmitterProvider>

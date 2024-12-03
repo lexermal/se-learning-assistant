@@ -8,6 +8,9 @@ import { HashRouter, Route, Routes } from "react-router-dom";
 import './index.css';
 import AddCard from './routes/toolbar/AddCard';
 import SilentReading from './routes/silentReading/page';
+import setTheme from './utils/ThemeSetter';
+
+setTheme();
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement

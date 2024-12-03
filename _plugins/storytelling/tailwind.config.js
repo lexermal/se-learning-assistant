@@ -8,7 +8,13 @@ module.exports = {
     flowbite.content(),
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        gray: {
+          920: 'rgb(6 12 30);', //sidebar background
+        },
+      },
+    },
   },
   plugins: [
     flowbite.plugin(),
