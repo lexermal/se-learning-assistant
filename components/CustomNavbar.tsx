@@ -73,7 +73,7 @@ function DropDownMenu(props: DropMenuProps) {
             <div className="hover:text-gray-300 transition p-4">
                 {props.title}
             </div>
-            <div className={"absolute hidden group-hover:block bg-gray-700 rounded shadow-lg" + (props.rightAligned ? " right-0" : "left-0")}>
+            <div className={"absolute hidden group-hover:block bg-gray-700 rounded shadow-lg z-50 overflow-hidden " + (props.rightAligned ? " right-0" : "left-0")}>
                 <ul className="py-2kk">
                     {props.items.map((item, index) => {
                         return (
