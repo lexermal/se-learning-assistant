@@ -39,7 +39,7 @@ function PluginSidebar({ plugin, contextMenuAction }: { plugin: Plugin, contextM
     }, [plugin, contextMenuAction]);
 
     return (
-        <div ref={iframeRef} className="w-full h-full"></div>
+        <div ref={iframeRef} className="w-full h-full border-l border-gray-600"></div>
     );
 }
 

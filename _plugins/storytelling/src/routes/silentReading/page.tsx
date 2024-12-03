@@ -4,6 +4,8 @@ import { useChat } from 'ai/react';
 import Markdown from 'react-markdown'
 import AudioPlayer from '../../components/audio/Playbutton';
 import { getBackendDomain } from '../../utils/PluginUtils';
+import getSilentReadingPrompt, { Instructions } from './ReadingPromptProvider';
+import { FaGear } from "react-icons/fa6";
 
 export default function SilentReading() {
     const [isFinalChapter, setIsFinalChapter] = useState(false);
@@ -21,8 +23,8 @@ export default function SilentReading() {
     }, [messages]);
 
     if (messages.length === 0) {
-        return <StartScreen onStart={topic => {
-            setMessages([{ id: "1", role: 'system', content: getPrompt(topic, 5) }]);
+        return <StartScreen onStart={instructions => {
+            setMessages([{ id: "1", role: 'system', content: getSilentReadingPrompt(instructions) }]);
             append({ role: 'user', content: "Lets go!" });
         }} />;
     }
@@ -54,43 +56,67 @@ export default function SilentReading() {
     );
 }
 
-function StartScreen(props: { onStart: (topic: string) => void }) {
+function StartScreen(props: { onStart: (i: Instructions) => void }) {
     const [topic, setTopic] = useState("");
+    const [length, setLength] = useState<5 | 8 | 15>(5);
+    const [difficulty, setDifficulty] = useState(1);
+    const [isOpen, setIsOpen] = useState(false);
+
     return (
-        <div className="flex flex-col w-full max-w-md py-24 mx-auto stre7tch">
-            <p className="text-4xl text-center mb-8">Storytelling</p>
+        <div className="flex flex-col w-full max-w-md py-24 mx-auto stretch">
+            <p className="text-4xl text-center mb-8 flex flex-row justify-center items-end group">Storytelling
+                <div className="text-xs ml-1 opacity-0 group-hover:opacity-75 cursor-pointer" onClick={() => setIsOpen(!isOpen)}><FaGear /></div>
+            </p>
             <textarea
-                className="w-full max-w-md p-2 min-h-24 rounded shadow-xl dark:bg-gray-800 dark:text-gray-100"
+                className="w-full max-w-md p-2 min-h-32 rounded shadow-xl dark:bg-gray-800 dark:text-gray-100 border-0"
                 placeholder="What should the story be about?"
                 onChange={e => setTopic(e.target.value)} />
-            <button className="right-0 p-2 mt-4 bg-blue-500 rounded text-xl"
-                onClick={() => props.onStart(topic)}
+
+            <div className="flex flex-col w-full mt-2">
+                <div className={"flex flex-col bg-gray-800 p-4 rounded mt-2 " + (isOpen ? "" : "hidden")}>
+                    <StoryLength length={length} setLength={setLength} />
+                    <DifficultySlider difficulty={difficulty} setDifficulty={setDifficulty} />
+                </div>
+            </div>
+
+            <button className="right-0 p-3 mt-4 bg-blue-700 rounded text-xl opacity-75"
+                onClick={() => props.onStart({ topic, length, difficulty })}
             >Start</button>
         </div>
     );
 }
 
-function getPrompt(storyTopic: string, storyLength: number) {
-    return `
-  Write a short chapter of an adventure story in Swedish using extremely simple vocabulary and present tense. 
-  The text should be suitable for beginners learning Swedish. Avoid complex grammar or idiomatic expressions. 
-  Keep sentences short and direct. The chapter should focus on basic verbs, nouns, and adjectives. 
-  The goal is to create engaging content that helps learners build vocabulary and understand basic sentence structure in Swedish.
-  Include only the text of the chapter, without explanations or translations.
+function StoryLength(props: { length: 5 | 8 | 15, setLength: (l: 5 | 8 | 15) => void }) {
+    return (
+        <div className="flex flex-row text-center items-end w-full opacity-80">
+            <p className='text-xl w-1/2 text-left py-1'>Story length</p>
+            <div className="flex w-1/2 border rounded border-gray-600">
+                <button className={`py-1 grow px-3 rounded-r-none ${props.length === 5 ? 'bg-gray-600' : 'bg-gray-800'} rounded`}
+                    onClick={() => props.setLength(5)}
+                >Short</button>
+                <button className={`py-1 px-3 border-x border-gray-600 ${props.length === 8 ? 'bg-gray-600' : 'bg-gray-800'} `}
+                    onClick={() => props.setLength(8)}
+                >Normal</button>
+                <button className={`py-1 grow px-3 rounded-l-none ${props.length === 15 ? 'bg-gray-600' : 'bg-gray-800'} rounded`}
+                    onClick={() => props.setLength(15)}
+                >Long</button>
+            </div>
+        </div>
+    );
+}
 
-  Example of a chapter:
-  \`\`\`
-  # Chapter 1: The Forest
-  The text of this chapter.
-  \`\`\`
-
-  The chapter should be written in Markdown format. Make use of italic for direct speech.
-  The last chapter has the title: "Hur det slutar" and the final text of the story.
-  Per message, only one chapter should be submitted.
-  The story consists of ${storyLength} chapers in total.
-  After the last chapter, the story is considered finished.
-
-  The story topic is: 
-  ${storyTopic}
-  `;
+function DifficultySlider(props: { difficulty: number, setDifficulty: (d: number) => void }) {
+    return (
+        <div className="flex flex-row items-center mt-4 opacity-80">
+            <label className="text-xl w-1/2">Difficulty</label>
+            <input
+                type="range"
+                min="1"
+                max="10"
+                value={props.difficulty}
+                onChange={e => props.setDifficulty(Number(e.target.value))}
+                className="w-1/2"
+            />
+        </div>
+    );
 }
