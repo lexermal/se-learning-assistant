@@ -80,7 +80,7 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
                     <div className="mr-1">{t.en_ett_word}</div>
                     <div className="font-bold text-5xl text-white">{swedishWord}</div>
                     <div className="ml-1 pb-1">
-                        <AudioPlayer text={swedishWord + " (svenska)"} />
+                        <AudioPlayer text={"(swedish:) "+swedishWord } />
                     </div>
                     {t.singular && <div className='flex flex-row'>
                         <div className="text-2xl pl-1">({t.singular}/{t.plural})</div>
@@ -120,7 +120,7 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
                 controller.add({
                     front: (isEtt ? "ein " : "") + germanTranslation[0] + formattedOtherMeaning,
                     back: getBackPage(t),
-                    deckId: undefined,
+                    deckId: id,
                     frontTags: ["lang:german"],
                     backTags: ["lang:swedish"],
                 })

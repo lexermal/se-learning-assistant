@@ -173,7 +173,7 @@ function RenderFlashcard(props: { card: Flashcard, showAnswer: boolean, editedCa
 function getTTSText(text: string, tags?: string[]) {
     const languageTag = tags?.find(tag => tag.startsWith("lang:"));
 
-    return text.replace(/\(.*?\)/g, "") + (languageTag ? ` (${languageTag})` : "")
+    return (languageTag ? `(${languageTag.replace("lang:", "")}:) ` : "") + text.replace(/\(.*?\)/g, "");
 }
 
 function renderShowAnswerButton(onClick: () => void) {
