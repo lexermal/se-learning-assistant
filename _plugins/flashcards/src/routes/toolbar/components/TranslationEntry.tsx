@@ -93,7 +93,7 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
                         <div className="text-3xl">({t.adjective.comparative}, {t.adjective.superlative})</div>
                     </div>}
                 </div>
-                <button className="bg-gray-800 p-1 rounded" onClick={() => onAddedToFlashcard()}>
+                <button className="bg-gray-700 p-1 px-2 rounded" onClick={() => onAddedToFlashcard()}>
                     New Search
                 </button>
             </div>
