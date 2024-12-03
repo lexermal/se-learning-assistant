@@ -12,12 +12,14 @@ export default function CustomNavbar() {
     const [plugins, setPlugins] = useState<Plugin[]>([]);
     const router = useRouter();
     const [user, setUser] = useState<User | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const supabase = createClient();
 
         supabase.auth.getUser().then(({ data }) => {
             setUser(data.user);
+            setIsLoading(false);
         });
 
         fetch(`/api/plugins`).then(res => res.json()).then(setPlugins);
@@ -41,13 +43,13 @@ export default function CustomNavbar() {
                     })}
                 </div>
             </div>
-            {user ? <DropDownMenu title={<FaUserCircle size={24} />} items={userMenu} rightAligned />
-                : <AuthComponents />}
+            {isLoading ? "" : (user ? <DropDownMenu title={<FaUserCircle size={24} />} items={userMenu} rightAligned />
+                : <AuthComponents />)}
         </div>
     </nav>
 }
 
-function AuthComponents(){
+function AuthComponents() {
     return <div>
         <a href="/sign-in" className="text-gray-300 hover:text-gray-100 bg-gray-800 border border-gray-500 p-2 rounded text-xl">Register</a>
         <a href="/sign-in" className="text-gray-300 hover:text-gray-100 bg-gray-800 border border-gray-500 p-2 rounded text-xl ml-2">Login</a>
