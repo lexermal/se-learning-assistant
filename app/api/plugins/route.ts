@@ -71,13 +71,13 @@ export async function GET() {
             ],
             sidebarPages: [
                 {
-                    name: "Quick add",
-                    url: "/sidebar/add",
-                },
-                {
                     name: "Translate",
                     url: "/sidebar/translate",
                     iconUrl: "http://localhost:3001/plugins/flashcards/translate.png",
+                },
+                {
+                    name: "Quick add",
+                    url: "/sidebar/add",
                 },
             ],
             settingsPage: "/settings",
@@ -97,10 +97,10 @@ export async function GET() {
             isSidebarPlugin: false,
             isMainPlugin: true,
             pluginPages: [
-                {
-                    name: "Entry page",
-                    url: "/",
-                },
+                // {
+                //     name: "Entry page",
+                //     url: "/",
+                // },
                 {
                     name: "Silent reading",
                     url: "/silent-reading",
