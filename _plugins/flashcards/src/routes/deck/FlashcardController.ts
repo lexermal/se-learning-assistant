@@ -1,4 +1,4 @@
-import { Card, createEmptyCard, FSRS, fsrs, generatorParameters, Grade, RecordLogItem, State, StateType } from "ts-fsrs";
+import { Card, createEmptyCard, FSRS, fsrs, generatorParameters, Grade, State } from "ts-fsrs";
 import { PluginController } from "../../utils/PluginController";
 import WhereClauseBuilder from "../../utils/WhereClauseBuilder";
 import { Deck } from "../App";
@@ -11,12 +11,22 @@ export interface Flashcard extends Omit<Card, "due" | "last_review" | "state"> {
     state: State;
     due: Date;
     last_review: Date | null | number;
+    front_tags: string[];
+    back_tags: string[];
 }
 
 export interface FlashcardRemaining {
     new: number;
     learning: number;
     review: number;
+}
+
+interface CrudCard {
+    front: string;
+    back: string;
+    deckId?: string;
+    frontTags: string[];
+    backTags: string[];
 }
 
 export default class FlashcardController {
@@ -45,15 +55,17 @@ export default class FlashcardController {
         this.sortCards();
     }
 
-    add(front: string, back: string, deckId?: string) {
-        const deck_id = deckId || this.deck_id;
+    add(newCard: CrudCard) {
+        const deck_id = newCard.deckId || this.deck_id;
         function cardAfterHandler(card: Card): Flashcard {
             return {
                 ...card,
                 id: "id" + Math.random(),
                 last_review: card.last_review ?? null,
-                front,
-                back,
+                front: newCard.front,
+                back: newCard.back,
+                front_tags: newCard.frontTags || {},
+                back_tags: newCard.backTags || {},
                 deck_id,
             } as Flashcard;
         }
@@ -66,9 +78,11 @@ export default class FlashcardController {
         this.addToDB({ ...card });
     }
 
-    edit(front: string, back: string) {
-        this.cards[0].front = front;
-        this.cards[0].back = back;
+    edit(editCard: CrudCard) {
+        this.cards[0].front = editCard.front;
+        this.cards[0].back = editCard.back;
+        this.cards[0].front_tags = editCard.frontTags;
+        this.cards[0].back_tags = editCard.backTags;
 
         this.db.dbUpdate("cards", { id: this.cards[0].id }, this.cards[0]);
         this.sortCards();

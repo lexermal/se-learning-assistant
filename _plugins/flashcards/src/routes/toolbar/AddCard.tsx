@@ -26,7 +26,13 @@ export default function AddCard() {
     const handleAddCard = () => {
         // console.log('Adding card:', { selectedDeck, question, answer });
         const controller = new FlashcardController(plugin);
-        controller.add(question.trim(), answer.trim(), selectedDeck);
+        controller.add({
+            front: question.trim(),
+            back: answer.trim(),
+            deckId: selectedDeck,
+            frontTags: [],
+            backTags: []
+        });
         setAnswer('');
         setQuestion('');
         setInitValue('');
@@ -48,7 +54,7 @@ export default function AddCard() {
 
     return (
         <div className="p-1 w-full">
-            <h1 className="text-xl font-bold my-5 text-center">Add a flashcard</h1>
+            <h1 className="text-xl font-bold my-5 text-center">Flashcard - Quick Add</h1>
             {selectedDeck === 'new' && <DeckModal />}
             <select
                 value={selectedDeck}

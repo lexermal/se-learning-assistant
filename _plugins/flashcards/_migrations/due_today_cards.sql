@@ -15,7 +15,9 @@ RETURNS TABLE (
   scheduled_days BIGINT,
   stability NUMERIC,
   state TEXT,
-  user_id UUID
+  user_id UUID,
+  front_tags JSON,
+  back_tags JSON
 ) AS $$
 BEGIN
   RETURN QUERY
@@ -39,7 +41,9 @@ BEGIN
         c1.scheduled_days,
         c1.stability,
         c1.state,
-        c1.user_id
+        c1.user_id,
+        c1.front_tags,
+        c1.back_tags
       FROM pl_flashcards_cards c1
       WHERE c1.state IN ('2', '1')
         AND c1.due < CURRENT_DATE + INTERVAL '1 day'
@@ -63,7 +67,9 @@ BEGIN
         c2.scheduled_days,
         c2.stability,
         c2.state,
-        c2.user_id
+        c2.user_id,
+        c2.front_tags,
+        c2.back_tags
       FROM pl_flashcards_cards c2
       WHERE c2.state = '0'
         AND c2.due < CURRENT_DATE + INTERVAL '1 day'

@@ -10,11 +10,14 @@ import { FaSave } from "react-icons/fa";
 import Pomodoro from "./Polodoro";
 import { useEventEmitter } from "../../utils/providers/EventEmitterContext";
 import AudioPlayer from "../../components/audio/Playbutton";
+import TagInput from "../toolbar/components/TagInput";
 
 interface FlashcardEdit {
     front: string,
     back: string,
-    new: boolean
+    new: boolean,
+    frontTags: string[],
+    backTags: string[]
 }
 
 export default function Training() {
@@ -100,7 +103,7 @@ export default function Training() {
                 setEditedCard={setEditedCard} />}
             <div className="fixed bottom-0 w-full p-4 flex flex-row justify-between items-center">
                 <div className="text-2xl p-2 cursor-pointer" onClick={() => {
-                    setEditedCard({ front: "", back: "", new: true });
+                    setEditedCard({ front: "", back: "", new: true, frontTags: [], backTags: [] });
                     setShowAnswer(true);
                 }
                 }><IoAddCircleOutline /></div>
@@ -109,13 +112,19 @@ export default function Training() {
                 <div className="flex flex-row items-end">
                     <div className="text-2xl mr-1 cursor-pointer" onClick={() => {
                         if (!editedCard) {
-                            setEditedCard({ front: card?.front || "", back: card?.back || "", new: false });
+                            setEditedCard({
+                                front: card?.front || "",
+                                back: card?.back || "",
+                                new: false,
+                                frontTags: card?.front_tags || [],
+                                backTags: card?.back_tags || []
+                            });
                             return;
                         }
                         if (editedCard.new) {
-                            cardController.add(editedCard.front, editedCard.back);
+                            cardController.add(editedCard);
                         } else {
-                            cardController.edit(editedCard.front, editedCard.back);
+                            cardController.edit(editedCard);
                         }
                         getNext();
                         setEditedCard(undefined);
@@ -139,24 +148,32 @@ function RenderFlashcard(props: { card: Flashcard, showAnswer: boolean, editedCa
     return <div className="pt-[25vh] w-full px-[29%]">
         <div className={"border-l-2 py-4 text-white text-3xl border-gray-700"}>
             <div className="flex flex-row items-center ml-4 group">
-                <MarkdownEditor content={editedCard?.new ? "" : card.front} editable={!!editedCard} onUpdate={text => {
-                    setEditedCard({ ...editedCard!, front: text });
-                }} />
-                {!editedCard && <div className="ml-2 opacity-0 group-hover:opacity-100"><AudioPlayer text={card.front} /></div>}
+                <div className="flex flex-col">
+                    <MarkdownEditor className="rounded" content={editedCard?.new ? "" : card.front} editable={!!editedCard} onUpdate={text => {
+                        setEditedCard({ ...editedCard!, front: text });
+                    }} />
+                    {editedCard && <TagInput className="mb-3 mt-2" initialTags={editedCard.frontTags} onTagsChange={tags => setEditedCard({ ...editedCard, frontTags: tags })} />}
+                </div>
+                {!editedCard && <div className="ml-2 opacity-0 group-hover:opacity-100"><AudioPlayer text={getTTSText(card.front, card.front_tags)} /></div>}
             </div>
             {showAnswer && (
                 <div className="border-t text-3xl pt-1 text-white w-full pl-4 border-gray-800 group flex flex-row items-center">
-                    <MarkdownEditor content={editedCard?.new ? "" : card.back} editable={!!editedCard} onUpdate={text => {
-                        setEditedCard({ ...editedCard!, back: text });
-                    }} />
-                    {!editedCard && <div className="ml-2 opacity-0 group-hover:opacity-100"><AudioPlayer text={card.back} /></div>}
-
-                    {/* {card?.back && <MarkdownEditor content={editedCard?.new ? "" : card.back} editable={!!editedCard} onUpdate={text => {
-                        setEditedCard({ ...editedCard!, back: text });
-                    }} />} */}
+                    <div className="flex flex-col mt-3">
+                        <MarkdownEditor className="rounded mb-1" content={editedCard?.new ? "" : card.back} editable={!!editedCard} onUpdate={text => {
+                            setEditedCard({ ...editedCard!, back: text });
+                        }} />
+                        {editedCard && <TagInput initialTags={editedCard.backTags} onTagsChange={tags => setEditedCard({ ...editedCard, backTags: tags })} />}
+                    </div>
+                    {!editedCard && <div className="ml-2 opacity-0 group-hover:opacity-100"><AudioPlayer text={getTTSText(card.back, card.back_tags)} /></div>}
                 </div>)}
         </div>
     </div>
+}
+
+function getTTSText(text: string, tags?: string[]) {
+    const languageTag = tags?.find(tag => tag.startsWith("lang:"));
+
+    return text.replace(/\(.*?\)/g, "") + (languageTag ? ` (${languageTag})` : "")
 }
 
 function renderShowAnswerButton(onClick: () => void) {

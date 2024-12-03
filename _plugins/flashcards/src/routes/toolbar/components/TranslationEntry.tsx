@@ -114,8 +114,16 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
                 console.log("translation", t);
                 const controller = new FlashcardController(plugin);
 
+                const isEtt = t.en_ett_word === "ett";
                 const germanTranslation = t.translation_german_word_singular || t.translation_german;
-                controller.add(germanTranslation[0] + formattedOtherMeaning, getBackPage(t), id);
+                
+                controller.add({
+                    front: (isEtt ? "ein " : "") + germanTranslation[0] + formattedOtherMeaning,
+                    back: getBackPage(t),
+                    deckId: undefined,
+                    frontTags: ["lang:german"],
+                    backTags: ["lang:swedish"],
+                })
                 onAddedToFlashcard();
             }} />
         </div>
@@ -123,10 +131,11 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
 }
 
 function getBackPage(t: Translation) {
-    let backPage = t.infinitive || t.swedish_word;;
+    let backPage = t.infinitive || t.swedish_word;
+    const isEtt = t.en_ett_word === "ett";
 
     if (t.type === "noun") {
-        backPage = `${t.en_ett_word === "ett" ? "ett " : ""}${t.singular} (${t.plural})`;
+        backPage = `${isEtt ? "ett " : ""}${t.singular} (${t.plural})`;
     } else if (t.type === "verb") {
         const { present, past, supine, imperative } = t.tenses!;
         if (t.irregular) {
