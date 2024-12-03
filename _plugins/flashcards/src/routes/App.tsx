@@ -19,9 +19,11 @@ function App() {
   const [decks, setDecks] = React.useState([] as DeckSummary[]);
   const { dbUpdate, dbInsert, dbDelete, dbFunctionCall } = usePlugin();
 
-  useEffect(() => {
+  const fetchDecks = () => {
     dbFunctionCall("due_today_summary").then(setDecks);
-  }, []);
+  }
+
+  useEffect(fetchDecks, []);
 
   return (
     <div className="mx-auto bg-gray-800 w-96 p-4 rounded-lg mt-24">
@@ -38,7 +40,7 @@ function App() {
         ))
       }
       <DeckCrudModal className='mt-6 block' buttonText='Add deck' onComplete={name => {
-        dbInsert("deck", { name }, "id, name").then(newDeck => setDecks([...decks, newDeck[0]]));
+        dbInsert("deck", { name }, "id, name").then(fetchDecks);
       }} />
     </div>
   );
@@ -50,10 +52,10 @@ function DeckRow(props: { deck: DeckSummary, onEdit: (id: string, name: string) 
       <Link to={`/deck/${props.deck.id}`} className='flex-1'>
         <span className='cursor-pointer'>{props.deck.name}</span>
       </Link>
-      <div className='flex-2 flex-row'>
-        <span className='mr-2 text-blue-600'>{props.deck.total_new}</span>
-        <span className='mr-2 text-red-700'>{props.deck.total_learning}</span>
-        <span className='mr-2 text-green-600'>{props.deck.total_review}</span>
+      <div className='flex-2 flex-row flex text-right'>
+        <div className='mr-1 w-5 text-blue-600'>{props.deck.total_new}</div>
+        <div className='mr-1 w-5 text-red-700'>{props.deck.total_learning}</div>
+        <div className='mr-1 w-5 text-green-600'>{props.deck.total_review}</div>
       </div>
       <div className='flex-3 flex-row opacity-0 group-hover:opacity-100'>
         <DeckCrudModal buttonText={<MdModeEdit />} deckName={props.deck.name} onComplete={newName => {
