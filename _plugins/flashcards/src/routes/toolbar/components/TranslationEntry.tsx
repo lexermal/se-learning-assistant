@@ -80,7 +80,7 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
                     <div className="mr-1">{t.en_ett_word}</div>
                     <div className="font-bold text-5xl text-white">{swedishWord}</div>
                     <div className="ml-1 pb-1">
-                        <AudioPlayer text={swedishWord+"(swedish)"} />
+                        <AudioPlayer text={swedishWord + " (svenska)"} />
                     </div>
                     {t.singular && <div className='flex flex-row'>
                         <div className="text-2xl pl-1">({t.singular}/{t.plural})</div>

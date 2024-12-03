@@ -26,6 +26,7 @@ export interface Plugin {
         url: string;
         iconUrl?: string;
     }[];
+    settingsPage: string;
 }
 
 export default class CommunicationHandler {

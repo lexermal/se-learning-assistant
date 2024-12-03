@@ -26,6 +26,7 @@ export interface Plugin {
         iconUrl?: string;
     }[];
     iconUrl: string;
+    settingsPage: string;
 }
 
 export async function GET() {
@@ -79,6 +80,7 @@ export async function GET() {
                     iconUrl: "http://localhost:3001/plugins/flashcards/translate.png",
                 },
             ],
+            settingsPage: "/settings",
         },
         {
             id: "2",
@@ -122,7 +124,8 @@ export async function GET() {
                 //     url: "/sidebar/write"
                 // }
             ],
-            sidebarPages: []
+            sidebarPages: [],
+            settingsPage: "/settings",
         },
     ];
 
