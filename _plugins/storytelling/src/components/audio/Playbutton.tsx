@@ -52,7 +52,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ text, voice = 'alloy' }) => {
         }
     };
 
-    const speedOptions = [0.5, 0.75, 0.9, 1.0, 1.1, 1.25, 1.5];
+    const speedOptions = [0.8, 0.9, 1.0, 1.1, 1.2, 1.5];
 
     return (
         <div className="group relative">
