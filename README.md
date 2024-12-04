@@ -33,6 +33,7 @@ The application is accessible via port 3000.
 - apis should ckeck the cookies to ensure a logged in user accesses them
 
 - light theme
+- pretty loading for main plugin
 - Translator: Keyboard shortcut for new search and add to flashcard
 - Training: Show 4th category of words or add them to one of the other categories (cuttently the count is wrong)
 
@@ -42,6 +43,7 @@ The application is accessible via port 3000.
 - Todo app/strikes plugin: Setting one selves a goal and achiving it by ticking it off which gives strikes. Like 3 times reading per week. If not ticket off before midnight it resets strikes to 0, no excelption
 - Support plugin: And asking questions about how world tree works. Bugs can also be reported
 - Flashcards: Import card from Anki
+- Web worker plugins (example code: https://chatgpt.com/c/6748f338-2b48-8007-bbae-ffab5500752c)
 
 ### Swedish story translation
 
@@ -59,6 +61,8 @@ The application is accessible via port 3000.
 - For now let it be working on pages where all text is wisible
 - Alternatively the user can simply past in the whole page (primary usage for an mvp)
 - Upload image and take that as topic, like the SFI sheets
+- Possibly tesseract could make ocr: https://www.npmjs.com/package/tesseract.js
+- example code with tesseract: https://chatgpt.com/c/674f6da5-3068-8007-9d38-2b709c7b1644
 
 #### Sidebar for notes
 
