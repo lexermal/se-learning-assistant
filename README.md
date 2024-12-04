@@ -15,7 +15,6 @@ The application is accessible via port 3000.
 ## Big features of below summarized and prioritized
 
 - Light theme
-- Language adjustment in Translator
 - Public Deployment
 
 - Pronounciation plugin

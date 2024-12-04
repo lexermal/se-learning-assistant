@@ -3,16 +3,18 @@ import { usePlugin } from "../../utils/plugin/providers/PluginProvider";
 import FlashcardController from "../deck/FlashcardController";
 import AudioPlayer from "../../components/audio/Playbutton";
 import AddToDeckButton from "../../components/DropDownButton";
+import { FlashcardPluginSettings } from "../settings/SettingsPage";
+import { getBackendDomain } from "../../utils/plugin/PluginUtils";
 
 export interface Translation {
     swedish_word: string;
-    translation_german: string[];
-    alternative_german_meaning?: string;
-    translation_german_word_singular: string[];
+    translation: string[];
+    translation_alternative_meaning?: string;
+    translation_noun_singular: string[];
     example_sentence: {
         swedish: string;
         english: string;
-        german: string;
+        mother_tongue: string;
     };
     type: string;
     explanation: string;
@@ -43,20 +45,25 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
     const [t, setTranslation] = useState<Translation | null>(null);
     const [decks, setDecks] = useState<any[]>([]);
     const plugin = usePlugin();
-    console.log(t);
+    const [settings, setSettings] = useState<FlashcardPluginSettings | null>(null);
+
+    console.log({ settings, translation: t });
 
     useEffect(() => {
+        plugin.getSettings<FlashcardPluginSettings>().then(setSettings);
         plugin.dbFetch('deck', "id, name, last_used")
             .then(decks => decks.sort((a: any, b: any) => new Date(b.last_used).getTime() - new Date(a.last_used).getTime())).then(setDecks);
     }, []);
 
     useEffect(() => {
         setTranslation(null);
-        getLookedUpWord(word).then(translation => {
+        if (!word || !settings) return
+
+        getLookedUpWord(word, settings.motherTongue).then(translation => {
             setTranslation(translation);
             onTranslationComplete(translation);
         });
-    }, [word]);
+    }, [word, settings]);
 
     if (!t) {
         return <div className="mx-auto mt-48 w-full max-w-32">
@@ -65,13 +72,13 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
     }
 
     const swedishWord = t.infinitive || t.swedish_word;
-    let alt = (t.alternative_german_meaning || "").replace("(in einem anderen Kontext)", "");
+    let alt = (t.translation_alternative_meaning || "");
 
-    if (t.translation_german.includes(alt) || alt.toLowerCase() === "n/a") {
+    if (t.translation.includes(alt) || alt.toLowerCase() === "n/a") {
         alt = "";
     }
 
-    const formattedOtherMeaning = alt ? ` oder ${alt}` : "";
+    const formattedOtherMeaning = alt ? ` ${settings?.translation_term_or} ${alt}` : "";
 
     return (
         <div className="flex flex-col w-full max-w-3xl pt-6 mx-auto stretch text-gray-200">
@@ -102,26 +109,26 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
             </div>
 
             <div className='flex flex-row text-4xl mt-3 mb-3 text-white'>
-                <div>{t.translation_german.join(", ")}{formattedOtherMeaning}</div>
+                <div>{t.translation.join(", ")}{formattedOtherMeaning}</div>
             </div>
 
             <div className='flex flex-col italic mb-3'>
                 <div className="whitespace-pre-wrap">{highlightBoldText(t.example_sentence.swedish)}</div>
                 <div className="whitespace-pre-wrap">{highlightBoldText(t.example_sentence.english)}</div>
-                <div className="whitespace-pre-wrap">{highlightBoldText(t.example_sentence.german)}</div>
+                <div className="whitespace-pre-wrap">{highlightBoldText(t.example_sentence.mother_tongue)}</div>
             </div>
             <AddToDeckButton options={decks} onSelect={id => {
                 console.log("translation", t);
                 const controller = new FlashcardController(plugin);
 
                 const isEtt = t.en_ett_word === "ett";
-                const germanTranslation = t.translation_german_word_singular || t.translation_german;
+                const targetTranslation = t.translation_noun_singular || t.translation;
 
                 controller.add({
-                    front: (isEtt ? "ein " : "") + germanTranslation[0] + formattedOtherMeaning,
+                    front: (isEtt ? settings?.translation_term_one + " " : "") + targetTranslation[0] + formattedOtherMeaning,
                     back: getBackPage(t),
                     deckId: id,
-                    frontTags: ["lang", "lang:german"],
+                    frontTags: ["lang", "lang:" + settings?.motherTongue],
                     backTags: ["lang", "lang:swedish"],
                 })
                 onAddedToFlashcard();
@@ -148,17 +155,17 @@ function getBackPage(t: Translation) {
     return backPage;
 }
 
-async function getLookedUpWord(word: string) {
+async function getLookedUpWord(word: string, targetLanguage: string = "german") {
     const prompt = `
     You are a language processing assistant specialized in Swedish vocabulary. When given a Swedish word, your task is to provide a JSON-formatted output with the following information:
 
     1. The word itself.
     2. A short, easy example sentence using the word in Swedish.
-    3. Translations of the word into German (provide multiple appropriate terms, if applicable).
-    4. The example sentence translated into both English and German. The word is highlighted in the sentences.
+    3. Translations of the word into ${targetLanguage} (provide multiple appropriate terms, if applicable).
+    4. The example sentence translated into both English and ${targetLanguage}. The word is highlighted in the sentences.
     5. The word's type (e.g., noun, verb, adjective, etc.).
     6. A clear explanation of the word in English.
-    7. If it has a second meaning, provide an alternative German translation.
+    7. If it has a second meaning, provide an alternative ${targetLanguage} translation.
     8. Additional information based on the word's type:
     - **For nouns**:
       - Singular and plural form.
@@ -176,18 +183,18 @@ async function getLookedUpWord(word: string) {
     ### Example Input:
     "fjäll"
 
-    ### Example Output:
+    ### Example Output for german:
     \`\`\`json
     {
         "swedish_word": "fjäll",
         "type": "noun",
-        "translation_german": ["Berge", "Gebirge"],
-        "alternative_german_meaning": "Schuppen (bei Tieren)", 
-        "translation_german_word_singular": ["Berg"],   
+        "translation": ["Berge", "Gebirge"],
+        "translation_alternative_meaning": "Schuppen (bei Tieren)", 
+        "translation_noun_singular": ["Berg"],   
         "example_sentence": {
             "swedish": "Vi vandrade i **fjällen** i somras.",
             "english": "We hiked in **the mountains** last summer.",
-            "german": "Wir wanderten letzten Sommer im **Gebirge**."
+            "mother_tongue": "Wir wanderten letzten Sommer im **Gebirge**."
         },
         "explanation": "Can mean a mountain range or fell (in Scandinavia) or scales (on animals).",
         "singular": "fjäll",
@@ -221,11 +228,13 @@ async function getLookedUpWord(word: string) {
             "superlative": "störst"
         }
     }
+
+    The target language is: ${targetLanguage}
     \`\`\``;
 
-    return await fetch('http://localhost:3000/api/chat', {
+    return await fetch(getBackendDomain() + '/api/chat', {
         method: 'POST',
-        body: JSON.stringify({ messages: [{ role: 'system', content: prompt }, { role: 'user', content: "Look uo the word(s): " + word }] })
+        body: JSON.stringify({ messages: [{ role: 'system', content: prompt }, { role: 'user', content: "Look up the word(s): " + word }] })
     })
         .then(r => r.json())
         //remove first and last line
