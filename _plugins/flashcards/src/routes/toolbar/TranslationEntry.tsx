@@ -115,7 +115,7 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
             <div className='flex flex-col italic mb-3'>
                 <div className="whitespace-pre-wrap">{highlightBoldText(t.example_sentence.swedish)}</div>
                 <div className="whitespace-pre-wrap">{highlightBoldText(t.example_sentence.english)}</div>
-                <div className="whitespace-pre-wrap">{highlightBoldText(t.example_sentence.mother_tongue)}</div>
+                {!!t.example_sentence.mother_tongue && <div className="whitespace-pre-wrap">{highlightBoldText(t.example_sentence.mother_tongue)}</div>}
             </div>
             <AddToDeckButton options={decks} onSelect={id => {
                 console.log("translation", t);
