@@ -160,6 +160,21 @@ export default class CommunicationHandler {
                 console.error("Failed to enter fullscreen", error.message);
             }
         });
+
+        // get settings
+        this.subscribe("get_settings", async () => {
+            console.log(`Plugin ${this.plugin.name} wants to get settings.`);
+            const { data } = await this.supabase.from("plugin_settings").select("*").eq("plugin_id", this.plugin.id);
+            console.log("fetched Settings", data);
+            this.call("get_settings", data?.length ? data[0].settings : null);
+        });
+
+        // set settings
+        this.subscribe("set_settings", async (data: any) => {
+            console.log(`Plugin ${this.plugin.name} wants to set settings.`);
+            await this.supabase.from("plugin_settings").upsert({ plugin_id: this.plugin.id, settings: data });
+        });
+
     }
 
     async subscribe(topic: string, callback: (data: any) => void) {

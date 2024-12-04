@@ -26,6 +26,8 @@ export class PluginController {
         this.dbUpdate = this.dbUpdate.bind(this);
         this.dbDelete = this.dbDelete.bind(this);
         this.subscribe = this.subscribe.bind(this);
+        this.setSettings = this.setSettings.bind(this);
+        this.getSettings = this.getSettings.bind(this);
         this.dbFunctionCall = this.dbFunctionCall.bind(this);
         this.emitAndWaitResponse = this.emitAndWaitResponse.bind(this);
     }
@@ -101,5 +103,13 @@ export class PluginController {
 
     public async dbFunctionCall(name: string, data?: any): Promise<any> {
         return await this.emitAndWaitResponse("db_call", { name, data });
+    }
+
+    public async getSettings<T>(): Promise<T> {
+        return await this.emitAndWaitResponse("get_settings", {}) as T;
+    }
+
+    public async setSettings(settings: any) {
+        await this.emitAndWaitResponse("set_settings", settings);
     }
 }

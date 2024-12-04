@@ -144,6 +144,8 @@ export default function Training() {
 
 function RenderFlashcard(props: { card: Flashcard, showAnswer: boolean, editedCard?: FlashcardEdit, setEditedCard: (editedCard: FlashcardEdit) => void }) {
     const { card, showAnswer, editedCard, setEditedCard } = props;
+    const frontTtsEnabled = card.front_tags?.includes("lang")
+    const backTtsEnabled = card.back_tags?.includes("lang");
 
     return <div className="pt-[25vh] w-full px-[29%]">
         <div className={"border-l-2 py-4 text-white text-3xl border-gray-700"}>
@@ -154,7 +156,9 @@ function RenderFlashcard(props: { card: Flashcard, showAnswer: boolean, editedCa
                     }} />
                     {editedCard && <TagInput className="mb-3 mt-2" initialTags={editedCard.frontTags} onTagsChange={tags => setEditedCard({ ...editedCard, frontTags: tags })} />}
                 </div>
-                {!editedCard && <div className="ml-2 opacity-0 group-hover:opacity-100"><AudioPlayer text={getTTSText(card.front, card.front_tags)} /></div>}
+                {!editedCard && frontTtsEnabled && <div className="ml-2 opacity-0 group-hover:opacity-100">
+                    <AudioPlayer text={getTTSText(card.front, card.front_tags)} />
+                </div>}
             </div>
             {showAnswer && (
                 <div className="border-t text-3xl pt-1 text-white w-full pl-4 border-gray-800 group flex flex-row items-center">
@@ -164,7 +168,9 @@ function RenderFlashcard(props: { card: Flashcard, showAnswer: boolean, editedCa
                         }} />
                         {editedCard && <TagInput initialTags={editedCard.backTags} onTagsChange={tags => setEditedCard({ ...editedCard, backTags: tags })} />}
                     </div>
-                    {!editedCard && <div className="ml-2 opacity-0 group-hover:opacity-100"><AudioPlayer text={getTTSText(card.back, card.back_tags)} /></div>}
+                    {!editedCard && backTtsEnabled && <div className="ml-2 opacity-0 group-hover:opacity-100">
+                        <AudioPlayer text={getTTSText(card.back, card.back_tags)} />
+                    </div>}
                 </div>)}
         </div>
     </div>

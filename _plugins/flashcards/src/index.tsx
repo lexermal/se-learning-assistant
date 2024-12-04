@@ -1,13 +1,9 @@
-import React from 'react';
-import App from './routes/DeckOverviewPage';
+import React, { lazy } from 'react';
 import ReactDOM from 'react-dom/client';
-import Training from './routes/deck/FlashcardTrainingPage';
 import reportWebVitals from './reportWebVitals';
 import { PluginProvider } from './utils/plugin/providers/PluginProvider';
 import { HashRouter, Route, Routes } from "react-router-dom";
 import './index.css';
-import AddCard from './routes/toolbar/AddCardPage';
-import TranslationSidebar from './routes/toolbar/TranslatorPage';
 import { EventEmitterProvider } from './utils/plugin/providers/EventEmitterContext';
 import setTheme from './utils/plugin/ThemeSetter';
 
@@ -17,6 +13,12 @@ const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement,
 );
 
+const Home = lazy(() => import('./routes/DeckOverviewPage'));
+const AddCard = lazy(() => import('./routes/toolbar/AddCardPage'));
+const Training = lazy(() => import('./routes/deck/FlashcardTrainingPage'));
+const SettingsPage = lazy(() => import('./routes/settings/SettingsPage'));
+const TranslationSidebar = lazy(() => import('./routes/toolbar/TranslatorPage'));
+
 root.render(
   <React.StrictMode>
     <PluginProvider>
@@ -24,7 +26,8 @@ root.render(
         <EventEmitterProvider>
           <HashRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
             <Routes>
-              <Route path="/" element={<App />} />
+              <Route path="/" element={<Home />} />
+              <Route path="/settings" element={<SettingsPage />} />
               <Route path="/deck/:id" element={<Training />} />
               <Route path="/sidebar/add" element={<AddCard />} />
               <Route path="/sidebar/translate" element={<TranslationSidebar />} />

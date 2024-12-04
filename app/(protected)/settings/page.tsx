@@ -3,6 +3,7 @@
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
 import { Plugin } from "../plugin/CommunicationHandler";
+import SettingsPluginHandler from '@/components/plugin/SettingsPluginHandler';
 
 const SettingsPage = () => {
     const [plugins, setPlugins] = useState<Plugin[]>([]);
@@ -14,13 +15,13 @@ const SettingsPage = () => {
 
     const entries = [{ name: "general", title: "General" }].concat(plugins);
     return (
-        <div style={{ display: 'flex', height: '100vh' }}>
-            <div style={{ width: '200px', borderRight: '1px solid #ccc' }}>
+        <div className="flex h-screen">
+            <div className="ml-5 border-r border-gray-600">
                 <ul>
                     {entries.map((plugin, index) => (
                         <li
                             key={plugin.name}
-                            style={{ padding: '10px', cursor: 'pointer', backgroundColor: index === settingIndex + 1 ? '#f0f0f0' : 'transparent' }}
+                            className={`p-2 pr-10 rounded-l cursor-pointer ${index === settingIndex + 1 ? 'bg-gray-600' : 'bg-transparent'}`}
                             onClick={() => setSettingIndex(index - 1)}
                         >
                             {plugin.title}
@@ -28,7 +29,7 @@ const SettingsPage = () => {
                     ))}
                 </ul>
             </div>
-            <div style={{ flex: 1, padding: '20px' }}>
+            <div className="flex-1 p-5">
                 {settingIndex === -1 ? <GeneralSettings /> : <PluginSettings plugin={plugins[settingIndex]} />}
             </div>
         </div>
@@ -37,27 +38,23 @@ const SettingsPage = () => {
 
 function PluginSettings(props: { plugin: Plugin }) {
     const { title, settingsPage } = props.plugin;
-
-    if (!settingsPage) {
-        return (<div>
-            <h1>{title} Settings</h1>
-            <div>No settings available</div>
+    return (
+        <div>
+            <h1 className="text-3xl font-bold">{title} Settings</h1>
+            <div>
+                {!settingsPage ? <div>No settings available</div> : <SettingsPluginHandler plugin={props.plugin} />}
+            </div>
         </div>
-        );
-    }
-    return <div>
-        <h1>{title} Settings</h1>
-        <div>Iframe stuff</div>
-    </div>
+    );
 }
 
 function GeneralSettings() {
-    const { theme, setTheme } = useTheme();
+    const { setTheme } = useTheme();
     return (
         <div>
-            <h1>General Settings</h1>
-            <button onClick={() => setTheme('light')}>Light</button>
-            <button onClick={() => setTheme('dark')}>Dark</button>
+            <h1 className="text-xl font-bold">General Settings</h1>
+            <button className="mr-2 p-2 bg-blue-500 text-white rounded" onClick={() => setTheme('light')}>Light</button>
+            <button className="p-2 bg-gray-800 text-white rounded" onClick={() => setTheme('dark')}>Dark</button>
         </div>
     );
 }

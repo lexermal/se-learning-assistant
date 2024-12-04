@@ -121,8 +121,8 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
                     front: (isEtt ? "ein " : "") + germanTranslation[0] + formattedOtherMeaning,
                     back: getBackPage(t),
                     deckId: id,
-                    frontTags: ["lang:german"],
-                    backTags: ["lang:swedish"],
+                    frontTags: ["lang", "lang:german"],
+                    backTags: ["lang", "lang:swedish"],
                 })
                 onAddedToFlashcard();
             }} />
