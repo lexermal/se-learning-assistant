@@ -3,9 +3,9 @@ import Markdown from 'react-markdown';
 import { useEffect, useState } from 'react';
 import { RiRobot3Fill } from "react-icons/ri";
 import { FaUserCircle } from "react-icons/fa";
-import { usePlugin } from '../../utils/PluginProvider';
-import { getBackendDomain } from '../../utils/PluginUtils';
-import TranslationEntry, { Translation } from './components/TranslationEntry';
+import { usePlugin } from '../../utils/plugin/providers/PluginProvider';
+import { getBackendDomain } from '../../utils/plugin/PluginUtils';
+import TranslationEntry, { Translation } from './TranslationEntry';
 
 export default function TranslationSidebar() {
     const [translation, setTranslation] = useState<Translation | null>(null);

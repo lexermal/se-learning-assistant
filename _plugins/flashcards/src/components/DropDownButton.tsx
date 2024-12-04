@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Deck } from "../../App";
+import { Deck } from "../routes/DeckOverviewPage";
 import { FaGear } from "react-icons/fa6";
 
 const AddToDeckButton = ({ options, onSelect }: { options: Deck[], onSelect: (id: string) => void }) => {

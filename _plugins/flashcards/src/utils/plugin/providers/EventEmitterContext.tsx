@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useRef } from "react";
-import EventEmitter from "../EventEmitter";
+import EventEmitter from "./EventEmitter";
 
 // Create the Context
 const EventEmitterContext = createContext<EventEmitter | null>(null);

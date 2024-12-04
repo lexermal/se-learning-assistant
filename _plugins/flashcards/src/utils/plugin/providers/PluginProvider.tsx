@@ -1,5 +1,5 @@
 import React, { createContext, useContext, ReactNode, useEffect } from 'react';
-import { PluginController } from './PluginController';
+import { PluginController } from '../PluginController';
 
 interface PluginProviderProps {
     children: ReactNode;

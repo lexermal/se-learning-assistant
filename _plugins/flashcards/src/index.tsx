@@ -1,15 +1,15 @@
 import React from 'react';
-import App from './routes/App';
+import App from './routes/DeckOverviewPage';
 import ReactDOM from 'react-dom/client';
-import Training from './routes/deck/Training';
+import Training from './routes/deck/FlashcardTrainingPage';
 import reportWebVitals from './reportWebVitals';
-import { PluginProvider } from './utils/PluginProvider';
+import { PluginProvider } from './utils/plugin/providers/PluginProvider';
 import { HashRouter, Route, Routes } from "react-router-dom";
 import './index.css';
-import AddCard from './routes/toolbar/AddCard';
-import TranslationSidebar from './routes/toolbar/WordLookup';
-import { EventEmitterProvider } from './utils/providers/EventEmitterContext';
-import setTheme from './utils/ThemeSetter';
+import AddCard from './routes/toolbar/AddCardPage';
+import TranslationSidebar from './routes/toolbar/TranslatorPage';
+import { EventEmitterProvider } from './utils/plugin/providers/EventEmitterContext';
+import setTheme from './utils/plugin/ThemeSetter';
 
 setTheme();
 

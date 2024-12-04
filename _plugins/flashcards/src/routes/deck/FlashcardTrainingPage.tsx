@@ -2,15 +2,15 @@ import React, { useEffect } from "react";
 import { Grade, Rating } from "ts-fsrs";
 import { IoAddCircleOutline } from "react-icons/io5";
 import { MdDelete, MdModeEdit } from "react-icons/md";
-import { usePlugin } from "../../utils/PluginProvider";
+import { usePlugin } from "../../utils/plugin/providers/PluginProvider";
 import { AiOutlineFullscreen, AiOutlineFullscreenExit } from "react-icons/ai";
 import FlashcardController, { Flashcard } from "./FlashcardController";
-import MarkdownEditor from "../toolbar/components/MarkdownEditor";
+import MarkdownEditor from "../../components/form/MarkdownEditor";
 import { FaSave } from "react-icons/fa";
-import Pomodoro from "./Polodoro";
-import { useEventEmitter } from "../../utils/providers/EventEmitterContext";
+import Pomodoro from "../../components/Polodoro";
+import { useEventEmitter } from "../../utils/plugin/providers/EventEmitterContext";
 import AudioPlayer from "../../components/audio/Playbutton";
-import TagInput from "../toolbar/components/TagInput";
+import TagInput from "../../components/form/TagInput";
 
 interface FlashcardEdit {
     front: string,

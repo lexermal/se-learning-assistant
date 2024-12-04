@@ -1,6 +1,6 @@
 import React, { ReactElement, useEffect } from 'react';
 import { Link } from "react-router-dom";
-import { usePlugin } from '../utils/PluginProvider';
+import { usePlugin } from '../utils/plugin/providers/PluginProvider';
 import { CRUDModal } from '../components/CRUDModal';
 import { MdDelete, MdModeEdit } from 'react-icons/md';
 

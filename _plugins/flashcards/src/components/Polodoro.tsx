@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { FaPauseCircle, FaPlayCircle, FaStopCircle } from 'react-icons/fa';
-import { useEventEmitter } from '../../utils/providers/EventEmitterContext';
+import { useEventEmitter } from '../utils/plugin/providers/EventEmitterContext';
 
 interface Session {
   type: 'Study' | 'Relax';
