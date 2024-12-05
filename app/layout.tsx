@@ -1,25 +1,16 @@
-import { ThemeSwitcher } from "@/components/theme-switcher";
 import { GeistSans } from "geist/font/sans";
 import { ThemeProvider } from "next-themes";
-import "./globals.css";
-import { EventEmitterProvider } from "@/utils/providers/EventEmitterContext";
 import CustomNavbar from "@/components/CustomNavbar";
-
-const defaultUrl = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
-  : "http://localhost:3000";
+import { EventEmitterProvider } from "@/utils/providers/EventEmitterContext";
+import "./globals.css";
 
 export const metadata = {
-  metadataBase: new URL(defaultUrl),
-  title: "World Tree",
-  description: "Where the community drives the content",
+  title: "Rimori",
+  metadataBase: new URL("https://rimori.se"),
+  description: "Where the community drives the content.",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={GeistSans.className} suppressHydrationWarning>
       <body>
@@ -27,13 +18,12 @@ export default function RootLayout({
           attribute="class"
           defaultTheme="system"
           enableSystem
-          disableTransitionOnChange
-        >
+          disableTransitionOnChange>
           <EventEmitterProvider>
             <main className="min-h-screen flex flex-col items-center dark:bg-gray-950">
-              <div className="flex-1 w-full flex flex-col gap-5 items-center">
+              <div className="flex-1 w-full flex flex-col items-center">
                 <CustomNavbar />
-                <div className="pl-5 w-full">
+                <div className="w-full">
                   {children}
                 </div>
               </div>
