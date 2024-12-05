@@ -5,6 +5,7 @@ import AudioPlayer from "../../components/audio/Playbutton";
 import AddToDeckButton from "../../components/DropDownButton";
 import { FlashcardPluginSettings } from "../settings/SettingsPage";
 import { getBackendDomain } from "../../utils/plugin/PluginUtils";
+import { PluginController } from "../../utils/plugin/PluginController";
 
 export interface Translation {
     swedish_word: string;
@@ -59,7 +60,7 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
         setTranslation(null);
         if (!word || !settings) return
 
-        getLookedUpWord(word, settings.motherTongue).then(translation => {
+        getLookedUpWord(word, settings.motherTongue, plugin).then(translation => {
             setTranslation(translation);
             onTranslationComplete(translation);
         });
@@ -96,7 +97,7 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
                         <div className="text-2xl">({t.tenses.present}, {t.tenses.past}, {t.tenses.supine}, {t.tenses.imperative})</div>
                         {t.irregular && <div className="text-sm">(irregular)</div>}
                     </div>}
-                    {t.adjective && <div className='flex flex-row'>
+                    {!!t.adjective?.comparative && <div className='flex flex-row'>
                         <div className="text-3xl">({t.adjective.comparative}, {t.adjective.superlative})</div>
                     </div>}
                 </div>
@@ -155,7 +156,7 @@ function getBackPage(t: Translation) {
     return backPage;
 }
 
-async function getLookedUpWord(word: string, targetLanguage: string = "german") {
+async function getLookedUpWord(word: string, targetLanguage: string = "german", plugin: PluginController): Promise<Translation> {
     const prompt = `
     You are a language processing assistant specialized in Swedish vocabulary. When given a Swedish word, your task is to provide a JSON-formatted output with the following information:
 
@@ -232,13 +233,11 @@ async function getLookedUpWord(word: string, targetLanguage: string = "german") 
     The target language is: ${targetLanguage}
     \`\`\``;
 
-    return await fetch(getBackendDomain() + '/api/chat', {
-        method: 'POST',
-        body: JSON.stringify({ messages: [{ role: 'system', content: prompt }, { role: 'user', content: "Look up the word(s): " + word }] })
-    })
-        .then(r => r.json())
+    return await plugin.getAIResponse([
+        { role: 'system', content: prompt },
+        { role: 'user', content: "Look up the word(s): " + word }])
         //remove first and last line
-        .then(json => JSON.parse(json.messages[0].content[0].text.split('\n').slice(1, -1).join('\n')));
+        .then((json: any) => JSON.parse(json.split('\n').slice(1, -1).join('\n')));
 }
 
 function highlightBoldText(text: string) {

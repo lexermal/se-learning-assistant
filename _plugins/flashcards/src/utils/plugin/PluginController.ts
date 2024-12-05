@@ -112,4 +112,20 @@ export class PluginController {
     public async setSettings(settings: any) {
         await this.emitAndWaitResponse("set_settings", settings);
     }
+
+    public async getAIResponse(messages: { role: string, content: string }[]) {
+        return this.emitAndWaitResponse("getAIResponse", messages);
+    }
+
+    public getAIResponseStream(messages: { role: string, content: string }[], onMessage: (id: string, message: string, finished: boolean) => void) {
+        let triggered = false;
+
+        this.emit("getAIResponseStream", messages);
+        this.subscribe("getAIResponseStream", (data: { id: string, response: string, finished: boolean }) => {
+            if (triggered) return;
+            triggered = data.finished;
+            onMessage(data.id, data.response, data.finished);
+        })
+    }
+
 }

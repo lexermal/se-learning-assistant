@@ -1,24 +1,25 @@
-import { useChat } from 'ai/react';
 import { useEffect, useState } from 'react';
 import { RiRobot3Fill } from "react-icons/ri";
 import { FaUserCircle } from "react-icons/fa";
 import { usePlugin } from '../../utils/plugin/providers/PluginProvider';
-import { getBackendDomain } from '../../utils/plugin/PluginUtils';
 import TranslationEntry, { Translation } from './TranslationEntry';
 import MarkdownEditor from '../../components/form/MarkdownEditor';
+
+interface Message {
+    id: string;
+    role: string;
+    content: string;
+}
 
 export default function TranslationSidebar() {
     const [translation, setTranslation] = useState<Translation | null>(null);
     const [word, setWord] = useState("");
     const plugin = usePlugin();
-
-    const { messages, input, handleInputChange, handleSubmit, setMessages } = useChat({
-        api: getBackendDomain() + "/api/chat/stream",
-        initialMessages: [
-            { id: '1', role: "system", content: supportPrompt },
-            { id: '2', role: "assistant", content: "The word that gets currently discussed:" + JSON.stringify(translation) }
-        ]
-    });
+    const [inputText, setInputText] = useState("");
+    const [messages, setMessages] = useState<Message[]>([
+        { id: '1', role: "system", content: supportPrompt },
+        { id: '2', role: "assistant", content: "The word that gets currently discussed:" + JSON.stringify(translation) }
+    ]);
 
     useEffect(() => {
         plugin.subscribe("toolAction", (data: { action: string, text: string }) => {
@@ -32,7 +33,7 @@ export default function TranslationSidebar() {
     const reset = () => {
         setWord("");
         setTranslation(null);
-        setMessages([]);
+        setMessages(messages.splice(0, 2));
         setTimeout(() => document.getElementById("word-lookup")?.focus(), 100);
     }
 
@@ -61,19 +62,34 @@ export default function TranslationSidebar() {
                 {messages.filter((_, i) => i > 1).map(m => (
                     <div key={m.id} className="whitespace-pre-wrap flex flex-row">
                         <div className="font-bold mr-1 mt-2">{m.role === 'user' ? <FaUserCircle /> : <RiRobot3Fill />}</div>
-                        <div className='bg-gray-800 mb-1 rounded-lg p-1 px-2'>
+                        <div className='bg-gray-800 mb-1 rounded-lg p-1 pb-0 pr-3 pt-2'>
                             <MarkdownEditor content={m.content} editable={false} />
                         </div>
                     </div>
                 ))}
 
-                <form onSubmit={handleSubmit}>
-                    <input
-                        value={input}
-                        className="fixed bottom-0 w-full max-w-3xl p-2 py-4 bg-gray-800 placeholder-gray-300 rounded shadow-xl outline-none"
-                        placeholder="Ask questions..."
-                        onChange={handleInputChange} />
-                </form>
+                <input
+                    className="fixed bottom-0 w-full max-w-3xl p-2 py-4 bg-gray-800 placeholder-gray-300 rounded shadow-xl outline-none"
+                    placeholder="Ask questions..."
+                    value={inputText}
+                    onChange={e => setInputText(e.target.value)}
+                    onKeyDown={e => {
+                        if (e.key !== 'Enter') return;
+
+                        setInputText("");
+                        const submittedMessages = [...messages, { role: 'user', content: inputText, id: messages.length.toString() }];
+
+                        plugin.getAIResponseStream(submittedMessages, (id: string, message: any) => {
+                            console.log({messages})
+                            const lastMessage = messages[messages.length - 1];
+                            if (lastMessage.id === id) {
+                                lastMessage.content = message;
+                                setMessages([...messages.splice(0, messages.length - 1), lastMessage]);
+                                return;
+                            }
+                            setMessages([...submittedMessages, { id, role: 'assistant', content: message }]);
+                        })
+                    }} />
             </div>
         </div>
     );

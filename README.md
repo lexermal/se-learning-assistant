@@ -14,7 +14,9 @@ The application is accessible via port 3000.
 
 ## Big features of below summarized and prioritized
 
+- Creating nice starting page/login/register
 - Light theme
+- Testing with light theme
 - Public Deployment
 
 - Pronounciation plugin
@@ -28,7 +30,6 @@ The application is accessible via port 3000.
 
 - Project cleanup (title, pages, files) in main application
 - Put plugins in own docker image to isolate them better (subdomain for plugins)
-- apis should ckeck the cookies to ensure a logged in user accesses them
 
 - light theme
 - pretty loading for main plugin

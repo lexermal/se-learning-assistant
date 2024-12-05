@@ -1,4 +1,5 @@
 import { MenuEntry } from "@/components/plugin/ContextMenu";
+import { createClient } from "@/utils/supabase/server";
 import { NextResponse } from "next/server";
 
 export interface Plugin {
@@ -30,6 +31,12 @@ export interface Plugin {
 }
 
 export async function GET() {
+    const supabase = await createClient();
+
+    if ((await supabase.auth.getUser()).data.user === null) {
+        return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     let plugins: Plugin[] = [
         {
             id: "1",

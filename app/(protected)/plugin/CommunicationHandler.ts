@@ -175,6 +175,25 @@ export default class CommunicationHandler {
             await this.supabase.from("plugin_settings").upsert({ plugin_id: this.plugin.id, settings: data });
         });
 
+        // get ai response
+        this.subscribe("getAIResponse", async (messages) => {
+            console.log(`Plugin ${this.plugin.name} wants to get AI response.`);
+            fetch('/api/chat', {
+                method: 'POST',
+                body: JSON.stringify({ messages })
+            }).then(r => r.json()).then(r => {
+                this.call("getAIResponse", r.messages[0].content[0].text);
+            });
+        });
+
+        // get ai response stream
+        this.subscribe("getAIResponseStream", async (messages) => {
+            console.log(`Plugin ${this.plugin.name} wants to get AI response stream.`);
+            streamChatGPT(messages, (id, response, finished) => {
+                this.call("getAIResponseStream", { id, response, finished });
+            });
+        });
+
     }
 
     async subscribe(topic: string, callback: (data: any) => void) {
@@ -201,4 +220,54 @@ export default class CommunicationHandler {
         await this.init();
         this.call(topic, data);
     }
+}
+
+
+async function streamChatGPT(messages: any[], onResponse: (id: string, response: string, finished: boolean) => void) {
+    const messageId = Math.random().toString(36).substring(3);
+    const response = await fetch('/api/chat/stream', {
+        method: 'POST',
+        body: JSON.stringify({
+            // model: 'gpt-4',  // specify the model
+            messages
+        })
+    });
+
+    if (!response.body) {
+        console.error('No response body.');
+        return;
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder('utf-8');
+
+    let content = "";
+    let done = false;
+    while (!done) {
+        const { value } = await reader.read();
+
+        if (value) {
+            const chunk = decoder.decode(value, { stream: true });
+            const lines = chunk.split('\n').filter(line => line.trim() !== '');
+
+            for (const line of lines) {
+                const data = line.substring(3, line.length - 1);
+                const command = line.substring(0, 1);
+                // console.log("data: ", { line, data, command });
+
+                if (command === '0') {
+                    content += data;
+                    // console.log("AI response:", content);
+
+                    //content \n\n should be real line break when message is displayed
+                    onResponse(messageId, content.replace(/\\n/g, '\n'), false);
+                } else if (command === 'd') {
+                    // console.log("AI usage:", JSON.parse(line.substring(2)));
+                    done = true;
+                    break;
+                }
+            }
+        }
+    }
+    onResponse(messageId, content.replace(/\\n/g, '\n'), true);
 }
