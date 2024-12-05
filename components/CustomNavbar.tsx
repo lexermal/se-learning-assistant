@@ -1,35 +1,48 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plugin } from "../app/(protected)/plugin/CommunicationHandler";
 import { useRouter } from "next/navigation";
+import { User } from "@supabase/supabase-js";
 import { FaUserCircle } from "react-icons/fa";
 import { signOutAction } from "@/app/actions";
-import { User } from "@supabase/supabase-js";
 import { createClient } from "@/utils/supabase/client";
+import { Plugin } from "../app/(protected)/plugin/CommunicationHandler";
+import { useEventEmitter } from "@/utils/providers/EventEmitterContext";
 
 export default function CustomNavbar() {
     const [plugins, setPlugins] = useState<Plugin[]>([]);
     const router = useRouter();
     const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const { on } = useEventEmitter();
 
-    useEffect(() => {
+    function init() {
         const supabase = createClient();
-
         supabase.auth.getUser().then(({ data }) => {
             setUser(data.user);
             setIsLoading(false);
         });
 
+        // Fetch plugins
         fetch(`/api/plugins`).then(res => res.json()).then(setPlugins);
+    }
+
+    useEffect(() => {
+        init();
+        on("user:signed-in", init);
     }, []);
+
 
 
     const userMenu = [
         // { name: "Profile", url: "/profile" },
         { name: "Settings", url: "/settings" },
-        { name: "Logout", onClick: () => signOutAction() }
+        {
+            name: "Logout", onClick: () => {
+                signOutAction();
+                setUser(null);
+            }
+        }
     ] as MenuItem[];
 
     return <nav className="w-full flex justify-center border-b border-b-gray-500 h-16">
@@ -46,16 +59,15 @@ export default function CustomNavbar() {
                 </div>
             </div>
             {isLoading ? "" : (user ? <DropDownMenu title={<FaUserCircle size={24} />} items={userMenu} rightAligned />
-                : <AuthComponents />)}
+                : <AuthComponent />)}
         </div>
     </nav>
 }
 
-function AuthComponents() {
-    return <div>
-        <a href="/sign-in" className="text-gray-300 hover:text-gray-100 bg-gray-800 border border-gray-500 p-2 rounded text-xl">Register</a>
-        <a href="/sign-in" className="text-gray-300 hover:text-gray-100 bg-gray-800 border border-gray-500 p-2 rounded text-xl ml-2">Login</a>
-    </div>
+function AuthComponent() {
+    return <a href="/sign-in" className="text-gray-300 font-bold hover:text-gray-100 bg-gray-800 border border-gray-700 p-2 rounded ml-2">
+        Get started
+    </a>
 }
 
 interface MenuItem {
