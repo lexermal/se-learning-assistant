@@ -35,7 +35,9 @@ export default function CustomNavbar() {
     return <nav className="w-full flex justify-center border-b border-b-gray-500 h-16">
         <div className="w-full max-w-5xl flex justify-between items-center p-3 px-5 text-sm">
             <div className="flex gap-5 items-center font-semibold">
-                <div className="text-xl cursor-pointer" onClick={() => router.push("/")}>World Tree</div>
+                <div className="text-xl cursor-pointer" onClick={() => router.push("/")}>
+                    <img src="/logo.svg" alt="Rimori" className="h-12 w-36 p-1 px-2 rounded invert" />
+                </div>
                 <div className="flex items-center gap-2">
                     {user && plugins.map((plugin, index) => {
                         const items = plugin.pluginPages.map(p => ({ ...p, url: `/plugin/${plugin.name}#${p.url}` }));
