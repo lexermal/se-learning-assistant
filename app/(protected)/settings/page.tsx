@@ -4,6 +4,7 @@ import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
 import { Plugin } from "../plugin/CommunicationHandler";
 import SettingsPluginHandler from '@/components/plugin/SettingsPluginHandler';
+import ResetPassword from '@/app/(protected)/settings/ResetPassword';
 
 const SettingsPage = () => {
     const [plugins, setPlugins] = useState<Plugin[]>([]);
@@ -50,11 +51,15 @@ function PluginSettings(props: { plugin: Plugin }) {
 
 function GeneralSettings() {
     const { setTheme } = useTheme();
+    const params = new URLSearchParams(window.location.search);
+    console.log(params);
     return (
         <div>
             <h1 className="text-xl font-bold">General Settings</h1>
             <button className="mr-2 p-2 bg-blue-500 text-white rounded" onClick={() => setTheme('light')}>Light</button>
             <button className="p-2 bg-gray-800 text-white rounded" onClick={() => setTheme('dark')}>Dark</button>
+            {/* based on query parameters define the search params */}
+            <ResetPassword searchParams={params} />
         </div>
     );
 }
