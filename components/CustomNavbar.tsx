@@ -8,6 +8,7 @@ import { signOutAction } from "@/app/actions";
 import { createClient } from "@/utils/supabase/client";
 import { Plugin } from "../app/(protected)/plugin/CommunicationHandler";
 import { useEventEmitter } from "@/utils/providers/EventEmitterContext";
+import Link from "next/link";
 
 export default function CustomNavbar() {
     const [plugins, setPlugins] = useState<Plugin[]>([]);
@@ -45,11 +46,12 @@ export default function CustomNavbar() {
         }
     ] as MenuItem[];
 
-    return <nav className="w-full flex justify-center border-b border-b-gray-500 h-16">
+    return <nav className="w-full flex justify-center border-b border-b-gray-500 h-16 z-30 bg-gray-950">
         <div className="w-full max-w-5xl flex justify-between items-center p-3 px-5 text-sm">
             <div className="flex gap-5 items-center font-semibold">
-                <div className="text-xl cursor-pointer" onClick={() => router.push("/")}>
+                <div className="text-xl cursor-pointer flex flex-row items-end" onClick={() => router.push("/dashboard")}>
                     <img src="/logo.svg" alt="Rimori" className="h-12 w-36 p-1 px-2 rounded invert" />
+                    <p className="text-gray-300 text-sm" style={{ marginBottom: "7px" }}>(beta)</p>
                 </div>
                 <div className="flex items-center gap-2">
                     {user && plugins.map((plugin, index) => {
@@ -57,6 +59,9 @@ export default function CustomNavbar() {
                         return <DropDownMenu key={index} items={items} title={plugin.title} />;
                     })}
                 </div>
+                {!isLoading && !user && <div className="hover:text-gray-300 transition p-4">
+                    <Link href={"/waitlist"}>Waitlist</Link>
+                </div>}
             </div>
             {isLoading ? "" : (user ? <DropDownMenu title={<FaUserCircle size={24} />} items={userMenu} rightAligned />
                 : <AuthComponent />)}
@@ -84,13 +89,13 @@ interface DropMenuProps {
 }
 
 function DropDownMenu(props: DropMenuProps) {
-    return <ul className="flex space-x-8">
+    return <ul className="flex space-x-8 cursor-default">
         <li className="group relative">
             <div className="hover:text-gray-300 transition p-4">
                 {props.title}
             </div>
             <div className={"absolute hidden group-hover:block bg-gray-700 rounded shadow-lg z-50 overflow-hidden " + (props.rightAligned ? " right-0" : "left-0")}>
-                <ul className="py-2kk">
+                <ul className="">
                     {props.items.map((item, index) => {
                         return (
                             <li key={index}>

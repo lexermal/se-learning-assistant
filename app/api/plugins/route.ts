@@ -4,7 +4,6 @@ import { NextResponse } from "next/server";
 
 export interface Plugin {
     id: string;
-    // @deprecate
     name: string;
     title: string;
     description: string;
@@ -20,11 +19,13 @@ export interface Plugin {
     pluginPages: {
         name: string;
         url: string;
+        description: string;
     }[];
     sidebarPages: {
         name: string;
         url: string;
-        iconUrl?: string;
+        iconUrl: string;
+        description: string;
     }[];
     iconUrl: string;
     settingsPage: string;
@@ -42,7 +43,7 @@ export async function GET() {
             id: "1",
             name: "flashcards",
             title: "Flashcards",
-            description: "A plugin to help you memorize things",
+            description: "Memorize words, phrases, and more with flashcards.",
             version: "1.0.0",
             author: "lexermal",
             endpoint: "/plugins/flashcards/index.html",
@@ -56,10 +57,12 @@ export async function GET() {
                 {
                     name: "Training",
                     url: "/",
+                    description: "Quickly memorizing info by using flashcards."
                 },
                 {
                     name: "Translation",
                     url: "/sidebar/translate",
+                    description: "Translating words into mutliple languages and quickly adding them to your flashcards."
                 },
             ],
             contextMenuActions: [
@@ -81,10 +84,14 @@ export async function GET() {
                     name: "Translate",
                     url: "/sidebar/translate",
                     iconUrl: "http://localhost:3001/plugins/flashcards/translate.png",
+                    description: "Translate words."
                 },
                 {
                     name: "Quick add",
                     url: "/sidebar/add",
+                    description: "Quickly add a word to your flashcards.",
+                    iconUrl: "http://localhost:3001/plugins/flashcards/logo.png",
+
                 },
             ],
             settingsPage: "/settings",
@@ -93,14 +100,14 @@ export async function GET() {
             id: "2",
             name: "storytelling",
             title: "Storytelling",
-            description: "A plugin to help you write stories",
+            description: "Learn vocabulary and grammar by reading stories.",
             version: "1.0.0",
             author: "lexermal",
             endpoint: "/plugins/storytelling/index.html",
             endpointDev: "http://localhost:3002",
             pluginRepo: "https://lexermal.github.io/se-learning-assistant/",
             pluginWebsite: "https://lexermal.github.io/se-learning-assistant/",
-            iconUrl: "http://localhost:3001/plugins/storytelling/logo.png",
+            iconUrl: "http://localhost:3002/plugins/storytelling/logo.png",
             isSidebarPlugin: false,
             isMainPlugin: true,
             pluginPages: [
@@ -111,6 +118,7 @@ export async function GET() {
                 {
                     name: "Silent reading",
                     url: "/silent-reading",
+                    description: "Practice reading with stories you like on your skill level."
                 },
                 // {
                 //     name: "Storytelling",

@@ -3,6 +3,13 @@ import Postmate from "postmate";
 import { MenuEntry } from "../../../components/plugin/ContextMenu";
 import buildSupabaseQuery from "./SelectStatementBuilder";
 
+export interface SidebarPage {
+    name: string;
+    url: string;
+    iconUrl: string;
+    description: string;
+}
+
 export interface Plugin {
     id: string;
     name: string;
@@ -20,12 +27,9 @@ export interface Plugin {
     pluginPages: {
         name: string;
         url: string;
+        description: string;
     }[];
-    sidebarPages: {
-        name: string;
-        url: string;
-        iconUrl?: string;
-    }[];
+    sidebarPages: SidebarPage[];
     settingsPage: string;
 }
 
