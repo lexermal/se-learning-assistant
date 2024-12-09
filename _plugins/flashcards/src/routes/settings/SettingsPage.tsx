@@ -1,9 +1,9 @@
 import { useState } from "react";
 import TagInput from "../../components/form/TagInput";
-import { usePlugin } from "../../utils/plugin/providers/PluginProvider";
+import { usePlugin } from "shared-components";
 import { useEffect } from "react";
 import LanguageSelector, { Language } from "../../components/form/LanguageSelector";
-import { getBackendDomain } from "../../utils/plugin/PluginUtils";
+import { getBackendDomain } from "shared-components";
 
 export interface FlashcardPluginSettings {
     ttsTags: string[];

@@ -1,11 +1,11 @@
 import React, { lazy } from 'react';
 import ReactDOM from 'react-dom/client';
 import reportWebVitals from './reportWebVitals';
-import { PluginProvider } from './utils/plugin/providers/PluginProvider';
+import { PluginProvider } from 'shared-components';
 import { HashRouter, Route, Routes } from "react-router-dom";
+import { EventEmitterProvider } from 'shared-components';
+import { setTheme } from 'shared-components/dist/utils/plugin/ThemeSetter';
 import './index.css';
-import { EventEmitterProvider } from './utils/plugin/providers/EventEmitterContext';
-import setTheme from './utils/plugin/ThemeSetter';
 
 setTheme();
 

@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { RiRobot3Fill } from "react-icons/ri";
 import { FaUserCircle } from "react-icons/fa";
-import { usePlugin } from '../../utils/plugin/providers/PluginProvider';
+import { usePlugin } from 'shared-components';
 import TranslationEntry, { Translation } from './TranslationEntry';
-import MarkdownEditor from '../../components/form/MarkdownEditor';
+import {MarkdownEditor} from 'shared-components';
 
 interface Message {
     id: string;
@@ -80,7 +80,7 @@ export default function TranslationSidebar() {
                         const submittedMessages = [...messages, { role: 'user', content: inputText, id: messages.length.toString() }];
 
                         plugin.getAIResponseStream(submittedMessages, (id: string, message: any) => {
-                            console.log({messages})
+                            console.log({ messages })
                             const lastMessage = messages[messages.length - 1];
                             if (lastMessage.id === id) {
                                 lastMessage.content = message;

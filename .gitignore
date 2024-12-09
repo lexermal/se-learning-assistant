@@ -38,3 +38,7 @@ next-env.d.ts
 
 public/plugins
 public/plugins/*
+
+_plugins/node_modules/
+_plugins/shared-components/node_modules
+_plugins/shared-components/dist

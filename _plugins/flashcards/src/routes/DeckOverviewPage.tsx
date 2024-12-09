@@ -1,7 +1,7 @@
 import React, { ReactElement, useEffect } from 'react';
 import { Link } from "react-router-dom";
-import { usePlugin } from '../utils/plugin/providers/PluginProvider';
-import { CRUDModal } from '../components/CRUDModal';
+import { usePlugin } from 'shared-components';
+import { CRUDModal } from 'shared-components';
 import { MdDelete, MdModeEdit } from 'react-icons/md';
 
 export interface Deck {

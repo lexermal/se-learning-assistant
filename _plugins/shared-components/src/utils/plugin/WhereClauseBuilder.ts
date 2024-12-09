@@ -6,7 +6,7 @@ type Condition = {
     OR?: Condition[];
 };
 
-export default class WhereClauseBuilder {
+export class WhereClauseBuilder {
     conditions: Condition[];
 
     constructor() {

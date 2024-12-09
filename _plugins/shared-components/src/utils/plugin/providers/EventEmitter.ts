@@ -1,6 +1,6 @@
 type Listener<T = any> = (event: T) => void;
 
-class EventEmitter {
+export class EventEmitter {
   private events: Map<string, Listener[]> = new Map();
 
   constructor() {
@@ -44,4 +44,3 @@ class EventEmitter {
   }
 }
 
-export default EventEmitter;

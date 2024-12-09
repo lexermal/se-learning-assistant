@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { usePlugin } from "../../utils/plugin/providers/PluginProvider";
+import { usePlugin } from "shared-components";
 import FlashcardController from "../deck/FlashcardController";
-import AudioPlayer from "../../components/audio/Playbutton";
+import { AudioPlayer } from "shared-components";
 import AddToDeckButton from "../../components/DropDownButton";
 import { FlashcardPluginSettings } from "../settings/SettingsPage";
-import { getBackendDomain } from "../../utils/plugin/PluginUtils";
-import { PluginController } from "../../utils/plugin/PluginController";
+// import { getBackendDomain } from "shared-components/utils/plugin/PluginUtils";
+import { PluginController } from "shared-components";
 
 export interface Translation {
     swedish_word: string;

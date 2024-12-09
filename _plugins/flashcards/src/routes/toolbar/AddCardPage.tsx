@@ -1,8 +1,8 @@
 import { Deck } from '../DeckOverviewPage';
 import { useState, useEffect } from 'react';
-import { usePlugin } from '../../utils/plugin/providers/PluginProvider';
-import { CRUDModal } from '../../components/CRUDModal';
-import MarkdownEditor from '../../components/form/MarkdownEditor';
+import { usePlugin } from 'shared-components';
+import { CRUDModal } from 'shared-components';
+import {MarkdownEditor} from 'shared-components';
 import FlashcardController from '../deck/FlashcardController';
 
 export default function AddCard() {

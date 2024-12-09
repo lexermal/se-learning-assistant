@@ -1,5 +1,5 @@
-import { Card, createEmptyCard, FSRS, fsrs, generatorParameters, Grade, RecordLogItem, State, StateType } from "ts-fsrs";
-import { PluginController } from "../../utils/PluginController";
+import { Card, createEmptyCard, FSRS, fsrs, generatorParameters, Grade, State } from "ts-fsrs";
+import { PluginController } from "shared-components";
 
 export interface Flashcard extends Omit<Card, "due" | "last_review" | "state"> {
     id: string;

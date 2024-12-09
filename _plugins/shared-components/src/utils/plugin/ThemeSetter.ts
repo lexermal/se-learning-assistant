@@ -1,4 +1,4 @@
-export default function setTheme() {
+export function setTheme() {
     const urlParams = new URLSearchParams(window.location.search);
   
     let theme = urlParams.get('theme');

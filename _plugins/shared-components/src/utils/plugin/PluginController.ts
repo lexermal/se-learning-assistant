@@ -1,5 +1,5 @@
 import Postmate from "postmate";
-import WhereClauseBuilder from "./WhereClauseBuilder";
+import { WhereClauseBuilder } from "./WhereClauseBuilder";
 
 export class PluginController {
     private static instance: PluginController;

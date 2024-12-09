@@ -1,6 +1,6 @@
 import { Card, createEmptyCard, FSRS, fsrs, generatorParameters, Grade, State } from "ts-fsrs";
-import { PluginController } from "../../utils/plugin/PluginController";
-import WhereClauseBuilder from "../../utils/plugin/WhereClauseBuilder";
+import { PluginController } from "shared-components";
+import {WhereClauseBuilder} from "shared-components";
 import { Deck } from "../DeckOverviewPage";
 
 export interface Flashcard extends Omit<Card, "due" | "last_review" | "state"> {

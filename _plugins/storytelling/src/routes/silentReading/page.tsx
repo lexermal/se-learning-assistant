@@ -2,8 +2,8 @@ import { useEffect } from 'react';
 import { useState } from 'react';
 import { useChat } from 'ai/react';
 import Markdown from 'react-markdown'
-import AudioPlayer from '../../components/audio/Playbutton';
-import { getBackendDomain } from '../../utils/PluginUtils';
+import { AudioPlayer } from 'shared-components';
+import { getBackendDomain } from 'shared-components';
 import getSilentReadingPrompt, { Instructions } from './ReadingPromptProvider';
 import { FaGear } from "react-icons/fa6";
 

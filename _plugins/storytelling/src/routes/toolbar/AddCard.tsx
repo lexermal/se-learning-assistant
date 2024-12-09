@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { usePlugin } from '../../utils/PluginProvider';
+import { useState, useEffect } from 'react';
+import { usePlugin } from 'shared-components';
 import FlashcardController from '../deck/FlashcardController';
 // import { Deck } from '../App';
-import { CRUDModal } from '../../components/CRUDModal';
+import { CRUDModal } from 'shared-components';
 
 export default function AddCard() {
     const [decks, setDecks] = useState<any[]>([]);

@@ -1,25 +1,19 @@
 import { Spinner } from "flowbite-react";
 import React, { useState, useEffect } from 'react';
 import { FaPlayCircle, FaStopCircle } from "react-icons/fa";
-import { getBackendDomain } from "../../utils/plugin/PluginUtils";
+import { getBackendDomain } from "./../utils/plugin/PluginUtils";
 
 type AudioPlayerProps = {
     text: string;
     voice?: string;
+    enableSpeedAdjustment?: boolean;
 };
 
-const AudioPlayer: React.FC<AudioPlayerProps> = ({ text, voice = 'alloy' }) => {
+export const AudioPlayer: React.FC<AudioPlayerProps> = ({ text, voice = 'alloy', enableSpeedAdjustment = false }) => {
     const [audioUrl, setAudioUrl] = useState<string | null>(null);
     const [speed, setSpeed] = useState(1.0);
     const [isPlaying, setIsPlaying] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-
-    //reset on word change
-    useEffect(() => {
-        setAudioUrl(null);
-        setIsPlaying(false);
-        setIsLoading(false);
-    }, [text]);
 
     // Function to generate audio from text using API
     const generateAudio = async () => {
@@ -59,31 +53,31 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ text, voice = 'alloy' }) => {
         }
     };
 
-    // const speedOptions = [0.5, 0.75, 0.9, 1.0, 1.1, 1.25, 1.5];
+    const speedOptions = [0.8, 0.9, 1.0, 1.1, 1.2, 1.5];
 
     return (
         <div className="group relative">
             <div className='flex flex-row items-end'>
-                <button className="text-gray-300 opacity-90" onClick={togglePlayback} disabled={isLoading}>
-                    {isLoading ? <Spinner /> : isPlaying ? <FaStopCircle size={"22px"} /> : <FaPlayCircle size={"22px"} />}
+                <button className="text-gray-500" onClick={togglePlayback} disabled={isLoading}>
+                    {isLoading ? <Spinner /> : isPlaying ? <FaStopCircle size={"25px"} /> : <FaPlayCircle size={"25px"} />}
                 </button>
-                {/* <div className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-row text-sm text-gray-500">
-                    <span className='pr-1'>Speed: </span>
-                    <select
-                        value={speed}
-                        className='appearance-none cursor-pointer pr-0 p-0 rounded shadow leading-tight focus:outline-none focus:bg-gray-800 focus:ring bg-transparent border-0'
-                        onChange={(e) => setSpeed(parseFloat(e.target.value))}
-                        disabled={isLoading}>
-                        {speedOptions.map((s) => (
-                            <option key={s} value={s}>
-                                {s}
-                            </option>
-                        ))}
-                    </select>
-                </div> */}
+                {enableSpeedAdjustment && (
+                    <div className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-row text-sm text-gray-500">
+                        <span className='pr-1'>Speed: </span>
+                        <select
+                            value={speed}
+                            className='appearance-none cursor-pointer pr-0 p-0 rounded shadow leading-tight focus:outline-none focus:bg-gray-800 focus:ring bg-transparent border-0'
+                            onChange={(e) => setSpeed(parseFloat(e.target.value))}
+                            disabled={isLoading}>
+                            {speedOptions.map((s) => (
+                                <option key={s} value={s}>
+                                    {s}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                )}
             </div>
         </div>
     );
 };
-
-export default AudioPlayer;

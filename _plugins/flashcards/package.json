@@ -1,5 +1,5 @@
 {
-  "name": "app",
+  "name": "flashcards",
   "version": "0.1.0",
   "private": true,
   "homepage": "/plugins/flashcards",
@@ -26,7 +26,8 @@
     "@types/jest": "^27.5.2",
     "@types/node": "^16.18.119",
     "@types/react": "^18.3.12",
-    "@types/react-dom": "^18.3.1"
+    "@types/react-dom": "^18.3.1",
+    "shared-components": "*"
   },
   "scripts": {
     "dev": "PORT=3001 react-scripts start",

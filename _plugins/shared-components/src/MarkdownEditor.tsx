@@ -109,5 +109,3 @@ export const MarkdownEditor = (props: Props) => {
         </div>
     );
 };
-
-export default MarkdownEditor;
