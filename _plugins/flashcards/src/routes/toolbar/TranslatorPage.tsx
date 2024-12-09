@@ -47,7 +47,8 @@ export default function TranslationSidebar() {
                     <p className='text-4xl text-center mb-3'>Look up a word</p>
                     <input
                         id="word-lookup"
-                        className='w-full p-2 rounded-xl shadow-xl text-center bg-gray-600 placeholder-gray-400 mt-1'
+                        autoComplete="off" 
+                        className='w-full p-2 focus:outline-none rounded-xl shadow-xl text-center bg-gray-600 placeholder-gray-400 mt-1'
                         placeholder='snö, fog, Baum,....'
                         onKeyDown={(e: any) => {
                             if (e.key === 'Enter') {

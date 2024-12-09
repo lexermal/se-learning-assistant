@@ -4,7 +4,6 @@ import FlashcardController from "../deck/FlashcardController";
 import { AudioPlayer } from "shared-components";
 import AddToDeckButton from "../../components/DropDownButton";
 import { FlashcardPluginSettings } from "../settings/SettingsPage";
-// import { getBackendDomain } from "shared-components/utils/plugin/PluginUtils";
 import { PluginController } from "shared-components";
 
 export interface Translation {
@@ -51,7 +50,12 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
     console.log({ settings, translation: t });
 
     useEffect(() => {
-        plugin.getSettings<FlashcardPluginSettings>().then(setSettings);
+        plugin.getSettings<FlashcardPluginSettings>({
+            motherTongue: "English",
+            translation_term_one: "one",
+            translation_term_or: "or",
+            ttsTags: ["lang"]
+        }).then(setSettings);
         plugin.dbFetch('deck', "id, name, last_used")
             .then(decks => decks.sort((a: any, b: any) => new Date(b.last_used).getTime() - new Date(a.last_used).getTime())).then(setDecks);
     }, []);
@@ -95,13 +99,13 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
                     </div>}
                     {t.tenses && <div className='flex flex-row flex-wrap items-end'>
                         <div className="text-2xl">({t.tenses.present}, {t.tenses.past}, {t.tenses.supine}, {t.tenses.imperative})</div>
-                        {t.irregular && <div className="text-sm">(irregular)</div>}
+                        {t.irregular && <div className="text-base">(irregular)</div>}
                     </div>}
                     {!!t.adjective?.comparative && <div className='flex flex-row'>
                         <div className="text-3xl">({t.adjective.comparative}, {t.adjective.superlative})</div>
                     </div>}
                 </div>
-                <button className="bg-gray-700 p-1 px-2 rounded" onClick={() => onAddedToFlashcard()}>
+                <button className="bg-gray-700 p-1 px-2 rounded" style={{ marginBottom: "2px" }} onClick={() => onAddedToFlashcard()}>
                     New Search
                 </button>
             </div>

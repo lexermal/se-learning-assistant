@@ -105,8 +105,12 @@ export class PluginController {
         return await this.emitAndWaitResponse("db_call", { name, data });
     }
 
-    public async getSettings<T>(): Promise<T> {
-        return await this.emitAndWaitResponse("get_settings", {}) as T;
+    public async getSettings<T>(defaultSettings: T): Promise<T> {
+        const response = await this.emitAndWaitResponse("get_settings", {}) as T;
+        if (response === null) {
+            return defaultSettings;
+        }
+        return response;
     }
 
     public async setSettings(settings: any) {

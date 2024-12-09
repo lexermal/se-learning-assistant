@@ -34,12 +34,17 @@ export default function SettingsPage() {
     }
 
     useEffect(() => {
-        getSettings<FlashcardPluginSettings>().then(data => {
+        getSettings<FlashcardPluginSettings>({
+            motherTongue: "English",
+            translation_term_one: "one",
+            translation_term_or: "or",
+            ttsTags: ["init"]
+        }).then(data => {
             // console.log("Settings", data);
             setPageSettings(data);
             setIsLoading(false);
 
-            if (!data?.ttsTags) {
+            if (data.ttsTags[0] === "init") {
                 setSettingsWrapper("ttsTags", ["lang"]);
             }
         }
