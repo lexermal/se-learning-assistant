@@ -86,7 +86,7 @@ export function SidebarPluginHandler({ plugins }: { plugins: Plugin[] }) {
                                     setOpenPlugin(index === openPlugin ? -1 : index);
                                     setSidebarPlugin(plugin);
                                     setPluginAction({ pluginName, action: url, text: "", url: url });
-                                }} className={"flex flex-col items-center rounded-l-lg py-3"}>
+                                }} className={"flex flex-col items-center rounded-l-lg py-3 brightness-150 dark:brightness-100"}>
                                     <img src={iconUrl || plugin.iconUrl} className="w-6 h-6 brightness-75" title={plugin.title + " - " + name} />
                                 </button>
                             );
