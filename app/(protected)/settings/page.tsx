@@ -17,12 +17,12 @@ const SettingsPage = () => {
     const entries = [{ name: "general", title: "General" }].concat(plugins);
     return (
         <div className="flex h-screen">
-            <div className="ml-5 border-r border-gray-600">
+            <div className="ml-5 pt-4 border-r border-gray-600">
                 <ul>
                     {entries.map((plugin, index) => (
                         <li
                             key={plugin.name}
-                            className={`p-2 pr-10 rounded-l cursor-pointer ${index === settingIndex + 1 ? 'bg-gray-600' : 'bg-transparent'}`}
+                            className={`p-2 pr-10 rounded-l cursor-pointer ${index === settingIndex + 1 ? 'bg-gray-400 dark:bg-gray-600' : 'bg-transparent'}`}
                             onClick={() => setSettingIndex(index - 1)}
                         >
                             {plugin.title}
@@ -56,8 +56,9 @@ function GeneralSettings() {
     return (
         <div>
             <h1 className="text-xl font-bold">General Settings</h1>
-            <button className="mr-2 p-2 bg-blue-500 text-white rounded" onClick={() => setTheme('light')}>Light</button>
-            <button className="p-2 bg-gray-800 text-white rounded" onClick={() => setTheme('dark')}>Dark</button>
+            <p>Change the theme</p>
+            <button className={"p-2 text-white rounded-l bg-blue-500 dark:bg-blue-600"} onClick={() => setTheme('light')}>Light</button>
+            <button className={"p-2 text-white rounded-r bg-blue-600 dark:bg-blue-800"} onClick={() => setTheme('dark')}>Dark</button>
             {/* based on query parameters define the search params */}
             <ResetPassword searchParams={params} />
         </div>

@@ -12,17 +12,17 @@ export default function ResetPassword(props: { searchParams: URLSearchParams }) 
         type="password"
         name="password"
         placeholder="New password"
-        className="p-2 rounded bg-gray-700"
+        className="p-2 rounded dark:bg-gray-700 bg-gray-400"
         required
       />
       <input
         type="password"
         name="confirmPassword"
         placeholder="Confirm password"
-        className="p-2 rounded bg-gray-700"
+        className="p-2 rounded dark:bg-gray-700 bg-gray-400"
         required
       />
-      <SubmitButton formAction={resetPasswordAction} className="bg-gray-800 p-1 rounded-xl">
+      <SubmitButton formAction={resetPasswordAction} className="dark:bg-blue-800 bg-blue-400 p-1 rounded-xl">
         Reset password
       </SubmitButton>
       {error && (
