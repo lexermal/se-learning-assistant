@@ -24,16 +24,14 @@ export default function CustomNavbar() {
             setIsLoading(false);
         });
 
-        // Fetch plugins
-        fetch(`/api/plugins`).then(res => res.json()).then(setPlugins);
+        // Fetch plugins and check if it failed
+        fetch(`/api/plugins`).then(res => res.ok ? res.json() : []).then(setPlugins)
     }
 
     useEffect(() => {
         init();
         on("user:signed-in", init);
     }, []);
-
-
 
     const userMenu = [
         // { name: "Profile", url: "/profile" },
@@ -54,7 +52,7 @@ export default function CustomNavbar() {
                     <p className="text-gray-300 text-sm" style={{ marginBottom: "7px" }}>(beta)</p>
                 </div>
                 <div className="flex items-center gap-2">
-                    {user && plugins.map((plugin, index) => {
+                    {user && plugins && plugins.map((plugin, index) => {
                         const items = plugin.pluginPages.map(p => ({ ...p, url: `/plugin/${plugin.name}#${p.url}` }));
                         return <DropDownMenu key={index} items={items} title={plugin.title} />;
                     })}

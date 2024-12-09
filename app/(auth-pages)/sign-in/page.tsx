@@ -29,7 +29,7 @@ export default function Login(props: { searchParams: Promise<{ error?: string, r
   }
 
   return (
-    <form className="flex-1 flex flex-col min-w-80 mx-auto mt-48 bg-gray-800 rounded-xl overflow-hidden">
+    <form className="max-w-36 items-start flex-1 flex flex-col min-w-80 mx-auto mt-48 bg-gray-800 rounded-xl overflow-hidden">
       <div className="flex flex-row border-b border-gray-600 w-full bg-gray-700 cursor-pointer text-center">
         <h1 onClick={() => setActionIsLogin(true)}
           className={"border-r w-1/2 h-16 border-gray-500 leading-[4rem] " + (actionIsLogin ? "text-3xl font-bold bg-gray-600" : "text-2xl")}>
@@ -40,7 +40,7 @@ export default function Login(props: { searchParams: Promise<{ error?: string, r
           Register
         </h1>
       </div>
-      <div className="flex flex-col gap-1 [&>input]:mb-3 p-5">
+      <div className="flex flex-col gap-2 w-full p-5">
         <input type="email" name="email" placeholder="Your email"
           className="p-1 rounded bg-gray-700 focus:outline-none"
           required />
@@ -51,7 +51,8 @@ export default function Login(props: { searchParams: Promise<{ error?: string, r
           placeholder="Your password"
           className="p-1 rounded bg-gray-700 focus:outline-none"
           required />
-        <SubmitButton className="border font-bold text-lg border-gray-500 bg-gray-600 hover:bg-gray-500" pendingText="Loading..." formAction={onSubmit}>
+        <SubmitButton className="border rounded-lg font-bold text-lg border-gray-500 bg-gray-600 hover:bg-gray-500"
+          pendingText="Loading..." formAction={onSubmit}>
           {actionIsLogin ? "Login" : "Register"}
         </SubmitButton>
         {successMessage && <p className="text-green-500 mt-3">{successMessage}</p>}
