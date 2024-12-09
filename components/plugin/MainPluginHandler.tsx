@@ -20,9 +20,12 @@ export default function MainPluginHandler({ plugin, globalContextMenuActions }: 
         if (!iframeRef.current || !plugin || !hash) {
             return;
         }
+        iframeRef.current!.style.opacity = "0";
 
         const connection = new CommunicationHandler(supabase, plugin, iframeRef.current, hash);
-        connection.init();
+        connection.init().then(() => {
+            iframeRef.current!.style.opacity = "1";
+        });
 
         connection.subscribe("heightAdjustment", (height: number) => {
             if (!iframeRef.current) {
@@ -67,14 +70,14 @@ export default function MainPluginHandler({ plugin, globalContextMenuActions }: 
         }, 100);
     }, []);
 
-    if (!plugin) {
-        return <div>Loading...</div>;
-    }
+    // if (!plugin) {
+    //     return <div>Loading...</div>;
+    // }
 
     return (
         <div className={`w-full`}>
             <ContextMenu contextMenu={contextMenu} actions={constextActions} />
-            <div ref={iframeRef} className="w-full"></div>
+            <div ref={iframeRef} className="w-full" style={{ opacity: 0 }}></div>
         </div>
     );
 }

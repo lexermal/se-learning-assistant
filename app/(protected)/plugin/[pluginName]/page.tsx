@@ -21,7 +21,7 @@ export default function PluginPage({ params }: { params: Promise<{ pluginName: s
   }, []);
 
   if (!plugins || mainPluginIndex === -1) {
-    return <div>Loading...</div>;
+    return <div></div>;
   }
 
   return (
