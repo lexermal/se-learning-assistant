@@ -1,0 +1,46 @@
+#!/bin/bash
+
+# Install dependencies for the main project and plugins
+echo "Installing dependencies..."
+yarn install --cwd ./
+yarn install --cwd ./_plugins/
+
+echo "Dependencies installed."
+
+# ANSI color codes
+PURPLE='\033[0;35m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+RESET='\033[0m'
+
+# Function to start and monitor a server with colored logs
+start_server() {
+  local dir=$1
+  local cmd=$2
+  local name=$3
+  local color=$4
+
+  while true; do
+    echo -e "${color}Starting server [$name] in $dir...${RESET}"
+    (
+      cd "$dir" || exit
+      $cmd 2>&1 | while IFS= read -r line; do
+        echo -e "${color}[$name] $line${RESET}"
+      done
+    )
+    echo -e "${YELLOW}Server [$name] in $dir crashed. Restarting in 5 seconds...${RESET}"
+    sleep 5
+  done
+}
+
+# Start development servers with colored logs
+start_server "./" "yarn dev" "Main" "$BLUE" &
+start_server "./_plugins/flashcards" "yarn dev" "Flashcards" "$GREEN" &
+start_server "./_plugins/storytelling" "yarn dev" "Storytelling" "$PURPLE" &
+start_server "./_plugins/shared-components" "yarn dev" "Shared-Components" "$YELLOW" &
+
+echo "All servers are running and being monitored. Logs are displayed below. Press Ctrl+C to stop."
+
+# Wait for all background processes
+wait
