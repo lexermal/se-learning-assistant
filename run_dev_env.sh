@@ -39,6 +39,7 @@ start_server "./" "yarn dev" "Main" "$BLUE" &
 start_server "./_plugins/flashcards" "yarn dev" "Flashcards" "$GREEN" &
 start_server "./_plugins/storytelling" "yarn dev" "Storytelling" "$PURPLE" &
 start_server "./_plugins/shared-components" "yarn dev" "Shared-Components" "$YELLOW" &
+start_server "./_plugins/shared-components" "yarn css-dev" "Shared-Components" "$YELLOW" &
 
 echo "All servers are running and being monitored. Logs are displayed below. Press Ctrl+C to stop."
 

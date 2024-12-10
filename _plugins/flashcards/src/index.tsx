@@ -6,6 +6,7 @@ import { HashRouter, Route, Routes } from "react-router-dom";
 import { EventEmitterProvider } from 'shared-components';
 import { setTheme } from 'shared-components/dist/utils/plugin/ThemeSetter';
 import './index.css';
+import 'shared-components/dist/style.css';
 
 setTheme();
 

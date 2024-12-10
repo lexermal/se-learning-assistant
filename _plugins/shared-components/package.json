@@ -5,7 +5,8 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "dev": "tsc -w"
+    "dev": "tsc -w",
+    "css-dev": "sass --watch src/style.scss:dist/style.css"
   },
   "peerDependencies": {
     "react": "^18.0.0",
@@ -19,6 +20,7 @@
   },
   "devDependencies": {
     "@types/react": "^18.0.1",
-    "@types/react-dom": "^18.0.1"
+    "@types/react-dom": "^18.0.1",
+    "sass": "^1.82.0"
   }
 }
