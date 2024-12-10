@@ -26,7 +26,7 @@ function App() {
   useEffect(fetchDecks, []);
 
   return (
-    <div className="mx-auto bg-gray-800 w-96 p-4 rounded-lg mt-24">
+    <div className="mx-auto bg-gray-200 dark:bg-gray-800 w-96 p-4 rounded-lg mt-24">
       <h1 className='text-4xl mb-3 text-center'>Decks</h1>
       {
         decks.map((deck, index) => (
@@ -48,7 +48,7 @@ function App() {
 
 function DeckRow(props: { deck: DeckSummary, onEdit: (id: string, name: string) => void, onDelete: (id: string) => void }) {
   return (
-    <div className='group flex flex-row hover:bg-gray-600 hover:font-bold justify-between text-left p-1 rounded'>
+    <div className='group flex flex-row hover:bg-gray-400 dark:hover:bg-gray-600 hover:font-bold justify-between text-left p-1 rounded'>
       <Link to={`/deck/${props.deck.id}`} className='flex-1'>
         <span className='cursor-pointer'>{props.deck.name}</span>
       </Link>
@@ -89,7 +89,7 @@ function DeckCrudModal(props: { onComplete: (deck: string) => void, deckName?: s
     ]}>
     <div className="flex flex-col gap-4">
       <input
-        className="bg-gray-500 rounded p-2 text-white"
+        className="bg-gray-300 dark:bg-gray-500 rounded p-2 dark:text-white focus:outline-none"
         placeholder="Deck name" defaultValue={deck} onChange={e => setDeck(e.target.value)} />
     </div>
   </CRUDModal>

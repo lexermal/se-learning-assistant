@@ -1,7 +1,6 @@
 "use client";
 
-import { Modal } from "flowbite-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 interface Props {
     title: string;
@@ -15,37 +14,52 @@ interface Props {
 
 interface ActionButton {
     text: string;
-    color?: string;
     onClick: () => void;
     closeModal?: boolean;
 }
 
 export function CRUDModal({ actionbuttons, children, title, buttonText, className, closeAble = true, show = false }: Props) {
     const [openModal, setOpenModal] = useState(show);
+    const dialogRef = useRef<HTMLDialogElement>(null);
 
     useEffect(() => {
+        if (show) {
+            dialogRef.current?.showModal();
+        } else {
+            dialogRef.current?.close();
+        }
         setOpenModal(show);
     }, [show]);
 
+    const handleClose = () => {
+        setOpenModal(false);
+        dialogRef.current?.close();
+    };
+
     return (
         <>
-            {!!buttonText && <button className={className} onClick={() => setOpenModal(true)}>{buttonText}</button>}
-            <Modal dismissible={closeAble} show={openModal} onClose={() => setOpenModal(false)}>
-                <Modal.Header>{title}</Modal.Header>
-                <Modal.Body>
+            {!!buttonText && <button className={className} onClick={() => {
+                setOpenModal(true);
+                dialogRef.current?.showModal();
+            }}>{buttonText}</button>}
+            <dialog ref={dialogRef} className="bg-gray-400 rounded-lg font-normal" onClose={handleClose}>
+                <div className="bg-gray-500 text-xl flex flex-row justify-between p-3 items-start font-bold">
+                    <h2>{title}</h2>
+                    {closeAble && <button onClick={handleClose}>&times;</button>}
+                </div>
+                <div className="modal-body p-2">
                     {children}
-                </Modal.Body>
-                <Modal.Footer>
-                    {actionbuttons.map(({ onClick, text, closeModal = true, color = "gray" }, index) => (
-                        <button key={index} color={color}
-                        className={"border-2 border-"+color+"-900 rounded-md py-2 px-4 bg-"+color+"-900 text-white font-bold"}
-                        onClick={() => {
-                            if (closeModal) setOpenModal(false);
-                            onClick();
-                        }}>{text}</button>
+                </div>
+                <div className="modal-footer px-2 py-2 flex flex-row gap-2 border-t-2">
+                    {actionbuttons.map(({ onClick, text, closeModal = true }, index) => (
+                        <button key={index} className=" bg-blue-500 hover:bg-blue-600 dark:border-gray-900 rounded-md py-2 px-4 dark:text-white font-bold"
+                            onClick={() => {
+                                if (closeModal) handleClose();
+                                onClick();
+                            }}>{text}</button>
                     ))}
-                </Modal.Footer>
-            </Modal>
+                </div>
+            </dialog>
         </>
     );
 }
