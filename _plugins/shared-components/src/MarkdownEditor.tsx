@@ -95,7 +95,7 @@ interface Props {
 
 export const MarkdownEditor = (props: Props) => {
     return (
-        <div className={"text-md border border-gray-800 " + props.className} style={{ borderWidth: props.editable ? 1 : 0 }}>
+        <div className={"text-md border border-gray-800 overflow-hidden " + props.className} style={{ borderWidth: props.editable ? 1 : 0 }}>
             <EditorProvider
                 key={(props.editable ? "editable" : "readonly") + props.content}
                 slotBefore={props.editable ? <MenuBar /> : null}

@@ -58,7 +58,7 @@ export default function AddCard() {
             {selectedDeck === 'new' && <DeckModal />}
             <select
                 value={selectedDeck}
-                className="w-full p-2 mb-4 border-0 rounded bg-gray-800"
+                className="w-full p-2 mb-4 border-0 rounded bg-gray-300 dark:bg-gray-800"
                 onChange={e => setSelectedDeck(e.target.value)}>
 
                 {decks.map(deck => (
@@ -68,16 +68,16 @@ export default function AddCard() {
                 ))}
                 <option value="new">Create new deck</option>
             </select>
-            <p className="text-gray-400">Front</p>
+            <p className="dark:text-gray-400">Front</p>
             <MarkdownEditor
-                className="w-full mb-3 bg-gray-900 rounded"
+                className="w-full mb-3 bg-gray-300 dark:bg-gray-900 rounded"
                 content={initValue} editable={true} onUpdate={setQuestion} />
-            <p className="text-gray-400">Back</p>
+            <p className="dark:text-gray-400">Back</p>
             <MarkdownEditor
-                className="w-full mb-3 bg-gray-900 rounded"
+                className="w-full mb-3 bg-gray-300 dark:bg-gray-900 rounded"
                 content={initValueBack} editable={true} onUpdate={setAnswer} />
             <button
-                className="w-full p-2 bg-blue-800 text-white rounded hover:bg-blue-700"
+                className="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
                 onClick={handleAddCard}>
                 Add Card
             </button>
