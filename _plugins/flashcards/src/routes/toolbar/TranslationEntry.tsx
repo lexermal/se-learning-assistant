@@ -86,7 +86,7 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
     const formattedOtherMeaning = alt ? ` ${settings?.translation_term_or} ${alt}` : "";
 
     return (
-        <div className="flex flex-col w-full max-w-3xl pt-6 mx-auto stretch text-gray-200">
+        <div className="flex flex-col w-full max-w-3xl pt-6 mx-auto stretch dark:text-gray-200">
             <div className="flex flex-row items-end w-full border-b mb-4 pb-1">
                 <div className="flex-1 flex flex-wrap items-end">
                     <div className="mr-1">{t.en_ett_word}</div>

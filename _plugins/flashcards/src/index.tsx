@@ -22,7 +22,7 @@ const TranslationSidebar = lazy(() => import('./routes/toolbar/TranslatorPage'))
 root.render(
   <React.StrictMode>
     <PluginProvider>
-      <div className='text-gray-800 dark:text-gray-200 min-h-[600px]'>
+      <div className='text-gray-900 dark:text-gray-200 min-h-[600px]'>
         <EventEmitterProvider>
           <HashRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
             <Routes>

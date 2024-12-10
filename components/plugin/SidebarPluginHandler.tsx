@@ -23,7 +23,7 @@ function PluginSidebar({ plugin, contextMenuAction }: { plugin: Plugin, contextM
     useEffect(() => {
         iframeRef.current!.style.opacity = "0";
 
-        const parent = new CommunicationHandler(supabase, plugin, iframeRef.current, contextMenuAction.url, ["h-full", "bg-gray-920"], new Map([["applicationMode", "sidebar"], ["theme", theme || "system"]]));
+        const parent = new CommunicationHandler(supabase, plugin, iframeRef.current, contextMenuAction.url, ["h-full", "dark:bg-gray-920"], new Map([["applicationMode", "sidebar"], ["theme", theme || "system"]]));
         setParent(parent);
 
         parent.init().then(() => {
