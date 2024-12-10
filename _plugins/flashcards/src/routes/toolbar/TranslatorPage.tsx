@@ -63,14 +63,14 @@ export default function TranslationSidebar() {
                 {messages.filter((_, i) => i > 1).map(m => (
                     <div key={m.id} className="whitespace-pre-wrap flex flex-row">
                         <div className="font-bold mr-1 mt-2">{m.role === 'user' ? <FaUserCircle /> : <RiRobot3Fill />}</div>
-                        <div className='bg-gray-800 mb-1 rounded-lg p-1 pb-0 pr-3 pt-2'>
+                        <div className='bg-gray-300 dark:bg-gray-800 mb-1 rounded-lg p-1 pb-0 pr-3 pt-2'>
                             <MarkdownEditor content={m.content} editable={false} />
                         </div>
                     </div>
                 ))}
 
                 <input
-                    className="fixed bottom-0 w-full max-w-3xl p-2 py-4 bg-gray-800 placeholder-gray-300 rounded shadow-xl outline-none"
+                    className="fixed bottom-0 w-full max-w-3xl p-2 py-4 placeholder-gray-200 bg-gray-400 dark:bg-gray-800 dark:placeholder-gray-300 rounded shadow-xl outline-none"
                     placeholder="Ask questions..."
                     value={inputText}
                     onChange={e => setInputText(e.target.value)}

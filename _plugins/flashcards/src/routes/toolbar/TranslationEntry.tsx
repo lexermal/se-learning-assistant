@@ -90,7 +90,7 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
             <div className="flex flex-row items-end w-full border-b mb-4 pb-1">
                 <div className="flex-1 flex flex-wrap items-end">
                     <div className="mr-1">{t.en_ett_word}</div>
-                    <div className="font-bold text-5xl text-white">{swedishWord}</div>
+                    <div className="font-bold text-5xl dark:text-white">{swedishWord}</div>
                     <div className="ml-1 pb-1">
                         <AudioPlayer text={"(swedish:) " + swedishWord} />
                     </div>
@@ -105,7 +105,7 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
                         <div className="text-3xl">({t.adjective.comparative}, {t.adjective.superlative})</div>
                     </div>}
                 </div>
-                <button className="bg-gray-700 p-1 px-2 rounded" style={{ marginBottom: "2px" }} onClick={() => onAddedToFlashcard()}>
+                <button className="bg-blue-300 dark:bg-gray-700 p-1 px-2 rounded" style={{ marginBottom: "2px" }} onClick={() => onAddedToFlashcard()}>
                     New Search
                 </button>
             </div>
@@ -113,7 +113,7 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
                 <div>{t.explanation}</div>
             </div>
 
-            <div className='flex flex-row text-4xl mt-3 mb-3 text-white'>
+            <div className='flex flex-row text-4xl mt-3 mb-3 dark:text-white'>
                 <div>{t.translation.join(", ")}{formattedOtherMeaning}</div>
             </div>
 
