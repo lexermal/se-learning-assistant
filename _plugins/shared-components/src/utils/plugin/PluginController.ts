@@ -28,7 +28,9 @@ export class PluginController {
         this.subscribe = this.subscribe.bind(this);
         this.setSettings = this.setSettings.bind(this);
         this.getSettings = this.getSettings.bind(this);
+        this.getAIResponse = this.getAIResponse.bind(this);
         this.dbFunctionCall = this.dbFunctionCall.bind(this);
+        this.getAIResponseStream = this.getAIResponseStream.bind(this);
         this.emitAndWaitResponse = this.emitAndWaitResponse.bind(this);
     }
 
@@ -123,6 +125,8 @@ export class PluginController {
 
     public getAIResponseStream(messages: { role: string, content: string }[], onMessage: (id: string, message: string, finished: boolean) => void) {
         let triggered = false;
+
+        console.log("getAIResponseStream", messages);
 
         this.emit("getAIResponseStream", messages);
         this.subscribe("getAIResponseStream", (data: { id: string, response: string, finished: boolean }) => {
