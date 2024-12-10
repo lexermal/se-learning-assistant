@@ -29,10 +29,10 @@ const TagInput: React.FC<TagInputProps> = ({ initialTags, onTagsChange, classNam
     };
 
     return (
-        <div className={"flex flex-wrap items-center p-1 pb-0 mt-1 rounded bg-gray-900 opacity-65 text-gray-300 " + (className || "")}>
+        <div className={"flex flex-wrap items-center p-1 pb-0 mt-1 rounded bg-gray-400 dark:bg-gray-900 text-black dark:text-gray-300 " + (className || "")}>
             {tags.map((tag, index) => (
                 <button key={index}
-                    className="bg-gray-800 p-1 px-2 rounded mr-1 mb-1 text-sm border-0"
+                    className="bg-gray-500 dark:bg-gray-800 p-1 px-2 rounded mr-1 mb-1 text-sm border-0"
                     onClick={() => removeTag(index)}>{tag}</button>
             ))}
             <input
@@ -40,7 +40,7 @@ const TagInput: React.FC<TagInputProps> = ({ initialTags, onTagsChange, classNam
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Add tags"
-                className="flex-grow p-1 pl-2 border-0 rounded bg-gray-800 mb-1 outline-none text-sm"
+                className="flex-grow p-1 pl-2 border-0 rounded bg-gray-300 dark:bg-gray-800 mb-1 outline-none text-sm"
             />
         </div>
     );

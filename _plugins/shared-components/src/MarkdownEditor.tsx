@@ -55,7 +55,7 @@ const MenuBar = () => {
     }
 
     return (
-        <div className="bg-gray-800 text-white text-lg flex flex-row flex-wrap items-center py-1">
+        <div className="bg-gray-400 dark:bg-gray-800 dark:text-white text-lg flex flex-row flex-wrap items-center p-1">
             <EditorButton action="toggleBold" isActive={editor.isActive("bold")} label={<FaBold />} disabled />
             <EditorButton action="toggleItalic" isActive={editor.isActive("italic")} label={<FaItalic />} disabled />
             <EditorButton action="toggleStrike" isActive={editor.isActive("strike")} label={<FaStrikethrough />} disabled />

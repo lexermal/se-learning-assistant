@@ -91,7 +91,7 @@ export default function Training() {
     }
 
     return (
-        <div className="pb-40">
+        <div className="pb-40 bg-white dark:bg-transparent">
             <TrainingNavbar deckName={deckName} remaining={remaining} />
             {finished && <div className="text-center text-3xl text-green-500 mt-[25vh]">
                 You learned all flashcards for today!🎉
@@ -148,7 +148,7 @@ function RenderFlashcard(props: { card: Flashcard, showAnswer: boolean, editedCa
     const backTtsEnabled = card.back_tags?.includes("lang");
 
     return <div className="pt-[25vh] w-full px-[29%]">
-        <div className={"border-l-2 py-4 text-white text-3xl border-gray-700"}>
+        <div className={"border-l-2 py-4 dark:text-white text-3xl border-gray-700"}>
             <div className="flex flex-row items-center ml-4 group">
                 <div className="flex flex-col">
                     <MarkdownEditor className="rounded" content={editedCard?.new ? "" : card.front} editable={!!editedCard} onUpdate={text => {
@@ -161,9 +161,9 @@ function RenderFlashcard(props: { card: Flashcard, showAnswer: boolean, editedCa
                 </div>}
             </div>
             {showAnswer && (
-                <div className="border-t text-3xl pt-1 text-white w-full pl-4 border-gray-800 group flex flex-row items-center">
+                <div className="border-t text-3xl pt-1 dark:text-white w-full pl-4 border-gray-800 group flex flex-row items-center">
                     <div className="flex flex-col mt-3">
-                        <MarkdownEditor className="rounded mb-1" content={editedCard?.new ? "" : card.back} editable={!!editedCard} onUpdate={text => {
+                        <MarkdownEditor className="rounded mb-1 max-w-1/2" content={editedCard?.new ? "" : card.back} editable={!!editedCard} onUpdate={text => {
                             setEditedCard({ ...editedCard!, back: text });
                         }} />
                         {editedCard && <TagInput initialTags={editedCard.backTags} onTagsChange={tags => setEditedCard({ ...editedCard, backTags: tags })} />}
@@ -185,7 +185,7 @@ function getTTSText(text: string, tags?: string[]) {
 function renderShowAnswerButton(onClick: () => void) {
     return <button
         onClick={onClick}
-        className="mx-auto w-1/4 border-2 border-gray-800 p-2 rounded-lg text-gray-300">
+        className="mx-auto w-1/4 border-2 border-gray-800 p-2 rounded-lg dark:text-gray-300">
         Show answer
     </button>
 }
@@ -195,7 +195,7 @@ function renderKnowledgButtons(onClick: (action: Grade) => void) {
         <div className="flex flex-row justify-evenly gap-2 w-1/3 mx-auto" style={{ padding: "1px 0" }}>
             <button onClick={_ => onClick(Rating.Again)} className="w-1/2 text-purple-700 border border-gray-800 p-2 rounded-lg">Again</button>
             <button onClick={_ => onClick(Rating.Hard)} className="w-1/2 text-red-600 border border-gray-800 p-2 rounded-lg">Hard</button>
-            <button onClick={_ => onClick(Rating.Good)} className="w-1/2 text-yellow-600 border border-gray-800 p-2 rounded-lg">Good</button>
+            <button onClick={_ => onClick(Rating.Good)} className="w-1/2 text-yellow-500 border border-gray-800 p-2 rounded-lg">Good</button>
             <button onClick={_ => onClick(Rating.Easy)} className="w-1/2 text-green-600 border border-gray-800 p-2 rounded-lg">Easy</button>
         </div>
     );
@@ -212,7 +212,7 @@ function TrainingNavbar({ deckName, remaining }: { deckName: string, remaining: 
     return (
         <div className="flex flex-row border-b-2 border-gray-700 items-end justify-between">
             <div className="flex flex-row max-w-1/3 w-1/3">
-                <span className="text-4xl mr-2 pl-2 pt-1 text-gray-300">{deckName}</span>
+                <span className="text-4xl mr-2 pl-2 pt-1 dark:text-gray-300">{deckName}</span>
                 <div className="flex items-end">
                     <span className="mr-2 font-bold text-blue-500">{remaining.new}</span>+
                     <span className="mx-1 font-bold text-red-500">{remaining.learning}</span>+

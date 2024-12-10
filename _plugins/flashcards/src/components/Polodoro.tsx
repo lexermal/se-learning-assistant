@@ -81,7 +81,7 @@ const Pomodoro: React.FC = () => {
   const isStudySession = currentSessionType === 'Study';
 
   return (
-    <div className={`rounded-t-md flex flex-row items-center p-1 border border-b-0 border-gray-800 opacity-80 hover:opacity-100`}>
+    <div className={`rounded-t-md flex flex-row items-center p-1 border border-b-0 border-gray-800 dark:opacity-80 hover:opacity-100`}>
       <h2 className="text-xl mr-1">
         {isCompleted ? (
           <span className="animate-pulse">
