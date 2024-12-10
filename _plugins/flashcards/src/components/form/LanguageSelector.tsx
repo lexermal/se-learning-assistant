@@ -24,7 +24,7 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ initLang, setLangua
         <select
             value={selectedLanguage}
             onChange={handleChange}
-            className={"w-full bg-gray-800 border-0 px-4 py-2 pr-8 rounded leading-tight focus:outline-none " + (className || "")}>
+            className={"w-full dark:bg-gray-800 border-0 px-4 py-2 pr-8 rounded leading-tight focus:outline-none " + (className || "")}>
             {Object.entries(languages)
                 .sort(([, a], [, b]) => a.localeCompare(b))
                 .map(([key, value]) => (

@@ -1,8 +1,6 @@
 import { useState } from "react";
-import TagInput from "../../components/form/TagInput";
 import { usePlugin } from "shared-components";
 import { useEffect } from "react";
-import LanguageSelector, { Language } from "../../components/form/LanguageSelector";
 
 export interface FlashcardPluginSettings {
     ttsTags: string[];
@@ -13,19 +11,19 @@ export interface FlashcardPluginSettings {
 
 export default function SettingsPage() {
     const [settings, setPageSettings] = useState<Partial<FlashcardPluginSettings> | null>(null);
-    const { getSettings, setSettings, getAIResponse } = usePlugin();
+    const { getSettings, setSettings } = usePlugin();
     const [isLoading, setIsLoading] = useState(true);
 
     function setSettingsWrapper(key: keyof FlashcardPluginSettings, value: any) {
         if (settings && settings[key] === value) return;
 
         if (key === "motherTongue") {
-            getFlashcardTerms(value, getAIResponse).then(terms => {
-                // console.log("Terms", terms);
-                const newSettings = { ...settings, translation_term_or: terms.or, translation_term_one: terms.one, motherTongue: value };
-                setPageSettings(newSettings);
-                setSettings(newSettings);
-            });
+            // getFlashcardTerms(value).then(terms => {
+            //     // console.log("Terms", terms);
+            //     const newSettings = { ...settings, translation_term_or: terms.or, translation_term_one: terms.one, motherTongue: value };
+            //     setPageSettings(newSettings);
+            //     setSettings(newSettings);
+            // });
         } else {
             setPageSettings({ ...settings, [key]: value });
             setSettings({ ...settings, [key]: value });
@@ -52,10 +50,9 @@ export default function SettingsPage() {
 
     if (isLoading) return <div />;
 
-    const lang = capitalizeFirstLetter(settings?.motherTongue ?? "english")
-
     return <div className="text-lg flex flex-row flex-wrap items-center py-1 mt-2">
-        <SettingsEntry
+        <p>The plugin has no settings.</p>
+        {/* <SettingsEntry
             title="Text-to-speech tags"
             description="These are the tags specifying which cards should support TTS.">
             <TagInput
@@ -67,7 +64,7 @@ export default function SettingsPage() {
             title="Mother tongue"
             description="The language you most familiar with.">
             <LanguageSelector initLang={lang as Language} setLanguage={(lang) => setSettingsWrapper("motherTongue", lang)} />
-        </SettingsEntry>
+        </SettingsEntry> */}
     </div>
 }
 
@@ -83,29 +80,4 @@ function SettingsEntry(props: { title: string, description: string, children: Re
             {props.children}
         </div>
     </div>
-}
-
-async function getFlashcardTerms(lang: string, getResponse: (messages: { role: string, content: string }[]) => Promise<string>) {
-    // console.log("Getting terms for", lang);
-
-    if (lang === "English") {
-        return { one: "one", or: "or" };
-    }
-
-    const prompt = `
-Thranslate the following words to ${lang}: "one" and "or"
-
-Example:
-\`\`\`json
-{
-  "one": "una",
-  "or": "o"
-}
-\`\`\`
-Just type the words and their translations in the same format.
-`
-
-    return await getResponse([{ role: 'system', content: prompt }])
-        //remove first and last line
-        .then((text: string) => JSON.parse(text.split('\n').slice(1, -1).join('\n')));
 }

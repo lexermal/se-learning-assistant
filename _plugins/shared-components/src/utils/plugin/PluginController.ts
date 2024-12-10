@@ -72,7 +72,7 @@ export class PluginController {
         this.onceListeners.get(eventName)?.push(callback);
     }
 
-    async emitAndWaitResponse(topic: string, data: any) {
+    async emitAndWaitResponse<T>(topic: string, data: any): Promise<T> {
         return await new Promise((resolve) => {
             let triggered = false;
 
@@ -119,7 +119,7 @@ export class PluginController {
         await this.emitAndWaitResponse("set_settings", settings);
     }
 
-    public async getAIResponse(messages: { role: string, content: string }[]) {
+    public async getAIResponse(messages: { role: string, content: string }[]): Promise<string> {
         return this.emitAndWaitResponse("getAIResponse", messages);
     }
 
