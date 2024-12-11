@@ -2,7 +2,6 @@ export * from "./MarkdownEditor";
 export * from "./CRUDModal";
 export * from "./audio/Playbutton";
 export * from "./utils/plugin/PluginController";
-export * from "./utils/plugin/PluginUtils";
 export * from "./utils/plugin/ThemeSetter";
 export * from "./utils/plugin/WhereClauseBuilder";
 export * from "./utils/plugin/providers/EventEmitterContext";

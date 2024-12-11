@@ -198,6 +198,18 @@ export default class CommunicationHandler {
             });
         });
 
+        // create voice respponse
+        this.subscribe("getVoiceResponse", async ({ text, voice = "alloy", speed = 1 }) => {
+            console.log(`Plugin ${this.plugin.name} wants to create voice response.`);
+            const response = await fetch('/api/speech', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ input: text, voice, speed }),
+            });
+            const blob = await response.blob();
+            this.call("getVoiceResponse", blob);
+        });
+
     }
 
     async subscribe(topic: string, callback: (data: any) => void) {

@@ -30,6 +30,7 @@ export class PluginController {
         this.getSettings = this.getSettings.bind(this);
         this.getAIResponse = this.getAIResponse.bind(this);
         this.dbFunctionCall = this.dbFunctionCall.bind(this);
+        this.getVoiceResponse = this.getVoiceResponse.bind(this);
         this.getAIResponseStream = this.getAIResponseStream.bind(this);
         this.emitAndWaitResponse = this.emitAndWaitResponse.bind(this);
     }
@@ -136,4 +137,7 @@ export class PluginController {
         })
     }
 
+    public getVoiceResponse(text: string, voice = "alloy", speed = 1): Promise<Blob> {
+        return this.emitAndWaitResponse("getVoiceResponse", { text, voice, speed });
+    }
 }
