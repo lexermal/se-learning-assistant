@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { createClient } from "@/utils/supabase/client";
+import { SupabaseClient } from "@/utils/supabase/client";
 import ContextMenu, { ContextMenuInfo, MenuEntry } from "./ContextMenu";
 import CommunicationHandler, { Plugin } from "../../app/(protected)/plugin/CommunicationHandler";
 import { useTheme } from "next-themes";
@@ -12,7 +12,7 @@ export default function MainPluginHandler({ plugin, globalContextMenuActions }: 
     const [constextActions, setContextMenuActions] = useState<MenuEntry[]>(globalContextMenuActions);
     const iframeRef = useRef(null as HTMLDivElement | null);
     const [hash, setHash] = useState<string | null>(null);
-    const supabase = createClient();
+    const supabase = SupabaseClient.getClient();
     const router = useRouter();
     const { theme } = useTheme();
 

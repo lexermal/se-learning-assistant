@@ -3,5 +3,13 @@ services:
     build:
       context: ./
       dockerfile: ./Dockerfile
+    env_file:
+      - .env
     ports:
-      - "3001:3000"
+      - "3100:3000"
+  rimori-plugins:
+    build:
+      context: ./_plugins
+      dockerfile: ./Dockerfile
+    ports:
+      - "3101:80"

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { createClient } from '@/utils/supabase/client';
+import { SupabaseClient } from '@/utils/supabase/client';
 
 enum Status {
     Idle,
@@ -23,7 +23,7 @@ const WaitlistPage = () => {
         setStatusMessage({ status: Status.Loading, message: '', });
 
         try {
-            const supabase = createClient();
+            const supabase = SupabaseClient.getClient();
             const { error } = await supabase.from('waitlist').insert({ email });
 
             if (!error) {

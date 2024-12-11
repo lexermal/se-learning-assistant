@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { User } from "@supabase/supabase-js";
 import { FaUserCircle } from "react-icons/fa";
 import { signOutAction } from "@/app/actions";
-import { createClient } from "@/utils/supabase/client";
+import { SupabaseClient } from "@/utils/supabase/client";
 import { Plugin } from "../app/(protected)/plugin/CommunicationHandler";
 import { useEventEmitter } from "@/utils/providers/EventEmitterContext";
 import Link from "next/link";
@@ -18,7 +18,7 @@ export default function CustomNavbar() {
     const { on } = useEventEmitter();
 
     function init() {
-        const supabase = createClient();
+        const supabase = SupabaseClient.getClient();
         supabase.auth.getUser().then(({ data }) => {
             setUser(data.user);
             setIsLoading(false);

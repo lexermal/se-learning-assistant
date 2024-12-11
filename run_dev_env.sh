@@ -1,5 +1,13 @@
 #!/bin/bash
 
+# Load environment variables from .env file
+if [ ! -f .env ]; then
+  echo "Error: .env file not found."
+  exit 1
+fi
+ 
+export $(cat .env | xargs)
+
 # Install dependencies for the main project and plugins
 echo "Installing dependencies..."
 yarn install --cwd ./

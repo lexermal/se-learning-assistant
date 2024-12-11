@@ -2,12 +2,12 @@
 
 import { useTheme } from "next-themes";
 import { useEffect, useRef } from "react";
-import { createClient } from "@/utils/supabase/client";
+import { SupabaseClient } from "@/utils/supabase/client";
 import CommunicationHandler, { Plugin } from "../../app/(protected)/plugin/CommunicationHandler";
 
 export default function SettingsPluginHandler({ plugin }: { plugin: Plugin }) {
     const iframeRef = useRef(null as HTMLDivElement | null);
-    const supabase = createClient();
+    const supabase = SupabaseClient.getClient();
     const { theme } = useTheme();
 
     useEffect(() => {

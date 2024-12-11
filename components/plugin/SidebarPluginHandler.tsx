@@ -1,17 +1,17 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { createClient } from "@/utils/supabase/client";
 import { ContextMenuAction, MenuEntry } from "./ContextMenu";
 import { useEventEmitter } from "@/utils/providers/EventEmitterContext";
 import { Plugin, SidebarPage } from "../../app/(protected)/plugin/CommunicationHandler";
 import CommunicationHandler from "../../app/(protected)/plugin/CommunicationHandler";
 import { useTheme } from "next-themes";
+import { SupabaseClient } from "@/utils/supabase/client";
 
 function PluginSidebar({ plugin, contextMenuAction }: { plugin: Plugin, contextMenuAction: MenuEntry }) {
     const iframeRef = useRef<HTMLDivElement | null>(null);
     const [parent, setParent] = useState<CommunicationHandler | null>(null);
-    const supabase = createClient();
+    const supabase = SupabaseClient.getClient();
     const { theme } = useTheme();
 
     useEffect(() => {
@@ -43,7 +43,7 @@ function PluginSidebar({ plugin, contextMenuAction }: { plugin: Plugin, contextM
 }
 
 export function SidebarPluginHandler({ plugins }: { plugins: Plugin[] }) {
-    const sidebarPlugins = plugins.flatMap((plugin) => plugin.sidebarPages.map(sp=>({ ...sp, pluginName: plugin.name }))) as (SidebarPage & { pluginName: string })[];
+    const sidebarPlugins = plugins.flatMap((plugin) => plugin.sidebarPages.map(sp => ({ ...sp, pluginName: plugin.name }))) as (SidebarPage & { pluginName: string })[];
 
     // console.log("Sidebar plugins", sidebarPlugins);
 

@@ -20,7 +20,7 @@ export default function Login(props: { searchParams: Promise<{ error?: string, r
     });
   }, []);
 
-  const onSubmit = (formData: FormData) => {
+  const onSubmit: any = (formData: FormData) => {
     if (actionIsLogin) {
       setTimeout(() => emit("user:signed-in"), 1000);
       return signInAction(formData);

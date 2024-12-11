@@ -19,6 +19,7 @@
     "typescript": "^5.7.2"
   },
   "devDependencies": {
+    "@types/postmate": "^1.5.0",
     "@types/react": "^18.0.1",
     "@types/react-dom": "^18.0.1",
     "sass": "^1.82.0"

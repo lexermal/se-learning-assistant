@@ -14,8 +14,6 @@ export interface Plugin {
     endpoint: string;
     endpointDev?: string;
     contextMenuActions: MenuEntry[];
-    isMainPlugin: boolean;
-    isSidebarPlugin: boolean;
     pluginPages: {
         name: string;
         url: string;
@@ -46,13 +44,11 @@ export async function GET() {
             description: "Memorize words, phrases, and more with flashcards.",
             version: "1.0.0",
             author: "lexermal",
-            endpoint: "/plugins/flashcards/index.html",
-            endpointDev: "http://localhost:3001",
+            endpoint: "http://localhost:3101/plugins/flashcards/",
+            endpointDev: "http://localhost:3001/plugins/flashcards/",
             pluginRepo: "https://github.com/lexermal/se-learning-assistant",
             pluginWebsite: "https://lexermal.github.io/se-learning-assistant/",
-            iconUrl: "http://localhost:3001/plugins/flashcards/logo.png",
-            isSidebarPlugin: true,
-            isMainPlugin: true,
+            iconUrl: "logo.png",
             pluginPages: [
                 {
                     name: "Training",
@@ -83,15 +79,14 @@ export async function GET() {
                 {
                     name: "Translate",
                     url: "/sidebar/translate",
-                    iconUrl: "http://localhost:3001/plugins/flashcards/translate.png",
+                    iconUrl: "translate.png",
                     description: "Translate words."
                 },
                 {
                     name: "Quick add",
                     url: "/sidebar/add",
                     description: "Quickly add a word to your flashcards.",
-                    iconUrl: "http://localhost:3001/plugins/flashcards/logo.png",
-
+                    iconUrl: "logo.png",
                 },
             ],
             settingsPage: "/settings",
@@ -103,42 +98,19 @@ export async function GET() {
             description: "Learn vocabulary and grammar by reading stories.",
             version: "1.0.0",
             author: "lexermal",
-            endpoint: "/plugins/storytelling/index.html",
-            endpointDev: "http://localhost:3002",
+            endpoint: "http://localhost:3101/plugins/storytelling/",
+            endpointDev: "http://localhost:3002/plugins/storytelling/",
             pluginRepo: "https://lexermal.github.io/se-learning-assistant/",
             pluginWebsite: "https://lexermal.github.io/se-learning-assistant/",
-            iconUrl: "http://localhost:3002/plugins/storytelling/logo.png",
-            isSidebarPlugin: false,
-            isMainPlugin: true,
+            iconUrl: "logo.png",
             pluginPages: [
-                // {
-                //     name: "Entry page",
-                //     url: "/",
-                // },
                 {
                     name: "Silent reading",
                     url: "/silent-reading",
                     description: "Practice reading with stories you like on your skill level."
                 },
-                // {
-                //     name: "Storytelling",
-                //     url: "/sidebar/write",
-                // },
             ],
-            contextMenuActions: [
-                // {
-                //     text: "Add to story",
-                //     pluginName: "storytelling",
-                //     action: "add",
-                //     url: "/sidebar/add"
-                // },
-                // {
-                //     text: "Write",
-                //     pluginName: "storytelling",
-                //     action: "write",
-                //     url: "/sidebar/write"
-                // }
-            ],
+            contextMenuActions: [],
             sidebarPages: [],
             settingsPage: "/settings",
         },
@@ -146,13 +118,20 @@ export async function GET() {
 
     console.log("node env", process.env.NODE_ENV);
 
-    plugins = plugins.map(plugin => {
+    plugins = plugins.map(p => {
         if (process.env.NODE_ENV !== "production") {
-            console.log("Using dev endpoint for plugin", plugin.name);
-            plugin.endpoint = plugin.endpointDev!;
+            console.log("Using dev endpoint for plugin", p.name);
+            p.endpoint = p.endpointDev!;
         }
-        delete plugin.endpointDev;
-        return plugin;
+        delete p.endpointDev;
+
+        p.iconUrl = p.endpoint + p.iconUrl;
+        p.sidebarPages = p.sidebarPages.map(sp => {
+            sp.iconUrl = p.endpoint + sp.iconUrl;
+            return sp;
+        });
+
+        return p;
     });
     return NextResponse.json(plugins);
 }

@@ -1,6 +1,8 @@
+import { env } from "@/utils/constants";
 import { GeistSans } from "geist/font/sans";
 import { ThemeProvider } from "next-themes";
 import CustomNavbar from "@/components/CustomNavbar";
+import { EnvProvider } from "@/utils/providers/EnvProvider";
 import { EventEmitterProvider } from "@/utils/providers/EventEmitterContext";
 import "./globals.css";
 
@@ -11,6 +13,7 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+
   return (
     <html lang="en" className={GeistSans.className} suppressHydrationWarning>
       <body>
@@ -20,14 +23,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           enableSystem
           disableTransitionOnChange>
           <EventEmitterProvider>
-            <main className="min-h-screen flex flex-col items-center dark:bg-gray-950">
-              <div className="flex-1 w-full flex flex-col items-center">
-                <CustomNavbar />
-                <div className="w-full">
-                  {children}
+            <EnvProvider env={env}>
+              <main className="min-h-screen flex flex-col items-center dark:bg-gray-950">
+                <div className="flex-1 w-full flex flex-col items-center">
+                  <CustomNavbar />
+                  <div className="w-full">
+                    {children}
+                  </div>
                 </div>
-              </div>
-            </main>
+              </main>
+            </EnvProvider>
           </EventEmitterProvider>
         </ThemeProvider>
       </body>

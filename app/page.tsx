@@ -1,14 +1,5 @@
-import { useEffect } from 'react';
-import { useRouter } from 'next/router';
+import { redirect } from 'next/navigation';
 
-const HomePage = () => {
-  const router = useRouter();
-
-  useEffect(() => {
-    router.push('/sign-in');
-  }, [router]);
-
-  return null;
-};
-
-export default HomePage;
+export default function HomePage() {
+  redirect('/sign-in');
+}
