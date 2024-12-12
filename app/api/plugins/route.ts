@@ -1,4 +1,5 @@
 import { MenuEntry } from "@/components/plugin/ContextMenu";
+import { env } from "@/utils/constants";
 import { createClient } from "@/utils/supabase/server";
 import { NextResponse } from "next/server";
 
@@ -44,7 +45,7 @@ export async function GET() {
             description: "Memorize words, phrases, and more with flashcards.",
             version: "1.0.0",
             author: "lexermal",
-            endpoint: "http://localhost:3101/plugins/flashcards/",
+            endpoint: env.DEFAULT_PLUGIN_ENDPOINT + "/plugins/flashcards/",
             endpointDev: "http://localhost:3001/plugins/flashcards/",
             pluginRepo: "https://github.com/lexermal/se-learning-assistant",
             pluginWebsite: "https://lexermal.github.io/se-learning-assistant/",
@@ -98,7 +99,7 @@ export async function GET() {
             description: "Learn vocabulary and grammar by reading stories.",
             version: "1.0.0",
             author: "lexermal",
-            endpoint: "http://localhost:3101/plugins/storytelling/",
+            endpoint: env.DEFAULT_PLUGIN_ENDPOINT + "/plugins/storytelling/",
             endpointDev: "http://localhost:3002/plugins/storytelling/",
             pluginRepo: "https://lexermal.github.io/se-learning-assistant/",
             pluginWebsite: "https://lexermal.github.io/se-learning-assistant/",
@@ -115,8 +116,6 @@ export async function GET() {
             settingsPage: "/settings",
         },
     ];
-
-    console.log("node env", process.env.NODE_ENV);
 
     plugins = plugins.map(p => {
         if (process.env.NODE_ENV !== "production") {

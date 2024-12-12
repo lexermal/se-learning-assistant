@@ -1,9 +1,8 @@
 import { type NextRequest } from "next/server";
 import { updateSession } from "@/utils/supabase/middleware";
-import { corsMiddleware } from "./utils/CorsMiddleware";
 
 export async function middleware(request: NextRequest) {
-  return corsMiddleware(await updateSession(request));
+  return await updateSession(request);
 }
 
 export const config = {

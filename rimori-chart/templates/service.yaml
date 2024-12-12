@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "rimori-chart.fullname" . }}
+  labels:
+    {{- include "rimori-chart.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "rimori-chart.selectorLabels" . | nindent 4 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: plugins-service
+  labels:
+    {{- include "rimori-chart.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: 80
+      targetPort: http-service
+      protocol: TCP
+      name: http-service
+  selector:
+    {{- include "rimori-chart.selectorLabels" . | nindent 4 }}

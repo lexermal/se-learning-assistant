@@ -6,18 +6,18 @@ import { SubmitButton } from "@/components/submit-button";
 import { signInAction, signUpAction } from "@/app/actions";
 import { useEventEmitter } from "@/utils/providers/EventEmitterContext";
 
-export default function Login(props: { searchParams: Promise<{ error?: string, register?: string, success?: string }> }) {
+export default function Login() {
   const [actionIsLogin, setActionIsLogin] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const { emit } = useEventEmitter();
 
   useEffect(() => {
-    props.searchParams.then((searchParams) => {
-      setError(searchParams.error || null);
-      setActionIsLogin(!searchParams.register);
-      setSuccessMessage(searchParams.success || null);
-    });
+    const searchParams = new URLSearchParams(location.search);
+
+    setError(searchParams.get("error") || null);
+    setActionIsLogin(!searchParams.get("register"));
+    setSuccessMessage(searchParams.get("success") || null);
   }, []);
 
   const onSubmit: any = (formData: FormData) => {

@@ -31,11 +31,11 @@ export const updateSession = async (request: NextRequest) => {
 
     // protected routes
     if (request.nextUrl.pathname.startsWith("/dashboard") && user.error) {
-      return NextResponse.redirect(new URL("/sign-in", request.url));
+      return NextResponse.redirect(new URL("/sign-in", env.APP_DOMAIN));
     }
 
     if (request.nextUrl.pathname === "/" && !user.error) {
-      return NextResponse.redirect(new URL("/dashboard", request.url));
+      return NextResponse.redirect(new URL("/dashboard", env.APP_DOMAIN));
     }
 
     return response;
@@ -43,10 +43,6 @@ export const updateSession = async (request: NextRequest) => {
     // If you are here, a Supabase client could not be created!
     // This is likely because you have not set up environment variables.
     // Check out http://localhost:3000 for Next Steps.
-    return NextResponse.next({
-      request: {
-        headers: request.headers,
-      },
-    });
+    return NextResponse.next({ request: { headers: request.headers } });
   }
 };

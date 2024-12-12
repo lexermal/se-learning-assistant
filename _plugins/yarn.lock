@@ -2504,6 +2504,11 @@
   resolved "https://registry.yarnpkg.com/@types/parse-json/-/parse-json-4.0.2.tgz#5950e50960793055845e956c427fc2b0d70c5239"
   integrity sha512-dISoDXWWQwUquiKsyZ4Ng+HX2KsPL7LyHKHQwgGFEA3IaKac4Obd+h2a/a6waisAoepJlBcx9paWqjA8/HVjCw==
 
+"@types/postmate@^1.5.0":
+  version "1.5.4"
+  resolved "https://registry.yarnpkg.com/@types/postmate/-/postmate-1.5.4.tgz#ad6e354c1e364caa0f816967d0de754a43c1d3fa"
+  integrity sha512-eZBPKSmEF+0s7dL6htpj3PJdVw9rbdsUXpydGpyQ+PhRPyuTJF1XsHm2thahXIKaHQnqzG2GUaY6m9xNK0sOeA==
+
 "@types/prettier@^2.1.5":
   version "2.7.3"
   resolved "https://registry.yarnpkg.com/@types/prettier/-/prettier-2.7.3.tgz#3e51a17e291d01d17d3fc61422015a933af7a08f"
@@ -8893,9 +8898,9 @@ prosemirror-menu@^1.2.4:
     prosemirror-state "^1.0.0"
 
 prosemirror-model@^1.0.0, prosemirror-model@^1.19.0, prosemirror-model@^1.20.0, prosemirror-model@^1.21.0, prosemirror-model@^1.23.0, prosemirror-model@^1.8.1:
-  version "1.24.0"
-  resolved "https://registry.yarnpkg.com/prosemirror-model/-/prosemirror-model-1.24.0.tgz#01fd4fdfd32b196d2a073066b25c232bcf946aa4"
-  integrity sha512-Ft7epNnycoQSM+2ObF35SBbBX+5WY39v8amVlrtlAcpglhlHs2tCTnWl7RX5tbp/PsMKcRcWV9cXPuoBWq0AIQ==
+  version "1.24.1"
+  resolved "https://registry.yarnpkg.com/prosemirror-model/-/prosemirror-model-1.24.1.tgz#b445e4f9b9cfc8c1a699215057b506842ebff1a9"
+  integrity sha512-YM053N+vTThzlWJ/AtPtF1j0ebO36nvbmDy4U7qA2XQB8JVaQp1FmB9Jhrps8s+z+uxhhVTny4m20ptUvhk0Mg==
   dependencies:
     orderedmap "^2.0.0"
 
@@ -8951,9 +8956,9 @@ prosemirror-transform@^1.0.0, prosemirror-transform@^1.1.0, prosemirror-transfor
     prosemirror-model "^1.21.0"
 
 prosemirror-view@^1.0.0, prosemirror-view@^1.1.0, prosemirror-view@^1.13.3, prosemirror-view@^1.27.0, prosemirror-view@^1.31.0, prosemirror-view@^1.37.0:
-  version "1.37.0"
-  resolved "https://registry.yarnpkg.com/prosemirror-view/-/prosemirror-view-1.37.0.tgz#4bc5486d70c546490733197d4bbf4579bfc3d84d"
-  integrity sha512-z2nkKI1sJzyi7T47Ji/ewBPuIma1RNvQCCYVdV+MqWBV7o4Sa1n94UJCJJ1aQRF/xRkFfyqLGlGFWitIcCOtbg==
+  version "1.37.1"
+  resolved "https://registry.yarnpkg.com/prosemirror-view/-/prosemirror-view-1.37.1.tgz#3ccd67cd3d831eb37a2505dd34151932462172fb"
+  integrity sha512-MEAnjOdXU1InxEmhjgmEzQAikaS6lF3hD64MveTPpjOGNTl87iRLA1HupC/DEV6YuK7m4Q9DHFNTjwIVtqz5NA==
   dependencies:
     prosemirror-model "^1.20.0"
     prosemirror-state "^1.0.0"

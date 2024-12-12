@@ -1,0 +1,143 @@
+# Default values for rimori-chart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: registry.rimori.se/language/rimori-ui
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "0.1.0"
+
+rimoriPluginServiceImage:
+  repository: registry.rimori.se/language/rimori-plugins
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "0.1.0"
+
+rimoriUi:
+  enabled: true  # Set to false to disable rimori-ui
+
+rimoriPluginService:
+  enabled: true  # Set to false to disable the plugin service
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Automatically mount a ServiceAccount's API credentials?
+  automount: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+env:
+  APP_DOMAIN:
+  SUPABASE_URL: 
+  SUPABASE_ANON_KEY: 
+  OPENAI_API_KEY: 
+  LOGGING_BACKEND_URL: 
+  LOGGING_USERNAME: 
+  LOGGING_PASSWORD: 
+  DEFAULT_PLUGIN_ENDPOINT: https://plugins.rimori.se
+  
+service:
+  type: ClusterIP
+  port: 3000
+
+ingress:
+  enabled: true
+  className: "traefik"
+  annotations: 
+    "cert-manager.io/cluster-issuer": letsencrypt-production
+  hosts:
+    - host: app.rimori.se
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls:
+   - secretName: rimori-tls
+     hosts:
+       - app.rimori.se
+
+pluginServiceIngress:
+  enabled: true
+  className: "traefik"
+  annotations: 
+    "cert-manager.io/cluster-issuer": letsencrypt-production
+  hosts:
+    - host: plugins.rimori.se
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls:
+   - secretName: rimori-plugins-service-tls
+     hosts:
+       - plugins.rimori.se
+
+resources:
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  limits:
+    cpu: 300m
+    memory: 500Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+livenessProbe:
+  httpGet:
+    path: /sign-in
+    port: http
+readinessProbe:
+  httpGet:
+    path: /sign-in
+    port: http
+
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+# Additional volumes on the output Deployment definition.
+volumes: []
+# - name: foo
+#   secret:
+#     secretName: mysecret
+#     optional: false
+
+# Additional volumeMounts on the output Deployment definition.
+volumeMounts: []
+# - name: foo
+#   mountPath: "/etc/foo"
+#   readOnly: true
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

@@ -2,7 +2,7 @@ import { Deck } from '../DeckOverviewPage';
 import { useState, useEffect } from 'react';
 import { usePlugin } from 'shared-components';
 import { CRUDModal } from 'shared-components';
-import {MarkdownEditor} from 'shared-components';
+import { MarkdownEditor } from 'shared-components';
 import FlashcardController from '../deck/FlashcardController';
 
 export default function AddCard() {
@@ -10,8 +10,8 @@ export default function AddCard() {
     const [selectedDeck, setSelectedDeck] = useState('');
     const [question, setQuestion] = useState('');
     const [answer, setAnswer] = useState('');
-    const [initValue, setInitValue] = useState("");
-    const [initValueBack, setInitValueBack] = useState("");
+    const [initValue, setInitValue] = useState<string | undefined>("");
+    const [initValueBack, setInitValueBack] = useState<string | undefined>("");
     const plugin = usePlugin();
 
     useEffect(() => {
@@ -35,8 +35,9 @@ export default function AddCard() {
         });
         setAnswer('');
         setQuestion('');
-        setInitValue('');
-        setInitValueBack('');
+        const value = initValue === undefined ? "" : undefined;
+        setInitValue(value);
+        setInitValueBack(value);
     };
 
     const DeckModal = () => {

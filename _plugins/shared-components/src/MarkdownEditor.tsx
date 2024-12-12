@@ -87,7 +87,7 @@ const extensions = [
 ];
 
 interface Props {
-    content: string;
+    content?: string;
     editable: boolean;
     className?: string;
     onUpdate?: (content: string) => void;

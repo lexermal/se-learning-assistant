@@ -1,5 +1,6 @@
 services:
   language-app:
+    image: registry.rimori.se/language/rimori-ui:0.1.0
     build:
       context: ./
       dockerfile: ./Dockerfile
@@ -8,6 +9,7 @@ services:
     ports:
       - "3100:3000"
   rimori-plugins:
+    image: registry.rimori.se/language/rimori-plugins:0.1.0
     build:
       context: ./_plugins
       dockerfile: ./Dockerfile
