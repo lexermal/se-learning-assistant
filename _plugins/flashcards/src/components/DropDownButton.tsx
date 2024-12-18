@@ -2,7 +2,13 @@ import { useState } from "react";
 import { Deck } from "../routes/DeckOverviewPage";
 import { FaGear } from "react-icons/fa6";
 
-const AddToDeckButton = ({ options, onSelect }: { options: Deck[], onSelect: (id: string) => void }) => {
+interface Props {
+    options: Deck[];
+    onSelect: (deckId: string) => void;
+    className?: string;
+}
+
+const AddToDeckButton = ({ options, onSelect, className }: Props) => {
     const [isOpen, setIsOpen] = useState(false);
     const [selectedDeck, setSelectedDeck] = useState(options[0].id);
 
@@ -16,7 +22,7 @@ const AddToDeckButton = ({ options, onSelect }: { options: Deck[], onSelect: (id
     };
 
     return (
-        <div className="relative inline-block">
+        <div className={"relative inline-block " + (className || "")}>
             <div className="flex flex-row items-center">
                 <button
                     onClick={() => onSelect(selectedDeck)}
