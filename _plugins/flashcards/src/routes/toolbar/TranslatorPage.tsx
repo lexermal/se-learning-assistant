@@ -81,7 +81,7 @@ export default function TranslationSidebar() {
                         const submittedMessages = [...messages, { role: 'user', content: inputText, id: messages.length.toString() }];
 
                         plugin.getAIResponseStream(submittedMessages, (id: string, message: any) => {
-                            console.log({ messages })
+                            // console.log({ messages })
                             const lastMessage = messages[messages.length - 1];
                             if (lastMessage.id === id) {
                                 lastMessage.content = message;

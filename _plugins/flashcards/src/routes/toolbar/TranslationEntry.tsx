@@ -22,10 +22,9 @@ export interface Translation {
     en_ett_word?: string;
     infinitive?: string;
     tenses?: {
-        present: string;
+        presens: string;
         past: string;
-        supine: string;
-        imperative: string;
+        perfekt: string;
     };
     irregular?: boolean;
     adjective?: {
@@ -41,13 +40,13 @@ interface Props {
 }
 
 export default function TranslationEntry({ onTranslationComplete, word, onAddedToFlashcard }: Props) {
-    const [basicInfo, setBasicInfo] = useState<Partial<Translation> | null>(null);
+    const [basicInfo, setBasicInfo] = useState<BasicWordInfo | null>(null);
     const [additionalInfo, setAdditionalInfo] = useState<Partial<Translation> | null>(null);
     const [decks, setDecks] = useState<any[]>([]);
     const plugin = usePlugin();
     const [settings, setSettings] = useState<FlashcardPluginSettings | null>(null);
 
-    console.log({ settings, translation: basicInfo });
+    // console.log({ settings, translation: basicInfo });
 
     useEffect(() => {
         plugin.getSettings<FlashcardPluginSettings>({
@@ -69,10 +68,13 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
             console.log("basic info", info);
             setBasicInfo(info);
 
-            getAdditionalWordInfo(info.swedish_word, info.type, settings.motherTongue, plugin).then(moreInfo => {
-                moreInfo.type = info.type;
-                moreInfo.swedish_word = info.swedish_word;
+            getAdditionalWordInfo(info, settings.motherTongue, plugin).then(moreInfo => {
                 console.log("additional info", moreInfo);
+                moreInfo.type = info.type;
+                moreInfo.swedish_word = info.swedish_translation;
+                if (info.language !== "swedish") {
+                    moreInfo.translation = [info.input];
+                }
 
                 setAdditionalInfo(moreInfo);
                 onTranslationComplete(moreInfo as Translation);
@@ -80,12 +82,14 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
         });
     }, [word, settings]);
 
-    const t = { ...basicInfo, ...additionalInfo } as Translation;
+    const t = { ...additionalInfo } as Translation;
+    t.swedish_word = basicInfo?.swedish_translation || "";
+    t.type = basicInfo?.type || "";
 
     const swedishWord = t.infinitive || t.swedish_word;
     let alt = (t.alternative_meaning || "");
 
-    if (t.translation?.includes(alt) || alt.toLowerCase() === "n/a") {
+    if (t.translation?.includes(alt) || alt.toLowerCase() === "n/a" || t.translation?.some((x: string) => x.toLowerCase().includes(alt.substring(0, alt.indexOf("(")).toLowerCase().trim()))) {
         alt = "";
     }
 
@@ -106,7 +110,7 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
                         <div className="text-2xl pl-1">({t.plural})</div>
                     </div>}
                     {t.tenses && <div className='flex flex-row flex-wrap items-end'>
-                        <div className="text-2xl">({t.tenses.present}, {t.tenses.past}, {t.tenses.supine}, {t.tenses.imperative})</div>
+                        <div className="text-2xl">({t.tenses.presens}{t.tenses.past ? ", " + t.tenses.past : ""}{t.tenses.perfekt ? ", " + t.tenses.perfekt : ""})</div>
                         {t.irregular && <div className="text-base">(irregular)</div>}
                     </div>}
                     {!!t.adjective?.comparative && <div className='flex flex-row'>
@@ -133,7 +137,7 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
                 </div>
             </> : ""}
             {additionalInfo ? <AddToDeckButton options={decks} onSelect={id => {
-                console.log("translation", t);
+                // console.log("translation", t);
                 const controller = new FlashcardController(plugin);
 
                 const isEtt = t.en_ett_word === "ett";
@@ -159,9 +163,9 @@ function getBackPage(t: Translation) {
     if (t.type === "noun") {
         backPage = `${isEtt ? "ett " : ""}${t.swedish_word} (${t.plural})`;
     } else if (t.type === "verb") {
-        const { present, past, supine, imperative } = t.tenses!;
+        const { presens: present, past, perfekt: supine } = t.tenses!;
         if (t.irregular) {
-            backPage += `  \n(${present}, ${past}, ${supine}, ${imperative})`;
+            backPage += `  \n(${present}, ${past}, ${supine})`;
         }
         return backPage;
     } else if (t.type === "adjective") {
@@ -170,14 +174,22 @@ function getBackPage(t: Translation) {
     return backPage;
 }
 
-async function getBasicWordInfo(word: string, plugin: PluginController): Promise<{ swedish_word: string, type: string }> {
+interface BasicWordInfo {
+    input: string;
+    language: string;
+    type: string;
+    swedish_translation: string;
+}
+
+async function getBasicWordInfo(word: string, plugin: PluginController): Promise<BasicWordInfo> {
     const prompt = `
 You are a language assistant specialized in Swedish vocabulary. For the given word or phrase, provide a JSON-formatted output with the following information:
 
 1. If the input is a sentence or a multi-word phrase (like "Jag söva i huset" or "laga mat"), return it as is in "swedish_word".
-2. If the input is a single word with an article or in conjugated form (like "att söva"), strip any articles or conjugations, and return the base form of the word in "swedish_word".
+2. If the input is a single word with an article or in conjugated form (like "att söva"), strip any articles or conjugations, and return the base form of the word in presents in "swedish_word".
 3. Determine the word's type (e.g., noun, verb, adjective, phrase, sentence, etc.). For phrases and sentences, set the type accordingly.
-4. If gramatically mistakes are found in the input fix them and return the corrected sentence.
+4. Determine the language of the input (e.g., Swedish).
+5. If gramatically mistakes are found in the input fix them and return the corrected sentence.
 
 Ensure the JSON is correctly structured and free of errors.
 
@@ -189,32 +201,50 @@ Ensure the JSON is correctly structured and free of errors.
 #### Output:
 \`\`\`json
 {
-    "swedish_word": "Jag söva i huset.",
-    "type": "sentence"
+    "gramatically_corrected_input_text": "Jag sover i huset.",
+    "input_word_language": "swedish",
+    "type": "sentence",
+    "swedish_base_word_translation": "Jag söva i huset."
 }
 \`\`\`
 
 #### Input:
-"att söva"
+"to sleepg"
 
 #### Output:
 \`\`\`json
 {
-    "swedish_word": "söva",
-    "type": "verb"
+    "gramatically_corrected_input_text": "to sleep",
+    "input_word_language": "english",
+    "type": "verb",
+    "swedish_base_word_translation": "söva"
 }
 \`\`\`
 
 #### Input:
-"laga mat"
+"laga mmat"
 
 #### Output:
 \`\`\`json
 {
-    "swedish_word": "laga mat",
-    "type": "phrase"
+    "gramatically_corrected_input_text": "laga mat",
+    "input_word_language": "swedish",
+    "type": "phrase",
+    "swedish_base_word_translation": "laga mat"
 }
 \`\`\`
+
+#### Input:
+"Flöteg"
+
+#### Output:
+\`\`\`json
+{
+    "gramatically_corrected_input_text": "Flöte",
+    "input_word_language": "german",
+    "type": "noun",
+    "swedish_base_word_translation": "flöjt"
+}
 
 For all outputs, ensure that "swedish_word" contains the appropriate form of the word or phrase, and "type" reflects its correct grammatical category.
 
@@ -223,10 +253,15 @@ For all outputs, ensure that "swedish_word" contains the appropriate form of the
     return await plugin.getAIResponse([
         { role: 'system', content: prompt },
         { role: 'user', content: "Look up the word or phrase: " + word }
-    ]).then(json => JSON.parse(json.split('\n').slice(1, -1).join('\n')));
+    ]).then(json => JSON.parse(json.split('\n').slice(1, -1).join('\n'))).then((json: any) => ({
+        input: json.gramatically_corrected_input_text,
+        language: json.input_word_language,
+        type: json.type,
+        swedish_translation: json.swedish_base_word_translation
+    }));
 }
 
-async function getAdditionalWordInfo(word: string, type: string, targetLanguage: string, plugin: PluginController): Promise<Partial<Translation>> {
+async function getAdditionalWordInfo(i: BasicWordInfo, targetLanguage: string, plugin: PluginController): Promise<Partial<Translation>> {
     const prompt = `
 You are a language assistant specialized in Swedish vocabulary. Provide a JSON-formatted output with the following information for the given word:
 
@@ -245,7 +280,7 @@ Include additional fields based on the word's type to fit the Translation interf
     - "en_ett_word": Indicate if it is an 'en' or 'ett' word.
 - For verbs:
     - "infinitive": The infinitive form.
-    - "tenses": Object containing "present", "past", "supine", and "imperative" forms in Swedish.
+    - "tenses": Object containing "presens", "past", and "perfekt" forms in Swedish.
     - "irregular": Boolean indicating whether it is a regular or irregular verb.
 - For adjectives:
     - "adjective": Object containing "comparative" and "superlative" forms.
@@ -280,10 +315,9 @@ Output:
         "en_ett_word": ""  
         ....
     "tenses": {
-        "present": "springer",
+        "presens": "springer",
         "past": "sprang",
-        "supine": "sprungit",
-        "imperative": "spring"
+        "perfekt": "har sprungit"
     },
     "irregular": false
 }
@@ -353,7 +387,7 @@ Please ensure that all relevant fields are included to fit the Translation inter
 `;
     return await plugin.getAIResponse([
         { role: 'system', content: prompt },
-        { role: 'user', content: `Get more details for the ${type}: ${word}` }
+        { role: 'user', content: `Get more details for the ${i.type}: ${i.input}(${i.language})` }
     ]).then((json: any) => JSON.parse(json.split('\n').slice(1, -1).join('\n')));
 }
 
