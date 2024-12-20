@@ -47,11 +47,11 @@ export default function SilentReading() {
     }
 
     return (
-        <div className="flex flex-col w-full max-w-xl py-8 mx-auto stretch">
+        <div className="flex flex-col w-full max-w-xl py-8 mx-auto stretch pl-1">
             {messages.filter((m, i) => i > 1 && m.role === "assistant").map((m, i, ms) => (
                 <Markdown key={m.id} components={{
                     h1: ({ node, ...props }) => (
-                        <div className='border-b bg-gray-300 dark:border-gray-600 mt-8 pb-1 mb-2 flex-row flex items-end'>
+                        <div className='border-b dark:border-gray-600 mt-8 pb-1 mb-2 flex-row flex flex-wrap items-end'>
                             <h1 className="text-3xl font-bold dark:text-gray-500 min-w-fit mr-1" {...props} />
                             {!(isLoading && i === ms.length - 1) && <AudioPlayer text={m.content} enableSpeedAdjustment />}
                         </div>
@@ -80,7 +80,7 @@ function StartScreen(props: { onStart: (i: Instructions) => void }) {
     const [isOpen, setIsOpen] = useState(false);
 
     return (
-        <div className="flex flex-col w-full max-w-md py-24 mx-auto stretch">
+        <div className="flex flex-col w-full max-w-md pt-10 sm:py-24 mx-auto stretch">
             <p className="text-4xl text-center mb-8 flex flex-row justify-center items-end group">Storytelling
                 <div className="text-xs ml-1 opacity-0 group-hover:opacity-75 cursor-pointer" onClick={() => setIsOpen(!isOpen)}><FaGear /></div>
             </p>
@@ -90,7 +90,7 @@ function StartScreen(props: { onStart: (i: Instructions) => void }) {
                 onChange={e => setTopic(e.target.value)} />
 
             <div className="flex flex-col w-full mt-2">
-                <div className={"flex flex-col bg-gray-400 dark:bg-gray-800 p-4 rounded mt-2 " + (isOpen ? "" : "hidden")}>
+                <div className={"flex flex-col bg-gray-400 dark:bg-gray-800 p-1 sm:p-4 rounded mt-2 " + (isOpen ? "" : "hidden")}>
                     <StoryLength length={length} setLength={setLength} />
                     <DifficultySlider difficulty={difficulty} setDifficulty={setDifficulty} />
                 </div>
@@ -105,16 +105,16 @@ function StartScreen(props: { onStart: (i: Instructions) => void }) {
 
 function StoryLength(props: { length: 5 | 8 | 15, setLength: (l: 5 | 8 | 15) => void }) {
     return (
-        <div className="flex flex-row text-center items-end w-full opacity-80">
-            <p className='text-xl w-1/2 text-left py-1'>Story length</p>
-            <div className="flex w-1/2 rounded text-white bg-gray-500 dark:border-gray-600">
-                <button className={`py-1 grow px-3 rounded-r-none ${props.length === 5 ? 'bg-gray-600' : ''} rounded`}
+        <div className="flex flex-row flex-wrap text-center items-end w-full opacity-80">
+            <p className='sm:text-xl sm:w-1/2 text-left py-1'>Story length</p>
+            <div className="flex flex-row justify-evenly w-full sm:w-1/2 rounded text-white bg-gray-500 dark:border-gray-600">
+                <button className={`py-1 w-full ${props.length === 5 ? 'bg-gray-600' : ''} rounded-l`}
                     onClick={() => props.setLength(5)}
                 >Short</button>
-                <button className={`py-1 px-3 border-x border-gray-600 ${props.length === 8 ? 'bg-gray-600' : ''} `}
+                <button className={`py-1 w-full ${props.length === 8 ? 'bg-gray-600' : ''} `}
                     onClick={() => props.setLength(8)}
                 >Normal</button>
-                <button className={`py-1 grow px-3 rounded-l-none ${props.length === 15 ? 'bg-gray-600' : ''} rounded`}
+                <button className={`py-1 w-full ${props.length === 15 ? 'bg-gray-600' : ''} rounded-r`}
                     onClick={() => props.setLength(15)}
                 >Long</button>
             </div>
@@ -124,15 +124,15 @@ function StoryLength(props: { length: 5 | 8 | 15, setLength: (l: 5 | 8 | 15) => 
 
 function DifficultySlider(props: { difficulty: number, setDifficulty: (d: number) => void }) {
     return (
-        <div className="flex flex-row items-center mt-4 opacity-80">
-            <label className="text-xl w-1/2">Difficulty</label>
+        <div className="flex flex-row flex-wrap items-center mt-4 opacity-80">
+            <label className="sm:text-xl sm:w-1/2">Difficulty</label>
             <input
                 type="range"
                 min="1"
                 max="10"
                 value={props.difficulty}
                 onChange={e => props.setDifficulty(Number(e.target.value))}
-                className="w-1/2"
+                className="w-full sm:w-1/2"
             />
         </div>
     );
