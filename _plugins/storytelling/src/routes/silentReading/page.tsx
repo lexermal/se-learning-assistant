@@ -2,8 +2,8 @@ import { useEffect } from 'react';
 import { useState } from 'react';
 import Markdown from 'react-markdown'
 import { AudioPlayer, usePlugin } from 'shared-components';
-import getSilentReadingPrompt, { Instructions } from './ReadingPromptProvider';
-import { FaGear } from "react-icons/fa6";
+import getSilentReadingPrompt from './ReadingPromptProvider';
+import { StartScreen } from './StartScreen';
 
 export default function SilentReading() {
     const [isFinalChapter, setIsFinalChapter] = useState(false);
@@ -69,71 +69,6 @@ export default function SilentReading() {
             {!isLoading && isFinalChapter && <button className="p-2 mt-4 bg-blue-500 dark:bg-blue-950 dark:text-gray-300 rounded"
                 onClick={() => setMessages([])}
             >New story</button>}
-        </div>
-    );
-}
-
-function StartScreen(props: { onStart: (i: Instructions) => void }) {
-    const [topic, setTopic] = useState("");
-    const [length, setLength] = useState<5 | 8 | 15>(5);
-    const [difficulty, setDifficulty] = useState(1);
-    const [isOpen, setIsOpen] = useState(false);
-
-    return (
-        <div className="flex flex-col w-full max-w-md pt-10 sm:py-24 mx-auto stretch">
-            <p className="text-4xl text-center mb-8 flex flex-row justify-center items-end group">Storytelling
-                <div className="text-xs ml-1 opacity-0 group-hover:opacity-75 cursor-pointer" onClick={() => setIsOpen(!isOpen)}><FaGear /></div>
-            </p>
-            <textarea
-                className="w-full max-w-md p-2 min-h-32 rounded bg-gray-300 dark:bg-gray-800 dark:text-gray-100 border-0"
-                placeholder="What should the story be about?"
-                onChange={e => setTopic(e.target.value)} />
-
-            <div className="flex flex-col w-full mt-2">
-                <div className={"flex flex-col bg-gray-400 dark:bg-gray-800 p-1 sm:p-4 rounded mt-2 " + (isOpen ? "" : "hidden")}>
-                    <StoryLength length={length} setLength={setLength} />
-                    <DifficultySlider difficulty={difficulty} setDifficulty={setDifficulty} />
-                </div>
-            </div>
-
-            <button className="right-0 p-3 mt-4 bg-blue-500 rounded text-xl"
-                onClick={() => props.onStart({ topic, length, difficulty })}
-            >Start</button>
-        </div>
-    );
-}
-
-function StoryLength(props: { length: 5 | 8 | 15, setLength: (l: 5 | 8 | 15) => void }) {
-    return (
-        <div className="flex flex-row flex-wrap text-center items-end w-full opacity-80">
-            <p className='sm:text-xl sm:w-1/2 text-left py-1'>Story length</p>
-            <div className="flex flex-row justify-evenly w-full sm:w-1/2 rounded text-white bg-gray-500 dark:border-gray-600">
-                <button className={`py-1 w-full ${props.length === 5 ? 'bg-gray-600' : ''} rounded-l`}
-                    onClick={() => props.setLength(5)}
-                >Short</button>
-                <button className={`py-1 w-full ${props.length === 8 ? 'bg-gray-600' : ''} `}
-                    onClick={() => props.setLength(8)}
-                >Normal</button>
-                <button className={`py-1 w-full ${props.length === 15 ? 'bg-gray-600' : ''} rounded-r`}
-                    onClick={() => props.setLength(15)}
-                >Long</button>
-            </div>
-        </div>
-    );
-}
-
-function DifficultySlider(props: { difficulty: number, setDifficulty: (d: number) => void }) {
-    return (
-        <div className="flex flex-row flex-wrap items-center mt-4 opacity-80">
-            <label className="sm:text-xl sm:w-1/2">Difficulty</label>
-            <input
-                type="range"
-                min="1"
-                max="10"
-                value={props.difficulty}
-                onChange={e => props.setDifficulty(Number(e.target.value))}
-                className="w-full sm:w-1/2"
-            />
         </div>
     );
 }
