@@ -47,7 +47,7 @@ export default function CustomNavbar() {
 
     return (
         <nav className="flex items-center justify-between flex-wrap border-b border-b-gray-500 z-30 bg-white dark:bg-gray-950 w-full">
-            <div className="flex flex-shrink-0 text-white mr-6 items-end" onClick={() => router.push("/dashboard")}>
+            <div className="flex flex-shrink-0 text-white mr-6 items-end cursor-pointer" onClick={() => router.push("/dashboard")}>
                 <img src="/logo.svg" alt="Rimori" className="h-12 w-36 p-1 px-2 rounded dark:invert" />
                 <p className="dark:text-gray-300 text-sm" style={{ marginBottom: "7px" }}>(beta)</p>
             </div>
@@ -65,14 +65,14 @@ export default function CustomNavbar() {
                 <div className="text-sm md:flex-grow">
                     {user && plugins && plugins.map((plugin, index) => {
                         const items = plugin.pluginPages.map(p => ({ ...p, url: `/plugin/${plugin.name}#${p.url}` }));
-                        return <DropDownMenu key={index} items={items} title={plugin.title} />;
+                        return <DropDownMenu key={index} items={items} title={plugin.title} onClick={() => setIsMobileMenuOpen(false)} />;
                     })}
                     {!isLoading && !user && <div className="hover:text-gray-300 transition p-4">
                         <Link href={"/waitlist"}>Waitlist</Link>
                     </div>}
                 </div>
                 <div className="flex items-center gap-2">
-                    {isLoading ? "" : (user ? <DropDownMenu title={<FaUserCircle size={24} />} items={userMenu} rightAligned={!isMobileMenuOpen} />
+                    {isLoading ? "" : (user ? <DropDownMenu title={<FaUserCircle size={24} />} items={userMenu} rightAligned={!isMobileMenuOpen} onClick={() => setIsMobileMenuOpen(false)} />
                         : <AuthComponent />)}
                 </div>
             </div>
@@ -97,20 +97,24 @@ interface DropMenuProps {
     title: string | React.ReactNode,
     items: MenuItem[],
     rightAligned?: boolean
+    onClick: () => void
 }
 
 function DropDownMenu(props: DropMenuProps) {
-    return <ul className="block mt-4 md:inline-block md:mt-0 mr-4 kkflex space-x-8 cursor-default">
+    return <ul className="block mt-4 md:inline-block md:mt-0 mr-4 space-x-8 cursor-default">
         <li className="group relative">
             <div className="dark:hover:text-gray-300 hover:text-gray-700 transition">
                 {props.title}
             </div>
-            <div className={"absolute hidden group-hover:block bg-gray-300 dark:bg-gray-700 rounded shadow-lg z-50 overflow-hidden " + (props.rightAligned ? " right-0" : "left-0")}>
+            <div className={"absolute hidden w-max group-hover:block bg-gray-300 dark:bg-gray-700 rounded shadow-lg z-50 overflow-hidden " + (props.rightAligned ? " right-0" : "left-0")}>
                 <ul className="">
                     {props.items.map((item, index) => {
                         return (
                             <li key={index}>
-                                <DropDownMenuItem name={item.name} url={item.url} onClick={item.onClick} />
+                                <DropDownMenuItem name={item.name} url={item.url} onClick={() => {
+                                    props.onClick();
+                                    item.onClick && item.onClick();
+                                }} />
                             </li>
                         );
                     })}
@@ -120,19 +124,20 @@ function DropDownMenu(props: DropMenuProps) {
     </ul>
 }
 
-function DropDownMenuItem(props: { name: string, url?: string, children?: React.ReactNode, onClick?: () => void }) {
+function DropDownMenuItem(props: { name: string, url?: string, children?: React.ReactNode, onClick: () => void }) {
     const router = useRouter();
 
     if (props.children) {
         return props.children;
     }
-    return <a href={props.url || "#"} className={"inline-block md:mt-0 text-sm px-4 py-2 leading-none hover:bg-gray-400 dark:hover:bg-gray-600" + (props.url || props.onClick ? " cursor-pointer" : "")} onClick={(e) => {
+    return <a href={props.url || "#"} className={"inline-block md:mt-0 text-sm px-4 py-2 leading-none w-full hover:bg-gray-400 dark:hover:bg-gray-600 cursor-pointer"} onClick={(e) => {
         e.preventDefault();
 
         if (props.onClick) {
             props.onClick();
-        } else if (props.url) {
-            router.push(props.url);
+            if (props.url) {
+                router.push(props.url);
+            }
         }
     }}>{props.name}</a>
 }
