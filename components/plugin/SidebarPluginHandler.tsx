@@ -44,13 +44,19 @@ function PluginSidebar({ plugin, contextMenuAction }: { plugin: Plugin, contextM
 
 export function SidebarPluginHandler({ plugins }: { plugins: Plugin[] }) {
     const sidebarPlugins = plugins.flatMap((plugin) => plugin.sidebarPages.map(sp => ({ ...sp, pluginName: plugin.name }))) as (SidebarPage & { pluginName: string })[];
-
-    // console.log("Sidebar plugins", sidebarPlugins);
-
+    const [openPlugin, setOpenPlugin] = useState<number>(-1);
     const [sidebarPlugin, setSidebarPlugin] = useState<Plugin | null>(null);
     const [pluginAction, setPluginAction] = useState<ContextMenuAction | undefined>(undefined);
-    const [openPlugin, setOpenPlugin] = useState<number>(-1);
+    const [windowWidth, setWindowWidth] = useState<number>(typeof window !== 'undefined' ? window.innerWidth : 0);
     const { on } = useEventEmitter();
+
+    useEffect(() => {
+        const handleResize = () => setWindowWidth(window.innerWidth);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    const isMdScreen = windowWidth <= 900;
 
     useEffect(() => {
         on("contextMenuAction", ({ pluginName, action, text, url }: ContextMenuAction) => {
@@ -71,13 +77,14 @@ export function SidebarPluginHandler({ plugins }: { plugins: Plugin[] }) {
     }, []);
 
 
-    const width = openPlugin > -1 ? 500 : 40;
-    // console.log({pluginAction, sidebarPlugin, openPlugin, width});  
+    const isOpen = openPlugin > -1;
+    const width = isOpen ? 500 : 40;
 
     return (
         <div className="flex flex-row">
-            <div style={{ paddingLeft: width + "px" }} className={`pl-[${width}px]`}>
-                <div style={{ width: width + "px" }} className={`fixed bottom-0 right-0 top-0 flex flex-row`}>
+            <div style={{ paddingLeft: width + "px" }} className={isOpen && isMdScreen ? 'absolute' : ''}>
+                <div style={isOpen && isMdScreen ? { width: '100%' } : { width: width + "px" }}
+                    className={`fixed bottom-0 right-0 top-0 flex flex-row`}>
                     <div className="flex flex-col gap-1 w-10 pt-[4.3rem]">
                         {sidebarPlugins.map(({ name, url, iconUrl, pluginName }, index) => {
                             const plugin = plugins.find(p => p.name === pluginName)!;

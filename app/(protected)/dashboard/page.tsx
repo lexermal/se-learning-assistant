@@ -35,7 +35,7 @@ const LandingPage = () => {
 
   return (
     <div className="flex flex-row">
-      <div className='w-full p-6'>
+      <div className='w-full p-1 sm:p-6'>
         {/* Welcome Banner */}
         <header className="text-center p-6 mb-5">
           <h1 className="text-3xl font-bold">Welcome to Rimori - The Language Learning Platform!</h1>
@@ -50,7 +50,7 @@ const LandingPage = () => {
 
             <div className="flex flex-row flex-wrap gap-4">
               {mainPlugin.pluginPages.map((page) => (
-                <PageButton key={page.url} url={"/plugin/" + mainPlugin.name + "#" + page.url} name={page.name} description={page.description} />
+                <PageButton key={page.url} url={`/plugin/${mainPlugin.name}#${page.url}`} name={page.name} description={page.description} />
               ))}
             </div>
           </section>
@@ -83,7 +83,7 @@ function PluginDescription({ title, description, iconUrl }: { title: string, des
 }
 
 function PageButton({ url, name, description }: { url: string, name: string, description: string }) {
-  return <div className="p-2 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-lg shadow-sm w-1/3 bg-gray-400 hover:bg-gray-300">
+  return <div className="p-2 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-lg shadow-sm w-full md:w-1/3 bg-gray-400 hover:bg-gray-300">
     <a href={url} className="">
       <div className="ml-2">
         <h3 className="text-xl font-bold">{name}</h3>
@@ -97,7 +97,7 @@ function SidebarButton({ url, name, description, iconUrl }: { url: string, name:
   const { emit } = useEventEmitter();
   const action = url.split("/").slice(-1)[0];
 
-  return <div className="flex flex-row items-center p-2 pl-4 bg-gray-400 hover:bg-gray-500 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-lg shadow-sm w-1/3 cursor-pointer" onClick={() => {
+  return <div className="flex flex-row items-center p-2 pl-4 bg-gray-400 hover:bg-gray-500 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-lg shadow-sm w-full md:w-1/3 cursor-pointer" onClick={() => {
     emit("contextMenuAction", { action, text: "", pluginName: "flashcards", url } as ContextMenuAction);
   }}>
     <img src={iconUrl} alt={name} className="w-14 h-14" />
