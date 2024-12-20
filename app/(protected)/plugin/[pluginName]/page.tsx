@@ -26,7 +26,7 @@ export default function PluginPage({ params }: { params: Promise<{ pluginName: s
 
   return (
     <EventEmitterProvider>
-      <div className="flex space-x-4">
+      <div className="flex sm:space-x-4">
         <MainPluginHandler plugin={plugins[mainPluginIndex]}
           globalContextMenuActions={plugins.flatMap(p => p.contextMenuActions)} />
         <SidebarPluginHandler plugins={plugins} />

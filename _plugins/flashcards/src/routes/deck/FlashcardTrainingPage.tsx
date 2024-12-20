@@ -5,11 +5,11 @@ import { MdDelete, MdModeEdit } from "react-icons/md";
 import { usePlugin } from "shared-components";
 import { AiOutlineFullscreen, AiOutlineFullscreenExit } from "react-icons/ai";
 import FlashcardController, { Flashcard } from "./FlashcardController";
-import {MarkdownEditor} from "shared-components";
+import { MarkdownEditor } from "shared-components";
 import { FaSave } from "react-icons/fa";
 import Pomodoro from "../../components/Polodoro";
 import { useEventEmitter } from "shared-components";
-import {AudioPlayer} from "shared-components";
+import { AudioPlayer } from "shared-components";
 import TagInput from "../../components/form/TagInput";
 
 interface FlashcardEdit {
@@ -101,7 +101,7 @@ export default function Training() {
                 showAnswer={showAnswer}
                 editedCard={editedCard}
                 setEditedCard={setEditedCard} />}
-            <div className="fixed bottom-0 w-full p-4 flex flex-row justify-between items-center">
+            <div className="fixed bottom-0 w-full p-4 flex flex-row justify-between items-center flex-wrap">
                 <div className="text-2xl p-2 cursor-pointer" onClick={() => {
                     setEditedCard({ front: "", back: "", new: true, frontTags: [], backTags: [] });
                     setShowAnswer(true);
@@ -147,9 +147,9 @@ function RenderFlashcard(props: { card: Flashcard, showAnswer: boolean, editedCa
     const frontTtsEnabled = card.front_tags?.includes("lang")
     const backTtsEnabled = card.back_tags?.includes("lang");
 
-    return <div className="pt-[25vh] w-full px-[29%]">
-        <div className={"border-l-2 py-4 dark:text-white text-3xl border-gray-700"}>
-            <div className="flex flex-row items-center ml-4 group">
+    return <div className="pt-8 md:pt-[25vh] w-full md:px-[29%]">
+        <div className={"md:border-l-2 py-4 dark:text-white text-3xl border-gray-700"}>
+            <div className="flex flex-row items-center md:ml-4 group">
                 <div className="flex flex-col">
                     <MarkdownEditor className="rounded" content={editedCard?.new ? "" : card.front} editable={!!editedCard} onUpdate={text => {
                         setEditedCard({ ...editedCard!, front: text });
@@ -161,7 +161,7 @@ function RenderFlashcard(props: { card: Flashcard, showAnswer: boolean, editedCa
                 </div>}
             </div>
             {showAnswer && (
-                <div className="border-t text-3xl pt-1 dark:text-white w-full pl-4 border-gray-800 group flex flex-row items-center">
+                <div className="border-t text-3xl pt-1 dark:text-white w-full md:pl-4 border-gray-800 group flex flex-row items-center">
                     <div className="flex flex-col mt-3">
                         <MarkdownEditor className="rounded mb-1 max-w-1/2" content={editedCard?.new ? "" : card.back} editable={!!editedCard} onUpdate={text => {
                             setEditedCard({ ...editedCard!, back: text });
@@ -192,11 +192,11 @@ function renderShowAnswerButton(onClick: () => void) {
 
 function renderKnowledgButtons(onClick: (action: Grade) => void) {
     return (
-        <div className="flex flex-row justify-evenly gap-2 w-1/3 mx-auto" style={{ padding: "1px 0" }}>
-            <button onClick={_ => onClick(Rating.Again)} className="w-1/2 text-purple-700 border border-gray-800 p-2 rounded-lg">Again</button>
-            <button onClick={_ => onClick(Rating.Hard)} className="w-1/2 text-red-600 border border-gray-800 p-2 rounded-lg">Hard</button>
-            <button onClick={_ => onClick(Rating.Good)} className="w-1/2 text-yellow-500 border border-gray-800 p-2 rounded-lg">Good</button>
-            <button onClick={_ => onClick(Rating.Easy)} className="w-1/2 text-green-600 border border-gray-800 p-2 rounded-lg">Easy</button>
+        <div className="flex flex-row flex-wrap justify-evenly gap-1 md:gap-2 md:w-1/3 mx-auto text-sm md:text-base" style={{ padding: "1px 0" }}>
+            <button onClick={_ => onClick(Rating.Again)} className="text-purple-700 border border-gray-800 p-1 md:p-2 rounded-lg">Again</button>
+            <button onClick={_ => onClick(Rating.Hard)} className="text-red-600 border border-gray-800 p-1 md:p-2 rounded-lg">Hard</button>
+            <button onClick={_ => onClick(Rating.Good)} className="text-yellow-500 border border-gray-800 p-1 md:p-2 rounded-lg">Good</button>
+            <button onClick={_ => onClick(Rating.Easy)} className="text-green-600 border border-gray-800 p-1 md:p-2 rounded-lg">Easy</button>
         </div>
     );
 }
@@ -212,8 +212,8 @@ function TrainingNavbar({ deckName, remaining }: { deckName: string, remaining: 
     return (
         <div className="flex flex-row border-b-2 border-gray-700 items-end justify-between">
             <div className="flex flex-row max-w-1/3 w-1/3">
-                <span className="text-4xl mr-2 pl-2 pt-1 dark:text-gray-300">{deckName}</span>
-                <div className="flex items-end">
+                <span className="text-4xl mr-2 pl-2 pt-1 hidden md:block dark:text-gray-300">{deckName}</span>
+                <div className="flex items-end text-sm md:text-base">
                     <span className="mr-2 font-bold text-blue-500">{remaining.new}</span>+
                     <span className="mx-1 font-bold text-red-500">{remaining.learning}</span>+
                     <span className="ml-1 font-bold text-green-600">{remaining.review}</span>
@@ -222,10 +222,9 @@ function TrainingNavbar({ deckName, remaining }: { deckName: string, remaining: 
             <div>
                 <Pomodoro />
             </div>
-            <div className="gap-1 flex font-normal p-1 w-1/3 flex-row-reverse">
+            <div className="gap-1 flex font-normal p-1 w-1/3 flex-row-reverse flex-grow-0">
                 <div className="mr-1 text-3xl cursor-pointer" onClick={() => {
                     plugin.emitAndWaitResponse("triggerFullscreen", !fullscreen)
-                    // .then(() => setFullscreen(!fullscreen));
                 }}>{fullscreen ? <AiOutlineFullscreenExit /> : <AiOutlineFullscreen />}</div>
             </div>
         </div>

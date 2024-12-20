@@ -117,7 +117,7 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
                         <div className="text-3xl">({t.adjective.comparative}, {t.adjective.superlative})</div>
                     </div>}
                 </div>
-                {additionalInfo ? <button className="bg-blue-300 dark:bg-gray-700 p-1 px-2 rounded" style={{ marginBottom: "2px" }} onClick={() => onAddedToFlashcard()}>
+                {additionalInfo ? <button className="hidden sm:block bg-blue-300 dark:bg-gray-700 p-1 px-2 rounded" style={{ marginBottom: "2px" }} onClick={() => onAddedToFlashcard()}>
                     New Search
                 </button> : ""}
             </div>
@@ -152,6 +152,10 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
                 })
                 onAddedToFlashcard();
             }} /> : <TranslationSkelleton />}
+            {/* for mobile view */}
+            {additionalInfo ? <button className="sm:hidden mt-2 bg-blue-300 dark:bg-gray-700 p-1 px-2 rounded-lg" onClick={() => onAddedToFlashcard()}>
+                New Search
+            </button> : ""}
         </div>
     );
 }

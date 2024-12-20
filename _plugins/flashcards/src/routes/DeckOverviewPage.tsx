@@ -26,7 +26,7 @@ function App() {
   useEffect(fetchDecks, []);
 
   return (
-    <div className="mx-auto bg-gray-200 dark:bg-gray-800 w-96 p-4 rounded-lg mt-24">
+    <div className="mx-auto bg-gray-200 dark:bg-gray-800 sm:w-96 p-4 rounded-lg mt-24">
       <h1 className='text-4xl mb-3 text-center'>Decks</h1>
       {
         decks.map((deck, index) => (
@@ -48,9 +48,9 @@ function App() {
 
 function DeckRow(props: { deck: DeckSummary, onEdit: (id: string, name: string) => void, onDelete: (id: string) => void }) {
   return (
-    <div className='group flex flex-row hover:bg-gray-400 dark:hover:bg-gray-600 hover:font-bold justify-between text-left p-1 rounded'>
+    <div className='group flex flex-row flex-wrap hover:bg-gray-400 dark:hover:bg-gray-600 hover:font-bold justify-between text-left p-1 rounded'>
       <Link to={`/deck/${props.deck.id}`} className='flex-1'>
-        <span className='cursor-pointer'>{props.deck.name}</span>
+        <div className='cursor-pointer min-w-3'>{props.deck.name}</div>
       </Link>
       <div className='flex-2 flex-row flex text-right'>
         <div className='mr-1 w-5 text-blue-600'>{props.deck.total_new}</div>
