@@ -110,6 +110,11 @@ export async function GET() {
                     url: "/silent-reading",
                     description: "Practice reading with stories you like on your skill level."
                 },
+                {
+                    name: "Discussions",
+                    url: "/discussions",
+                    description: "Practice your swedish knowledge."
+                }
             ],
             contextMenuActions: [],
             sidebarPages: [],

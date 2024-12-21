@@ -11,12 +11,7 @@ export async function POST(request: Request) {
             'Authorization': `Bearer ${env.OPENAI_API_KEY}`,
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-            model: 'tts-1',
-            input,
-            voice,
-            speed
-        }),
+        body: JSON.stringify({ model: 'tts-1', input, voice, speed })
     });
 
     const audioBuffer = await response.arrayBuffer();

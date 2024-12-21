@@ -17,6 +17,7 @@ const root = ReactDOM.createRoot(
 
 const SilentReading = lazy(() => import('./routes/silentReading/page'));
 const SettingsPage = lazy(() => import('./routes/settings/SettingsPage'));
+const DiscussionsPage = lazy(() => import('./routes/discussions/page'));
 
 
 root.render(
@@ -28,6 +29,7 @@ root.render(
             {/* <Route path="/" element={<App />} /> */}
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/silent-reading" element={<SilentReading />} />
+            <Route path="/discussions" element={<DiscussionsPage />} />
             {/* <Route path="/deck/:id" element={<Training />} />
           <Route path="/sidebar/add" element={<AddCard />} /> */}
           </Routes>
