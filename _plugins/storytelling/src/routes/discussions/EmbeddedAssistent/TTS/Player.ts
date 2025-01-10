@@ -3,10 +3,7 @@
 export default class ChunkedAudioPlayer {
 
     private audioContext: AudioContext;
-    private chunkQueue: ArrayBufferLike[] = [];
-    private combinedChunks: AudioBuffer[] = [];
-    private chunkSplit: number[] = [];
-    private currentChunkIndex = 0;
+    private chunkQueue: ArrayBuffer[] = [];
     private isPlaying = false;
     private chunksReceived = 0;
     private analyser: AnalyserNode;
@@ -16,6 +13,8 @@ export default class ChunkedAudioPlayer {
     private isMonitoring = false;
     private handle = 0;
     private volume = 1.0;
+    private loudnessCallback: (value: number) => void = () => { };
+    private currentIndex = 0;
 
     constructor() {
         this.audioContext = new AudioContext();
@@ -29,104 +28,89 @@ export default class ChunkedAudioPlayer {
         // });
     }
 
-    async addChunk(chunk: ArrayBufferLike, chunkSplit: number[]): Promise<void> {
-        this.chunkQueue.push(chunk);
-        this.chunkSplit = chunkSplit;
-        this.chunksReceived++;
-
-        if (this.chunkQueue.length >= this.chunkSplit[this.currentChunkIndex]) {
-            const combinedBuffer = await this.combineChunks();
-            this.combinedChunks.push(combinedBuffer);
-            this.currentChunkIndex++;
-            if (!this.isPlaying && this.chunksReceived >= 5) {
-                this.playChunks();
-            }
-        }
+    public setOnLoudnessChange(callback: (value: number) => void) {
+        this.loudnessCallback = callback;
     }
 
-    private async combineChunks(): Promise<AudioBuffer> {
-        const chunksToCombine = this.chunkQueue.splice(0, this.chunkSplit[this.currentChunkIndex]);
-        const combinedBuffer = this.concatenateArrayBuffers(chunksToCombine);
-        const audioBuffer = await this.audioContext.decodeAudioData(combinedBuffer.slice(0));
-        return audioBuffer;
+    public async addChunk(chunk: ArrayBuffer, position: number): Promise<void> {
+        // console.log('Adding chunk', chunk);
+        this.chunkQueue[position] = chunk; // changed from push to positional storage
+        this.chunksReceived++;
+        // console.log("received chunk", {
+        //     chunksReceived: this.chunksReceived,
+        //     chunkQueue: this.chunkQueue.length,
+        //     isPlaying: this.isPlaying,
+        // })
+
+        if (!this.isPlaying && position === this.currentIndex) {
+            this.playChunks();
+        }
     }
 
     private playChunks(): void {
-        if (this.combinedChunks.length > 0 && !this.isPlaying) {
-            console.log('Playing chunk ' + this.combinedChunks.length);
-            this.isPlaying = true;
-
-            this.playChunk(this.combinedChunks.shift()!).then(() => {
-                this.isPlaying = false;
-                if (this.combinedChunks.length > 0) {
-                    this.playChunks();
-                } else {
-                    // Stop loudness monitoring when all chunks are done
-                    this.shouldMonitorLoudness = false;
-                }
-            });
+        // console.log({ isPlaying: this.isPlaying });
+        if (this.isPlaying) return;
+        if (!this.chunkQueue[this.currentIndex]) {
+            return; // wait until the correct chunk arrives
         }
-    }
-
-
-    private playChunk(chunk: AudioBuffer): Promise<void> {
-        return new Promise((resolve) => {
-            const source = this.audioContext.createBufferSource();
-            source.buffer = chunk;
-
-            // Create a GainNode for volume control
-            const gainNode = this.audioContext.createGain();
-            gainNode.gain.value = this.volume;
-
-            // Connect the source to the GainNode, then to the analyser node, then to the destination (speakers)
-            source.connect(gainNode);
-            gainNode.connect(this.analyser);
-            this.analyser.connect(this.audioContext.destination);
-
-            source.start(0);
-            // this.emitter.on('enableAudio', (enable: boolean) => {
-                // gainNode.gain.value = enable ? 1.0 : 0.0;
-            // });
-
-            source.onended = () => {
-                resolve();
-            };
-
-            // Start monitoring loudness only once
-            if (!this.isMonitoring) {
-                this.isMonitoring = true;
-                this.monitorLoudness();
+        this.isPlaying = true;
+        this.playChunk(this.chunkQueue[this.currentIndex]).then(() => {
+            this.isPlaying = false;
+            this.currentIndex++;
+            if (this.chunkQueue[this.currentIndex]) {
+                this.playChunks();
+            } else {
+                this.shouldMonitorLoudness = false;
             }
         });
     }
 
-    private concatenateArrayBuffers(buffers: ArrayBufferLike[]): ArrayBuffer {
-        let totalLength = 0;
-        for (const buffer of buffers) {
-            totalLength += buffer.byteLength;
-        }
-
-        const concatenatedBuffer = new ArrayBuffer(totalLength);
-        const dataView = new DataView(concatenatedBuffer);
-        let offset = 0;
-        for (const buffer of buffers) {
-            for (let i = 0; i < buffer.byteLength; i++) {
-                dataView.setUint8(offset + i, new Uint8Array(buffer)[i]);
-            }
-            offset += buffer.byteLength;
-        }
-
-        return concatenatedBuffer;
+    public stopPlayback(): void {
+        // Implement logic to stop the current playback
+        this.isPlaying = false;
+        this.chunkQueue = [];
+        this.shouldMonitorLoudness = false;
+        cancelAnimationFrame(this.handle);
     }
 
-    async endConversation(): Promise<void> {
-        console.log('Conversation ended');
-        if (this.chunkQueue.length > 0) {
-            const combinedBuffer = await this.combineChunks();
-            this.combinedChunks.push(combinedBuffer);
-            if (!this.isPlaying) {
-                this.playChunks();
-            }
+    private playChunk(chunk: ArrayBuffer): Promise<void> {
+        // console.log('Playing chunk', chunk);
+        return new Promise((resolve) => {
+            const source = this.audioContext.createBufferSource();
+            this.audioContext.decodeAudioData(chunk.slice(0)).then((audioBuffer) => {
+                source.buffer = audioBuffer;
+
+                // Create a GainNode for volume control
+                const gainNode = this.audioContext.createGain();
+                gainNode.gain.value = this.volume;
+
+                // Connect the source to the GainNode, then to the analyser node, then to the destination (speakers)
+                source.connect(gainNode);
+                gainNode.connect(this.analyser);
+                this.analyser.connect(this.audioContext.destination);
+
+                source.start(0);
+                // this.emitter.on('enableAudio', (enable: boolean) => {
+                // gainNode.gain.value = enable ? 1.0 : 0.0;
+                // });
+
+                source.onended = () => {
+                    resolve();
+                };
+
+                // Start monitoring loudness only once
+                if (!this.isMonitoring) {
+                    this.isMonitoring = true;
+                    this.monitorLoudness();
+                }
+            });
+        });
+    }
+
+    async playAgain(): Promise<void> {
+        console.log('Playing again');
+        if (this.chunkQueue.length > 0 && !this.isPlaying) {
+            this.playChunks();
         }
     }
 
@@ -169,7 +153,7 @@ export default class ChunkedAudioPlayer {
 
             const loudnessScale = ((loudnessInDb - minDb) / (maxDb - minDb)) * 100;
 
-            // this.emitter.emit('loudness', loudnessScale);
+            this.loudnessCallback(loudnessScale);
         }
 
         // Call this method again at regular intervals if you want continuous loudness monitoring

@@ -1,114 +1,75 @@
-import TTS, { VoiceId } from "./TTS";
+import ChunkedAudioPlayer from './Player';
 
-// class that splits the text pieces so it can be sent in an efficient manner for allowing real-time communication
-class MessageSender {
-    private voiceId?: VoiceId;
-    private updateCount = 0;
-    private tts: TTS | null = null;
-    private prefLastAssistentMessage = '';
-    private voiceEnabled = true;
-    // private ELEVENLABS_API_KEY = "";
+type VoiceBackend = (text: string, voice?: string, speed?: number) => Promise<Blob>;
 
-    public setVoiceId(voiceId: VoiceId) {
-        this.voiceId = voiceId;
+export default class MessageTTSHandler {
+    private player = new ChunkedAudioPlayer();
+    private fetchedSentences = new Set<string>();
+    private lastLoading = false;
+    private voice: string;
+    private model: string;
+    private voiceBackend: VoiceBackend;
+
+    constructor(voiceBackend: VoiceBackend, voice: string = 'alloy', model = 'openai') {
+        this.voiceBackend = voiceBackend;
+        this.voice = voice;
+        this.model = model;
     }
 
-    public setVoiceEnabled(enabled: boolean) {
-        this.voiceEnabled = enabled;
-    }
-
-    // public setElevenLabsApiKey(apiKey: string) {
-    //     this.ELEVENLABS_API_KEY = apiKey;
-    // }
-
-    public async steamFullMessage(message: string) {
-        if (!this.voiceEnabled) {
-            return;
+    private getCompletedSentences(currentText: string, isLoading: boolean): string[] {
+        const pattern = /(.+?[,.?!:\n]+)/g;
+        const result: string[] = [];
+        let match;
+        while ((match = pattern.exec(currentText)) !== null) {
+            result.push(match[0].trim());
         }
-
-        await this.streamOngoingMessage(true, undefined);
-
-        const tokens = message.split(' ');
-        for (let i = 0; i < tokens.length; i++) {
-            await this.streamOngoingMessage(true, tokens.slice(0, i + 1).join(' '));
-        }
-
-        await this.streamOngoingMessage(false, message);
-    }
-
-    // This function slowly transmits the message as it is being generated
-    public async streamOngoingMessage(inProgress: boolean, message: string | undefined) {
-        if (!this.voiceEnabled) {
-            return;
-        }
-
-        if (inProgress && !this.tts) {
-            this.tts = await TTS.createAsync(this.voiceId!);
-            // console.log('TTS created');
-        }
-
-        if (!message) {
-            return;
-        }
-
-        if (message.includes(this.prefLastAssistentMessage)) {
-            // Only send message on every second update
-            // console.log('updateCount', this.updateCount);
-            if (this.updateCount % 2 === 0) {
-                this.sendMessage(message);
+        if (!isLoading) {
+            const lastFullSentence = result[result.length - 1];
+            const leftoverIndex = currentText.lastIndexOf(lastFullSentence) + lastFullSentence.length;
+            if (leftoverIndex < currentText.length) {
+                result.push(currentText.slice(leftoverIndex).trim());
             }
-            this.updateCount++;
+        }
+        return result;
+    }
+
+    public async handleNewText(currentText: string, isLoading: boolean) {
+        if (!currentText) {
+            return;
         }
 
-        if (!inProgress) {
-            this.sendMessage(message, true);
-            this.prefLastAssistentMessage = '';
-            this.updateCount = 0;
-            this.tts?.endConversation();
-            // console.log('TTS ended');
-            this.tts = null;
+        if (!this.lastLoading && isLoading) {
+            this.reset();
+        }
+
+        this.lastLoading = isLoading;
+        const sentences = this.getCompletedSentences(currentText, isLoading);
+
+        for (let i = 0; i < sentences.length; i++) {
+            const sentence = sentences[i];
+            if (!this.fetchedSentences.has(sentence)) {
+                this.fetchedSentences.add(sentence);
+                const audioData = await this.generateSpeech(sentence);
+                await this.player.addChunk(audioData, i);
+            }
         }
     }
 
-    private sendMessage(lastMessage: string, everything = false) {
-        let newSubstring = lastMessage.replace(this.prefLastAssistentMessage, '');
+    private async generateSpeech(sentence: string): Promise<ArrayBuffer> {
+        const blob = await this.voiceBackend(sentence, this.voice, 1.0)
+        return await blob.arrayBuffer();
+    }
 
-        if (everything) {
-            // console.log('will send full last rest of message:' + newSubstring);
-            this.tts?.sendMessage(newSubstring);
-            return;
-        }
+    public play() {
+        this.player.playAgain();
+    }
 
-        // check if newSubstring contains no visible characters
-        if (!newSubstring.trim()) {
-            return;
-        }
+    public stop() {
+        this.player.stopPlayback();
+    }
 
-        const parts = newSubstring.split(' ');
-        if (parts.length > 1 && !(parts.length === 2 && parts[0] === '')) {
-            const subString = parts.splice(0, parts.length - 1).join(' ');
-            // console.log('will send message:' + subString);
-            // console.log('full string would have been:' + newSubstring);
-            newSubstring = subString;
-        }
-        //check if newSubstring constains a sentence ending like . or ! or ?
-        //if it does, send each part separately
-        const parts2 = newSubstring.split(/(?<=[.?!])/);
-        if (parts2.length > 1) {
-            // console.log('found sentence ending, will send parts separately');
-            //send a break before the next part
-            // shit it makes such a difference now the voice sounds smooth!!!
-            parts2[2] = parts2[1];
-            parts2[1] = '   ';
-        }
-        parts2.forEach((part) => {
-            this.tts?.sendMessage(part);
-        });
-        // append the new substring to the prefLastAssistentMessage
-        this.prefLastAssistentMessage = this.prefLastAssistentMessage
-            ? this.prefLastAssistentMessage + newSubstring
-            : newSubstring;
+    private reset() {
+        this.stop();
+        this.fetchedSentences.clear();
     }
 }
-
-export default MessageSender;
