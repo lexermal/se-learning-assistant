@@ -67,8 +67,8 @@ export default class CommunicationHandler {
         return url.toString();
     }
 
-    private call(topic: string, data: any) {
-        this.parent!.call("triggerChild", { topic, data });
+    private call(topic: string, callId: number, data: any) {
+        this.parent!.call("triggerChild", { topic, data, _id: callId });
     }
 
     private getTable(table: string) {
@@ -93,28 +93,28 @@ export default class CommunicationHandler {
     }
 
     async initSubscribers() {
-        this.subscribe("db_fetch", async (data: { table: string, select: string, filter: any }) => {
+        this.subscribe("db_fetch", async (callId, data: { table: string, select: string, filter: any }) => {
             console.log(`Plugin ${this.plugin.name} wants to fetch data from: ${data.table}`);
 
             const query = await buildSupabaseQuery(this.supabase, this.getTableName(data.table), data.select, data.filter);
-            this.call("db_fetch", query.data);
+            this.call("db_fetch", callId, query.data);
         });
 
         // insert
-        this.subscribe("db_insert", async (data: { table: string, values: any | any[], returnValues?: string }) => {
+        this.subscribe("db_insert", async (callId, data: { table: string, values: any | any[], returnValues?: string }) => {
             console.log("Plugin " + this.plugin.name + " wants to insert data into: ", data.table);
 
             if (data.returnValues) {
                 console.log("Plugin " + this.plugin.name + " wants to return response after insert");
                 const date = await this.getTable(data.table).insert(data.values).select(data.returnValues);
-                return this.call("db_insert", date.data);
+                return this.call("db_insert", callId, date.data);
             }
 
             await this.getTable(data.table).insert(data.values);
         });
 
         // update
-        this.subscribe("db_update", async (data: { table: string, values: any, filter: any, returnValues?: string }) => {
+        this.subscribe("db_update", async (callId, data: { table: string, values: any, filter: any, returnValues?: string }) => {
             console.log("Plugin " + this.plugin.name + " wants to update data in: ", data.table);
 
             if (data.returnValues) {
@@ -127,26 +127,26 @@ export default class CommunicationHandler {
         });
 
         // delete
-        this.subscribe("db_delete", async (data: { table: string, filter: any }) => {
+        this.subscribe("db_delete", async (callId, data: { table: string, filter: any }) => {
             console.log("Plugin " + this.plugin.name + " wants to delete data from: ", data.table);
 
             return await this.getTable(data.table).delete().match(data.filter);
         });
 
         // call function
-        this.subscribe("db_call", async (data: { name: string, data?: any }) => {
+        this.subscribe("db_call", async (callId, data: { name: string, data?: any }) => {
             console.log("Plugin " + this.plugin.name + " wants to call: ", data.name);
 
             const { data: result } = await this.supabase.rpc(this.getTableName(data.name), data.data);
             // console.log("db call result: ", result);
-            this.call("db_call", result);
+            this.call("db_call", callId, result);
         });
 
         // request fullscreen
         let isFullscreen = false;
         document.addEventListener("fullscreenchange", () => {
             isFullscreen = !!document.fullscreenElement;
-            this.call("triggerFullscreen", isFullscreen);
+            this.call("triggerFullscreen", 0, isFullscreen);
         });
 
         this.subscribe("triggerFullscreen", async () => {
@@ -166,11 +166,11 @@ export default class CommunicationHandler {
         });
 
         // get settings
-        this.subscribe("get_settings", async () => {
+        this.subscribe("get_settings", async (callId) => {
             console.log(`Plugin ${this.plugin.name} wants to get settings.`);
             const { data } = await this.supabase.from("plugin_settings").select("*").eq("plugin_id", this.plugin.id);
             console.log("fetched Settings", data);
-            this.call("get_settings", data?.length ? data[0].settings : null);
+            this.call("get_settings", callId, data?.length ? data[0].settings : null);
         });
 
         // set settings
@@ -180,26 +180,26 @@ export default class CommunicationHandler {
         });
 
         // get ai response
-        this.subscribe("getAIResponse", async (messages) => {
+        this.subscribe("getAIResponse", async (callId, messages) => {
             console.log(`Plugin ${this.plugin.name} wants to get AI response.`);
             fetch('/api/chat', {
                 method: 'POST',
                 body: JSON.stringify({ messages })
             }).then(r => r.json()).then(r => {
-                this.call("getAIResponse", r.messages[0].content[0].text);
+                this.call("getAIResponse", callId, r.messages[0].content[0].text);
             });
         });
 
         // get ai response stream
-        this.subscribe("getAIResponseStream", async (messages) => {
+        this.subscribe("getAIResponseStream", async (callId, messages) => {
             console.log(`Plugin ${this.plugin.name} wants to get AI response stream.`);
             streamChatGPT(messages, (id, response, finished) => {
-                this.call("getAIResponseStream", { id, response, finished });
+                this.call("getAIResponseStream", callId, { id, response, finished });
             });
         });
 
         // create voice respponse
-        this.subscribe("getVoiceResponse", async ({ text, voice = "alloy", speed = 1 }) => {
+        this.subscribe("getVoiceResponse", async (callId, { text, voice = "alloy", speed = 1 }) => {
             console.log(`Plugin ${this.plugin.name} wants to create voice response.`);
             const response = await fetch('/api/speech', {
                 method: 'POST',
@@ -207,20 +207,20 @@ export default class CommunicationHandler {
                 body: JSON.stringify({ input: text, voice, speed }),
             });
             const blob = await response.blob();
-            this.call("getVoiceResponse", blob);
+            this.call("getVoiceResponse", callId, blob);
         });
 
     }
 
-    async subscribe(topic: string, callback: (data: any) => void) {
+    async subscribe(topic: string, callback: (callId: number, data: any) => void) {
         if (!this.parent) {
             // console.log("Parent not ready, waiting for it to be ready");
             await this.init();
         }
-        this.parent!.on(topic, (result: { secret: string, data: any }) => {
+        this.parent!.on(topic, (result: { secret: string, _id: number, data: any }) => {
             // console.log("Received data from child", result);
             if (result.secret === this.communicationSecret) {
-                callback(result.data);
+                callback(result._id, result.data);
             } else {
                 console.debug(`The child secret ${result.secret} did not match the parent secret ${this.communicationSecret}. Ignoring the data request.`);
             }
@@ -234,7 +234,7 @@ export default class CommunicationHandler {
 
     async emit(topic: string, data: any) {
         await this.init();
-        this.call(topic, data);
+        this.call(topic, 0, data);
     }
 }
 

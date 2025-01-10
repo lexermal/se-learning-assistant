@@ -10,17 +10,16 @@ export class PluginController {
 
     private constructor() {
         this.plugin = new Postmate.Model({
-            pluginName: "flashcards",
-            triggerChild: ({ topic, data }: any) => {
+            triggerChild: ({ topic, data, _id }: any) => {
                 // console.log("trigger child with topic:" + topic + " and data: ", data);
-                this.onceListeners.get(topic)?.forEach((callback: any) => callback(data));
+                this.onceListeners.get(topic)?.forEach((callback: any) => callback(_id, data));
                 this.onceListeners.set(topic, []);
-                this.listeners.get(topic)?.forEach((callback: any) => callback(data));
+                this.listeners.get(topic)?.forEach((callback: any) => callback(_id, data));
             }
         });
 
-        this.onOnce = this.onOnce.bind(this);
         this.emit = this.emit.bind(this);
+        this.onOnce = this.onOnce.bind(this);
         this.dbFetch = this.dbFetch.bind(this);
         this.dbInsert = this.dbInsert.bind(this);
         this.dbUpdate = this.dbUpdate.bind(this);
@@ -28,6 +27,7 @@ export class PluginController {
         this.subscribe = this.subscribe.bind(this);
         this.setSettings = this.setSettings.bind(this);
         this.getSettings = this.getSettings.bind(this);
+        this.internalEmit = this.internalEmit.bind(this);
         this.getAIResponse = this.getAIResponse.bind(this);
         this.dbFunctionCall = this.dbFunctionCall.bind(this);
         this.getVoiceResponse = this.getVoiceResponse.bind(this);
@@ -54,10 +54,15 @@ export class PluginController {
     }
 
     public emit(eventName: string, data?: any) {
-        this.plugin?.then(child => child.emit(eventName, { data, secret: this.getSecret() }));
+        this.internalEmit(eventName, 0, data);
     }
 
-    public subscribe(eventName: string, callback: (data: any) => void) {
+    // the communication needs to have an id to be able to distinguish between different responses
+    private internalEmit(eventName: string, id: number, data?: any) {
+        this.plugin?.then(child => child.emit(eventName, { data, _id: id, secret: this.getSecret() }));
+    }
+
+    public subscribe(eventName: string, callback: (_id: number, data: any) => void) {
         if (!this.listeners.has(eventName)) {
             this.listeners.set(eventName, []);
         }
@@ -76,11 +81,12 @@ export class PluginController {
     async emitAndWaitResponse<T>(topic: string, data: any): Promise<T> {
         return await new Promise((resolve) => {
             let triggered = false;
+            const id = Math.random();
 
-            this.emit(topic, data);
+            this.internalEmit(topic, id, data);
 
-            this.onOnce(topic, (data: any) => {
-                if (triggered) return;
+            this.subscribe(topic, (_id: number, data: any) => {
+                if (triggered || (_id !== id && _id !== 0)) return;
                 triggered = true;
 
                 resolve(data)
@@ -124,14 +130,15 @@ export class PluginController {
         return this.emitAndWaitResponse("getAIResponse", messages);
     }
 
-    public getAIResponseStream(messages: { role: string, content: string }[], onMessage: (id: string, message: string, finished: boolean) => void) {
+    public async getAIResponseStream(messages: { role: string, content: string }[], onMessage: (id: string, message: string, finished: boolean) => void) {
         let triggered = false;
 
         console.log("getAIResponseStream", messages);
 
-        this.emit("getAIResponseStream", messages);
-        this.subscribe("getAIResponseStream", (data: { id: string, response: string, finished: boolean }) => {
-            if (triggered) return;
+        const id = Math.random();
+        this.internalEmit("getAIResponseStream", id, messages);
+        this.subscribe("getAIResponseStream", (_id: number, data: { id: string, response: string, finished: boolean }) => {
+            if (triggered || (_id !== id && _id !== 0)) return;
             triggered = data.finished;
             onMessage(data.id, data.response, data.finished);
         })
