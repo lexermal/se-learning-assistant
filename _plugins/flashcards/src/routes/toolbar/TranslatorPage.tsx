@@ -3,7 +3,7 @@ import { RiRobot3Fill } from "react-icons/ri";
 import { FaUserCircle } from "react-icons/fa";
 import { usePlugin } from 'shared-components';
 import TranslationEntry, { Translation } from './TranslationEntry';
-import {MarkdownEditor} from 'shared-components';
+import { MarkdownEditor } from 'shared-components';
 
 interface Message {
     id: string;
@@ -22,7 +22,7 @@ export default function TranslationSidebar() {
     ]);
 
     useEffect(() => {
-        plugin.subscribe("toolAction", (data: { action: string, text: string }) => {
+        plugin.subscribe("toolAction", (_id: number, data: { action: string, text: string }) => {
             if (data.action === 'translate') {
                 console.log('translate', data.text);
                 setWord(data.text);
@@ -47,7 +47,7 @@ export default function TranslationSidebar() {
                     <p className='text-4xl text-center mb-3'>Look up a word</p>
                     <input
                         id="word-lookup"
-                        autoComplete="off" 
+                        autoComplete="off"
                         className='w-full p-2 focus:outline-none rounded-xl shadow-xl text-center bg-gray-400 dark:bg-gray-600 placeholder-gray-600 dark:placeholder-gray-400 mt-1'
                         placeholder='snö, fog, Baum,....'
                         onKeyDown={(e: any) => {

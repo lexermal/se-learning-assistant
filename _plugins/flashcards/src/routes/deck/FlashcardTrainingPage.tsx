@@ -206,7 +206,7 @@ function TrainingNavbar({ deckName, remaining }: { deckName: string, remaining: 
     const [fullscreen, setFullscreen] = React.useState(false);
 
     useEffect(() => {
-        plugin.subscribe("triggerFullscreen", setFullscreen);
+        plugin.subscribe("triggerFullscreen", (_, data) => setFullscreen(data));
     }, []);
 
     return (
