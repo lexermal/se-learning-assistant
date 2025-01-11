@@ -1,12 +1,12 @@
 import React, { useEffect, useRef } from 'react';
-// import EmitterSingleton from '@/utils/Emitter';
+import { EmitterSingleton } from 'shared-components';
 
 interface CircleAudioAvatarProps {
     imageUrl: string;
     className?: string;
 }
 
-// const emitter = EmitterSingleton;
+const emitter = EmitterSingleton;
 
 const CircleAudioAvatar: React.FC<CircleAudioAvatarProps> = ({ imageUrl, className }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -26,10 +26,11 @@ const CircleAudioAvatar: React.FC<CircleAudioAvatarProps> = ({ imageUrl, classNa
                     draw(ctx, canvas, image, loudness);
                 };
 
-                // emitter.on('loudness', handleLoudness);
+                // Subscribe to loudness changes
+                emitter.on('loudness', handleLoudness);
 
                 return () => {
-                    // emitter.off('loudness', handleLoudness);
+                    emitter.removeListener('loudness', handleLoudness);
                 };
             }
         }

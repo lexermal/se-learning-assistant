@@ -1,15 +1,11 @@
-// import EmitterSingleton from "@/utils/Emitter";
-
 export default class ChunkedAudioPlayer {
 
     private audioContext: AudioContext;
     private chunkQueue: ArrayBuffer[] = [];
     private isPlaying = false;
-    private chunksReceived = 0;
     private analyser: AnalyserNode;
     private dataArray: Uint8Array;
     private shouldMonitorLoudness = true;
-    // private emitter = EmitterSingleton;
     private isMonitoring = false;
     private handle = 0;
     private volume = 1.0;
@@ -22,22 +18,20 @@ export default class ChunkedAudioPlayer {
         this.analyser.fftSize = 256; // Set the FFT size (smaller values provide faster updates, larger ones give better resolution)
         const bufferLength = this.analyser.frequencyBinCount;
         this.dataArray = new Uint8Array(bufferLength); // Array to hold frequency data
-
-        // this.emitter.on('enableAudio', (enable: boolean) => {
-        //     this.volume = enable ? 1.0 : 0.0;
-        // });
     }
 
     public setOnLoudnessChange(callback: (value: number) => void) {
         this.loudnessCallback = callback;
     }
 
+    public setVolume(volume: number) {
+        this.volume = volume;
+    }
+
     public async addChunk(chunk: ArrayBuffer, position: number): Promise<void> {
         // console.log('Adding chunk', chunk);
-        this.chunkQueue[position] = chunk; // changed from push to positional storage
-        this.chunksReceived++;
+        this.chunkQueue[position] = chunk;
         // console.log("received chunk", {
-        //     chunksReceived: this.chunksReceived,
         //     chunkQueue: this.chunkQueue.length,
         //     isPlaying: this.isPlaying,
         // })
@@ -58,6 +52,7 @@ export default class ChunkedAudioPlayer {
             this.isPlaying = false;
             this.currentIndex++;
             if (this.chunkQueue[this.currentIndex]) {
+                this.shouldMonitorLoudness = true;
                 this.playChunks();
             } else {
                 this.shouldMonitorLoudness = false;
@@ -90,10 +85,7 @@ export default class ChunkedAudioPlayer {
                 this.analyser.connect(this.audioContext.destination);
 
                 source.start(0);
-                // this.emitter.on('enableAudio', (enable: boolean) => {
-                // gainNode.gain.value = enable ? 1.0 : 0.0;
-                // });
-
+                gainNode.gain.value = this.volume;
                 source.onended = () => {
                     resolve();
                 };
@@ -101,6 +93,7 @@ export default class ChunkedAudioPlayer {
                 // Start monitoring loudness only once
                 if (!this.isMonitoring) {
                     this.isMonitoring = true;
+                    this.shouldMonitorLoudness = true;
                     this.monitorLoudness();
                 }
             });
@@ -117,9 +110,9 @@ export default class ChunkedAudioPlayer {
     private monitorLoudness(): void {
         // Stop monitoring when the flag is false
         if (!this.shouldMonitorLoudness) {
-            console.log('Loudness monitoring stopped.');
+            // console.log('Loudness monitoring stopped.');
             cancelAnimationFrame(this.handle);
-            // this.emitter.emit('loudness', 0);
+            this.loudnessCallback(0);
             return;
         }
 
@@ -137,7 +130,7 @@ export default class ChunkedAudioPlayer {
 
         // Handle the case where RMS is 0 to avoid log10(0)
         if (rms === 0) {
-            console.log('Current loudness: Silent');
+            // console.log('Current loudness: Silent');
         } else {
             let loudnessInDb = 20 * Math.log10(rms); // Convert to dB
             // console.log('Current loudness:' + loudnessInDb);
@@ -152,11 +145,22 @@ export default class ChunkedAudioPlayer {
             }
 
             const loudnessScale = ((loudnessInDb - minDb) / (maxDb - minDb)) * 100;
+            // console.log("root:corrent loudness", loudnessScale);
 
             this.loudnessCallback(loudnessScale);
         }
 
         // Call this method again at regular intervals if you want continuous loudness monitoring
         this.handle = requestAnimationFrame(() => this.monitorLoudness());
+    }
+    public reset() {
+        this.stopPlayback();
+        this.currentIndex = 0;
+        this.shouldMonitorLoudness = true;
+        //reset to the beginning when the class gets initialized
+        this.isMonitoring = false;
+        this.isPlaying = false;
+
+
     }
 }

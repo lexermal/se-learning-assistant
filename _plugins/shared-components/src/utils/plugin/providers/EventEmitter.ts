@@ -43,4 +43,5 @@ export class EventEmitter {
     listeners.forEach((listener) => listener(event));
   }
 }
-
+const emitter = new EventEmitter();
+export const EmitterSingleton = emitter;

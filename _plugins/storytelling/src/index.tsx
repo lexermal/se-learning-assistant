@@ -21,7 +21,7 @@ const DiscussionsPage = lazy(() => import('./routes/discussions/page'));
 
 
 root.render(
-  <React.StrictMode>
+  // <React.StrictMode>
     <PluginProvider>
       <div className='dark:bg-gray-950 bg-white text-gray-900 dark:text-gray-200 min-h-[600px]'>
         <HashRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
@@ -36,7 +36,7 @@ root.render(
         </HashRouter>
       </div>
     </PluginProvider>
-  </React.StrictMode>
+  // </React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function

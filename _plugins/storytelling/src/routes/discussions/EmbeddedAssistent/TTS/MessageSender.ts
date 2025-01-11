@@ -56,7 +56,9 @@ export default class MessageTTSHandler {
     }
 
     private async generateSpeech(sentence: string): Promise<ArrayBuffer> {
-        const blob = await this.voiceBackend(sentence, this.voice, 1.0)
+        // console.log('Generating speech for:', sentence);
+        const blob = await this.voiceBackend(sentence, this.voice, 1.0);
+        // console.log('Generated speech for:', sentence, blob);
         return await blob.arrayBuffer();
     }
 
@@ -71,5 +73,18 @@ export default class MessageTTSHandler {
     private reset() {
         this.stop();
         this.fetchedSentences.clear();
+        this.player.reset();
+    }
+
+    public setVolume(volume: number) {
+        this.player.setVolume(volume);
+    }
+
+    public setOnLoudnessChange(callback: (value: number) => void) {
+        // console.log('Setting loudness callback');
+        this.player.setOnLoudnessChange((loudness) => {
+            // console.log("lol loudness in message sender", loudness);
+            callback(loudness);
+        });
     }
 }

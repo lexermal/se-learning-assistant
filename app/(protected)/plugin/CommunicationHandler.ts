@@ -39,6 +39,9 @@ export default class CommunicationHandler {
     private plugin: Plugin;
     private parent?: Postmate.ParentAPI;
     private communicationSecret: string | null = null;
+    private voiceQueue: Array<{ callId: number; text: string; voice: string; speed: number }> = [];
+    private activeVoiceRequests = 0;
+    private maxConcurrentVoiceRequests = 3;
 
     constructor(supabase: SupabaseClient, plugin: Plugin, ref: any, hash?: string, classListArray?: string[], queryParams?: Map<string, string>) {
         hash = "#" + (hash || "").replace("#", "");
@@ -50,6 +53,7 @@ export default class CommunicationHandler {
 
         this.pluginConnection = new Postmate({ container: ref, url: url, classListArray: [...(classListArray || []), "w-full"] });
         this.init().then(() => this.initSubscribers());
+
     }
 
     private getUrl(endpoint: string, hash: string, queryParams?: Map<string, string>) {
@@ -200,7 +204,26 @@ export default class CommunicationHandler {
 
         // create voice respponse
         this.subscribe("getVoiceResponse", async (callId, { text, voice = "alloy", speed = 1 }) => {
-            console.log(`Plugin ${this.plugin.name} wants to create voice response.`);
+            this.voiceQueue.push({ callId, text, voice, speed });
+            this.processVoiceQueue();
+        });
+
+    }
+
+    private processVoiceQueue() {
+        while (this.activeVoiceRequests < this.maxConcurrentVoiceRequests && this.voiceQueue.length) {
+            const { callId, text, voice, speed } = this.voiceQueue.shift()!;
+            this.activeVoiceRequests++;
+            this.handleGetVoiceResponse(callId, text, voice, speed)
+                .finally(() => {
+                    this.activeVoiceRequests--;
+                    this.processVoiceQueue();
+                });
+        }
+    }
+
+    private async handleGetVoiceResponse(callId: number, text: string, voice: string, speed: number) {
+        try {
             const response = await fetch('/api/speech', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -208,8 +231,9 @@ export default class CommunicationHandler {
             });
             const blob = await response.blob();
             this.call("getVoiceResponse", callId, blob);
-        });
-
+        } catch (error: any) {
+            console.error("Failed to create voice response", error.message);
+        }
     }
 
     async subscribe(topic: string, callback: (callId: number, data: any) => void) {
