@@ -1,15 +1,18 @@
-import Postmate from "postmate";
+import { Child } from "ibridge-flex";
 import { WhereClauseBuilder } from "./WhereClauseBuilder";
 
 export class PluginController {
     private static instance: PluginController;
-    private plugin: Postmate.Model | null = null;
+    private plugin: Child<null, null>;
     private onceListeners: Map<string, any[]> = new Map();
     private listeners: Map<string, any[]> = new Map();
     private communicationSecret: string | null = null;
+    private initialized = false;
 
     private constructor() {
-        this.plugin = new Postmate.Model({
+        // localStorage.debug = "*";
+
+        this.plugin = new Child({
             triggerChild: ({ topic, data, _id }: any) => {
                 // console.log("trigger child with topic:" + topic + " and data: ", data);
                 this.onceListeners.get(topic)?.forEach((callback: any) => callback(_id, data));
@@ -17,6 +20,7 @@ export class PluginController {
                 this.listeners.get(topic)?.forEach((callback: any) => callback(_id, data));
             }
         });
+        this.init();
 
         this.emit = this.emit.bind(this);
         this.onOnce = this.onOnce.bind(this);
@@ -33,6 +37,7 @@ export class PluginController {
         this.getVoiceResponse = this.getVoiceResponse.bind(this);
         this.getAIResponseStream = this.getAIResponseStream.bind(this);
         this.emitAndWaitResponse = this.emitAndWaitResponse.bind(this);
+        this.getVoiceToTextResponse = this.getVoiceToTextResponse.bind(this);
     }
 
     public static getInstance(): PluginController {
@@ -40,6 +45,17 @@ export class PluginController {
             PluginController.instance = new PluginController();
         }
         return PluginController.instance;
+    }
+
+    async init() {
+        if (this.initialized) {
+            return;
+        }
+
+        // Wait for the plugin to be ready
+        await this.plugin.handshake().then(() => this.initialized = true).catch((error: any) => {
+            console.error("Failed to initialize the plugin communication:", error);
+        });
     }
 
     private getSecret() {
@@ -59,7 +75,7 @@ export class PluginController {
 
     // the communication needs to have an id to be able to distinguish between different responses
     private internalEmit(eventName: string, id: number, data?: any) {
-        this.plugin?.then(child => child.emit(eventName, { data, _id: id, secret: this.getSecret() }));
+        this.init().then(() => this.plugin.emitToParent(eventName, { data, _id: id, secret: this.getSecret() }));
     }
 
     public subscribe(eventName: string, callback: (_id: number, data: any) => void) {
@@ -133,7 +149,7 @@ export class PluginController {
     public async getAIResponseStream(messages: { role: string, content: string }[], onMessage: (id: string, message: string, finished: boolean) => void) {
         let triggered = false;
 
-        console.log("getAIResponseStream", messages);
+        // console.log("getAIResponseStream", messages);
 
         const id = Math.random();
         this.internalEmit("getAIResponseStream", id, messages);
@@ -146,5 +162,9 @@ export class PluginController {
 
     public getVoiceResponse(text: string, voice = "alloy", speed = 1): Promise<Blob> {
         return this.emitAndWaitResponse("getVoiceResponse", { text, voice, speed });
+    }
+
+    public getVoiceToTextResponse(file: Blob): Promise<string> {
+        return this.emitAndWaitResponse("getSTTResponse", file);
     }
 }

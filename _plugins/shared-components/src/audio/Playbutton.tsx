@@ -9,7 +9,7 @@ type AudioPlayerProps = {
     enableSpeedAdjustment?: boolean;
 };
 
-export const AudioPlayer: React.FC<AudioPlayerProps> = ({ text, voice = 'alloy', enableSpeedAdjustment = false }) => {
+export const AudioPlayer: React.FC<AudioPlayerProps> = ({ text, voice = 'openai_alloy', enableSpeedAdjustment = false }) => {
     const [audioUrl, setAudioUrl] = useState<string | null>(null);
     const [speed, setSpeed] = useState(1.0);
     const [isPlaying, setIsPlaying] = useState(false);

@@ -1,5 +1,5 @@
 import { SupabaseClient } from "@supabase/supabase-js";
-import Postmate from "postmate";
+import { Parent } from "ibridge-flex"
 import { MenuEntry } from "../../../components/plugin/ContextMenu";
 import buildSupabaseQuery from "./SelectStatementBuilder";
 
@@ -34,29 +34,30 @@ export interface Plugin {
 }
 
 export default class CommunicationHandler {
-    private pluginConnection: Postmate;
     private supabase: SupabaseClient;
     private plugin: Plugin;
-    private parent?: Postmate.ParentAPI;
+    private parent: Parent;
     private communicationSecret: string | null = null;
     private voiceQueue: Array<{ callId: number; text: string; voice: string; speed: number }> = [];
     private activeVoiceRequests = 0;
     private maxConcurrentVoiceRequests = 3;
+    private initialized = false;
 
     constructor(supabase: SupabaseClient, plugin: Plugin, ref: any, hash?: string, classListArray?: string[], queryParams?: Map<string, string>) {
-        hash = "#" + (hash || "").replace("#", "");
         this.plugin = plugin;
         this.supabase = supabase;
         this.communicationSecret = Math.random().toString(36).substring(3);
 
         const url = this.getUrl(plugin.endpoint, hash, queryParams);
-
-        this.pluginConnection = new Postmate({ container: ref, url: url, classListArray: [...(classListArray || []), "w-full"] });
+        // localStorage.debug = "*";
+        ref.children[0].src = url;
+        this.parent = new Parent({ container: ref, target: ref.children[0], showIframe: true, classList: [...(classListArray || []), "w-full"] });
         this.init().then(() => this.initSubscribers());
-
     }
 
-    private getUrl(endpoint: string, hash: string, queryParams?: Map<string, string>) {
+    private getUrl(endpoint: string, hash?: string, queryParams?: Map<string, string>) {
+        hash = "#" + (hash || "").replace("#", "");
+
         const url = new URL(endpoint);
 
         url.hash = hash;
@@ -72,7 +73,7 @@ export default class CommunicationHandler {
     }
 
     private call(topic: string, callId: number, data: any) {
-        this.parent!.call("triggerChild", { topic, data, _id: callId });
+        this.parent.get("triggerChild", { topic, data, _id: callId })
     }
 
     private getTable(table: string) {
@@ -84,16 +85,20 @@ export default class CommunicationHandler {
     }
 
     async destroy() {
-        (await this.pluginConnection).destroy();
+        this.parent.destroy();
     }
 
     async init() {
-        if (!this.pluginConnection || this.parent) {
+        if (this.initialized) {
             return;
         }
 
         // Wait for the plugin to be ready
-        this.parent = await this.pluginConnection;
+        await this.parent.handshake().then(() => {
+            this.initialized = true;
+        }).catch((error: any) => {
+            console.error("Failed to initialize the plugin communication:", error);
+        });
     }
 
     async initSubscribers() {
@@ -202,12 +207,23 @@ export default class CommunicationHandler {
             });
         });
 
-        // create voice respponse
+        // create voice response
         this.subscribe("getVoiceResponse", async (callId, { text, voice = "alloy", speed = 1 }) => {
             this.voiceQueue.push({ callId, text, voice, speed });
             this.processVoiceQueue();
         });
 
+        // get speech to text response
+        this.subscribe("getSTTResponse", async (callId, audio) => {
+            console.log(`Plugin ${this.plugin.name} wants to get STT response.`);
+
+            const formData = new FormData();
+            formData.append('file', audio);
+
+            fetch('/api/stt', { method: 'POST', body: formData })
+                .then(r => r.json())
+                .then(r => this.call("getSTTResponse", callId, r.text));
+        });
     }
 
     private processVoiceQueue() {
@@ -237,23 +253,23 @@ export default class CommunicationHandler {
     }
 
     async subscribe(topic: string, callback: (callId: number, data: any) => void) {
-        if (!this.parent) {
-            // console.log("Parent not ready, waiting for it to be ready");
+        if (!this.initialized) {
             await this.init();
         }
-        this.parent!.on(topic, (result: { secret: string, _id: number, data: any }) => {
-            // console.log("Received data from child", result);
-            if (result.secret === this.communicationSecret) {
-                callback(result._id, result.data);
+
+        this.parent.on(topic, (result: unknown) => {
+            const { secret, _id, data } = result as { secret: string, _id: number, data: any };
+            if (secret === this.communicationSecret) {
+                callback(_id, data);
             } else {
-                console.debug(`The child secret ${result.secret} did not match the parent secret ${this.communicationSecret}. Ignoring the data request.`);
+                console.debug(`The child secret ${secret} did not match the parent secret ${this.communicationSecret}. Ignoring the data request.`);
             }
         });
     }
 
     async getPluginProperty(prop: string) {
         await this.init();
-        return await this.parent!.get(prop);
+        return await this.parent.get(prop);
     }
 
     async emit(topic: string, data: any) {

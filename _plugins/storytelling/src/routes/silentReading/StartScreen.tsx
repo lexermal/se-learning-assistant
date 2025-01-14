@@ -12,9 +12,9 @@ export function StartScreen(props: { onStart: (i: Instructions) => void }) {
 
     return (
         <div className="flex flex-col w-full max-w-md pt-10 sm:py-24 mx-auto stretch">
-            <p className="text-4xl text-center mb-8 flex flex-row justify-center items-end group">Storytelling
+            <div className="text-4xl text-center mb-8 flex flex-row justify-center items-end group">Storytelling
                 <div className="text-xs ml-1 opacity-0 group-hover:opacity-75 cursor-pointer" onClick={() => setIsOpen(!isOpen)}><FaGear /></div>
-            </p>
+            </div>
             <div className="w-full h-0">
                 <div className="ml-auto h-10 w-7 mt-1">
                     <div className="absolute cursor-pointer" onClick={()=>{

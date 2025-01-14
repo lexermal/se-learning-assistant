@@ -17,17 +17,16 @@ export default function MainPluginHandler({ plugin, globalContextMenuActions }: 
     const { theme } = useTheme();
 
     useEffect(() => {
-        if (!iframeRef.current || !plugin || !hash) {
+        if (!iframeRef.current || !iframeRef.current.children[0] || !plugin || !hash) {
             return;
         }
-        iframeRef.current!.style.opacity = "0";
 
         const connection = new CommunicationHandler(supabase, plugin, iframeRef.current, hash);
         connection.init().then(() => {
             iframeRef.current!.style.opacity = "1";
         });
 
-        connection.subscribe("heightAdjustment", (height: number) => {
+        connection.subscribe("heightAdjustment", (_id, height: number) => {
             if (!iframeRef.current) {
                 return;
             }
@@ -36,24 +35,21 @@ export default function MainPluginHandler({ plugin, globalContextMenuActions }: 
             // console.log("adjusting height", height);
             iframe.style.minHeight = `calc(100vh - 300px)`;
             iframe.style.height = `${height}px`;
-            iframe.setAttribute("scrolling", "no");
         });
 
-        connection.subscribe("urlChange", async (url: string) => {
+        connection.subscribe("urlChange", async (_id, url: string) => {
             console.log("urlChange", url);
             router.push(url);
         });
 
-        connection.subscribe("contextMenu", (data: ContextMenuInfo) => {
+        connection.subscribe("contextMenu", (_id, data: ContextMenuInfo) => {
             const rect = iframeRef.current!.getBoundingClientRect();
             setContextMenu({ x: data.x + rect.left, y: data.y + rect.top, open: data.open, text: data.text });
         });
 
-        connection.subscribe("addContextMenuActions", (actions: MenuEntry[]) => {
+        connection.subscribe("addContextMenuActions", (_id, actions: MenuEntry[]) => {
             setContextMenuActions([...actions, ...constextActions]);
         });
-
-        return () => { connection.destroy() }
     }, [plugin, hash]);
 
     //url hash changed
@@ -70,14 +66,13 @@ export default function MainPluginHandler({ plugin, globalContextMenuActions }: 
         }, 100);
     }, []);
 
-    // if (!plugin) {
-    //     return <div>Loading...</div>;
-    // }
-
     return (
         <div className={`w-full`}>
             <ContextMenu contextMenu={contextMenu} actions={constextActions} />
-            <div ref={iframeRef} className="w-full" style={{ opacity: 0 }}></div>
+            {/* For the communication library to use it needs to have the div with the iframe inside!!! */}
+            <div ref={iframeRef} className="w-full" style={{ opacity: 0 }}>
+                <iframe className="w-full" scrolling="no" allow="microphone; autoplay; fullscreen" src={plugin.endpoint} />
+            </div>
         </div>
     );
 }

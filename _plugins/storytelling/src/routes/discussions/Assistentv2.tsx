@@ -2,10 +2,9 @@ import React, { useEffect, useMemo } from 'react';
 import CircleAudioAvatar from './EmbeddedAssistent/CircleAudioAvatar';
 import AudioInputField from './EmbeddedAssistent/AudioInputField';
 import MessageSender from './EmbeddedAssistent/TTS/MessageSender';
-// import { VoiceId } from './EmbeddedAssistent/TTS/TTS';
-import Markdown from 'react-markdown';
 import { usePlugin, EmitterSingleton } from 'shared-components';
 import { useChat } from './EmbeddedAssistent/UseChatHook';
+import Markdown from 'react-markdown';
 
 const emitter = EmitterSingleton;
 
@@ -86,6 +85,7 @@ function Assistentv2({ avatarImageUrl, voiceId, onComplete, autoStartConversatio
                 </div>}
             </div>
             <AudioInputField
+                blockSubmission={isLoading}
                 onSubmit={message => {
                     append([{ role: 'user', content: message }]);
                 }}

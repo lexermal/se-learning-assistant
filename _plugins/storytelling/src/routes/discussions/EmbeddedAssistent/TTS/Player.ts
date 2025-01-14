@@ -1,18 +1,23 @@
 export default class ChunkedAudioPlayer {
 
-    private audioContext: AudioContext;
+    private audioContext!: AudioContext;
     private chunkQueue: ArrayBuffer[] = [];
     private isPlaying = false;
-    private analyser: AnalyserNode;
-    private dataArray: Uint8Array;
+    private analyser!: AnalyserNode;
+    private dataArray!: Uint8Array;
     private shouldMonitorLoudness = true;
     private isMonitoring = false;
     private handle = 0;
     private volume = 1.0;
     private loudnessCallback: (value: number) => void = () => { };
     private currentIndex = 0;
+    private startedPlaying = false;
 
     constructor() {
+        this.init();
+    }
+
+    private init(): void {
         this.audioContext = new AudioContext();
         this.analyser = this.audioContext.createAnalyser();
         this.analyser.fftSize = 256; // Set the FFT size (smaller values provide faster updates, larger ones give better resolution)
@@ -29,14 +34,15 @@ export default class ChunkedAudioPlayer {
     }
 
     public async addChunk(chunk: ArrayBuffer, position: number): Promise<void> {
-        // console.log('Adding chunk', chunk);
+        console.log('Adding chunk', position, chunk);
         this.chunkQueue[position] = chunk;
         // console.log("received chunk", {
         //     chunkQueue: this.chunkQueue.length,
         //     isPlaying: this.isPlaying,
         // })
 
-        if (!this.isPlaying && position === this.currentIndex) {
+        if (position === 0 && !this.startedPlaying) {
+            this.startedPlaying = true;
             this.playChunks();
         }
     }
@@ -45,9 +51,11 @@ export default class ChunkedAudioPlayer {
         // console.log({ isPlaying: this.isPlaying });
         if (this.isPlaying) return;
         if (!this.chunkQueue[this.currentIndex]) {
-            return; // wait until the correct chunk arrives
+            // wait until the correct chunk arrives
+            setTimeout(() => this.playChunks(), 10);
         }
         this.isPlaying = true;
+
         this.playChunk(this.chunkQueue[this.currentIndex]).then(() => {
             this.isPlaying = false;
             this.currentIndex++;
@@ -55,20 +63,36 @@ export default class ChunkedAudioPlayer {
                 this.shouldMonitorLoudness = true;
                 this.playChunks();
             } else {
-                this.shouldMonitorLoudness = false;
+                // console.log('Playback finished', { currentIndex: this.currentIndex, chunkQueue: this.chunkQueue });
+                setTimeout(() => {
+                    // console.log('Check again if really playback finished', { currentIndex: this.currentIndex, chunkQueue: this.chunkQueue });
+                    if (this.chunkQueue.length > this.currentIndex) {
+                        this.playChunks();
+                    } else {
+                        this.startedPlaying = false;
+                        this.shouldMonitorLoudness = false;
+                    }
+                }, 1000);
             }
         });
     }
 
     public stopPlayback(): void {
+        // console.log('Stopping playback');
         // Implement logic to stop the current playback
         this.isPlaying = false;
         this.chunkQueue = [];
+        this.startedPlaying = false;
         this.shouldMonitorLoudness = false;
         cancelAnimationFrame(this.handle);
     }
 
     private playChunk(chunk: ArrayBuffer): Promise<void> {
+        console.log({queue: this.chunkQueue})
+        if (!chunk) {
+            return Promise.resolve();
+        }
+
         // console.log('Playing chunk', chunk);
         return new Promise((resolve) => {
             const source = this.audioContext.createBufferSource();
@@ -85,8 +109,10 @@ export default class ChunkedAudioPlayer {
                 this.analyser.connect(this.audioContext.destination);
 
                 source.start(0);
+                // console.log('Playing chunk', this.currentIndex);
                 gainNode.gain.value = this.volume;
                 source.onended = () => {
+                    // console.log('Chunk ended');
                     resolve();
                 };
 
@@ -154,13 +180,13 @@ export default class ChunkedAudioPlayer {
         this.handle = requestAnimationFrame(() => this.monitorLoudness());
     }
     public reset() {
+        // console.log('Resetting player');
         this.stopPlayback();
         this.currentIndex = 0;
         this.shouldMonitorLoudness = true;
         //reset to the beginning when the class gets initialized
         this.isMonitoring = false;
         this.isPlaying = false;
-
-
+        this.init();
     }
 }

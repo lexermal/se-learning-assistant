@@ -21,7 +21,10 @@ export default class MessageTTSHandler {
         const result: string[] = [];
         let match;
         while ((match = pattern.exec(currentText)) !== null) {
-            result.push(match[0].trim());
+            const sentence = match[0].trim();
+            if (sentence.length > 0) {
+                result.push(sentence);
+            }
         }
         if (!isLoading) {
             const lastFullSentence = result[result.length - 1];
@@ -56,9 +59,7 @@ export default class MessageTTSHandler {
     }
 
     private async generateSpeech(sentence: string): Promise<ArrayBuffer> {
-        // console.log('Generating speech for:', sentence);
         const blob = await this.voiceBackend(sentence, this.voice, 1.0);
-        // console.log('Generated speech for:', sentence, blob);
         return await blob.arrayBuffer();
     }
 
@@ -81,9 +82,7 @@ export default class MessageTTSHandler {
     }
 
     public setOnLoudnessChange(callback: (value: number) => void) {
-        // console.log('Setting loudness callback');
         this.player.setOnLoudnessChange((loudness) => {
-            // console.log("lol loudness in message sender", loudness);
             callback(loudness);
         });
     }
