@@ -2,7 +2,7 @@
 
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
-import { Plugin } from "../plugin/CommunicationHandler";
+import { Plugin } from "../../../utils/plugin/CommunicationHandler";
 import SettingsPluginHandler from '@/components/plugin/SettingsPluginHandler';
 import ResetPassword from '@/app/(protected)/settings/ResetPassword';
 

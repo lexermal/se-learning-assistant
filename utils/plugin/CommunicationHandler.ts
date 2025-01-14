@@ -1,6 +1,6 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 import { Parent } from "ibridge-flex"
-import { MenuEntry } from "../../../components/plugin/ContextMenu";
+import { MenuEntry } from "../../components/plugin/ContextMenu";
 import buildSupabaseQuery from "./SelectStatementBuilder";
 
 export interface SidebarPage {

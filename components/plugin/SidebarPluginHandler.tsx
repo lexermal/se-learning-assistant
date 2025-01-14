@@ -3,13 +3,13 @@
 import { useEffect, useRef, useState } from "react";
 import { ContextMenuAction, MenuEntry } from "./ContextMenu";
 import { useEventEmitter } from "@/utils/providers/EventEmitterContext";
-import { Plugin, SidebarPage } from "../../app/(protected)/plugin/CommunicationHandler";
-import CommunicationHandler from "../../app/(protected)/plugin/CommunicationHandler";
-import { useTheme } from "next-themes";
+import { Plugin, SidebarPage } from "../../utils/plugin/CommunicationHandler";
+import CommunicationHandler from "../../utils/plugin/CommunicationHandler";
 import { SupabaseClient } from "@/utils/supabase/client";
+import { useTheme } from "next-themes";
 
 function PluginSidebar({ plugin, contextMenuAction }: { plugin: Plugin, contextMenuAction: MenuEntry }) {
-    const iframeRef = useRef<HTMLDivElement | null>(null);
+    const iframeRef = useRef<HTMLIFrameElement | null>(null);
     const [parent, setParent] = useState<CommunicationHandler | null>(null);
     const supabase = SupabaseClient.getClient();
     const { theme } = useTheme();
@@ -21,8 +21,6 @@ function PluginSidebar({ plugin, contextMenuAction }: { plugin: Plugin, contextM
     }, [contextMenuAction]);
 
     useEffect(() => {
-        iframeRef.current!.style.opacity = "0";
-
         const parent = new CommunicationHandler(supabase, plugin, iframeRef.current, contextMenuAction.url, ["h-full", "dark:bg-gray-920"], new Map([["applicationMode", "sidebar"], ["theme", theme || "system"]]));
         setParent(parent);
 
@@ -31,13 +29,14 @@ function PluginSidebar({ plugin, contextMenuAction }: { plugin: Plugin, contextM
 
             iframeRef.current!.style.opacity = "1";
         });
-
-        return () => { parent.destroy() };
     }, [plugin, contextMenuAction]);
 
     return (
         <div className="dark:bg-gray-920 w-full h-full border-l border-gray-600 pt-16">
-            <div ref={iframeRef} className="w-full h-full" style={{ opacity: 0 }}></div>
+            {/* For the communication library to use it needs to have the div with the iframe inside!!! */}
+            <div ref={iframeRef} className="w-full h-full" style={{ opacity: 0 }}>
+                <iframe className="w-full h-full" scrolling="no" allow="microphone; autoplay; fullscreen" src={plugin.endpoint} />
+            </div>
         </div>
     );
 }

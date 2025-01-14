@@ -6,7 +6,7 @@ import { User } from "@supabase/supabase-js";
 import { FaUserCircle } from "react-icons/fa";
 import { signOutAction } from "@/app/actions";
 import { SupabaseClient } from "@/utils/supabase/client";
-import { Plugin } from "../app/(protected)/plugin/CommunicationHandler";
+import { Plugin } from "../utils/plugin/CommunicationHandler";
 import { useEventEmitter } from "@/utils/providers/EventEmitterContext";
 import Link from "next/link";
 

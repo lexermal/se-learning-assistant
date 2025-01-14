@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { SupabaseClient } from "@/utils/supabase/client";
 import ContextMenu, { ContextMenuInfo, MenuEntry } from "./ContextMenu";
-import CommunicationHandler, { Plugin } from "../../app/(protected)/plugin/CommunicationHandler";
+import CommunicationHandler, { Plugin } from "../../utils/plugin/CommunicationHandler";
 import { useTheme } from "next-themes";
 
 export default function MainPluginHandler({ plugin, globalContextMenuActions }: { plugin: Plugin, globalContextMenuActions: MenuEntry[] }) {

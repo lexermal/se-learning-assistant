@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plugin } from "../CommunicationHandler";
+import { Plugin } from "../../../../utils/plugin/CommunicationHandler";
 import MainPluginHandler from "../../../../components/plugin/MainPluginHandler";
 import { EventEmitterProvider } from "@/utils/providers/EventEmitterContext";
 import { SidebarPluginHandler } from "../../../../components/plugin/SidebarPluginHandler";
