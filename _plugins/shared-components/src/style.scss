@@ -1,14 +1,10 @@
-/* @import "tailwindcss/base";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities"; */
-
 dialog::backdrop {
   backdrop-filter: blur(2px);
-  background: rgb(255, 255, 255, 0.5);
+  // background: rgb(255, 255, 255, 0.5);
 }
 
 .dark * dialog::backdrop {
-  background: rgb(0, 0, 0, 0.5);
+  background: transparent;
 }
 
 .tiptap {
@@ -69,14 +65,16 @@ dialog::backdrop {
 
   ul {
     @apply list-disc pl-8;
-    li > p {
+
+    li>p {
       @apply mb-1;
     }
   }
 
   ol {
     @apply list-decimal pl-7;
-    li > p {
+
+    li>p {
       @apply mb-1;
     }
   }
@@ -122,12 +120,15 @@ dialog::backdrop {
     h1 {
       @apply text-3xl;
     }
+
     h2 {
       @apply text-2xl;
     }
+
     p {
       @apply text-base;
     }
+
     img {
       @apply max-w-full;
     }

@@ -2,13 +2,14 @@ import React, { useEffect, useRef } from 'react';
 import { EmitterSingleton } from 'shared-components';
 
 interface CircleAudioAvatarProps {
+    width?: string;
     imageUrl: string;
     className?: string;
 }
 
 const emitter = EmitterSingleton;
 
-const CircleAudioAvatar: React.FC<CircleAudioAvatarProps> = ({ imageUrl, className }) => {
+const CircleAudioAvatar: React.FC<CircleAudioAvatarProps> = ({ imageUrl, className, width = "150px" }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     useEffect(() => {
@@ -70,7 +71,7 @@ const CircleAudioAvatar: React.FC<CircleAudioAvatarProps> = ({ imageUrl, classNa
         }
     };
 
-    return <canvas ref={canvasRef} className={className} width={500} height={500} style={{ width: '150px', height: '150px' }} />;
+    return <canvas ref={canvasRef} className={className} width={500} height={500} style={{ width }} />;
 };
 
 export default CircleAudioAvatar;

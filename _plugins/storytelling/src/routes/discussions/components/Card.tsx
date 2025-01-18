@@ -10,7 +10,7 @@ export default function Card(props: Props): JSX.Element {
   return (
     <div
       className={
-        'max-w-sm overflow-hidden shadow-lg bg-gray-400 p-3 rounded-lg ' +
+        'max-w-sm overflow-hidden shadow-lg bg-gray-700 p-4 rounded-lg h-full ' +
         (props.success ? '' : 'cursor-pointer')
       }
       onClick={props.success ? undefined : props.onClick}
@@ -40,9 +40,9 @@ export default function Card(props: Props): JSX.Element {
         width={500}
         height={500}
       />
-      <div className={'px-6 py-4' + (props.success ? ' opacity-50' : '')}>
+      <div className={'pt-2' + (props.success ? ' opacity-50' : '')}>
         <div className='font-bold text-xl mb-2'>{props.title}</div>
-        <p className='text-gray-700 text-base'>{props.description}</p>
+        <p className='text-base'>{props.description}</p>
       </div>
     </div>
   );

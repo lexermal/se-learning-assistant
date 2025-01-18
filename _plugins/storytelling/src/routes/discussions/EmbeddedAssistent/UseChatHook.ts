@@ -1,12 +1,19 @@
 import React from "react";
 import { usePlugin } from "shared-components";
 
+interface Message {
+    role: string;
+    content: string;
+    id: string | number;
+    toolInvocations?: any[];
+}
+
 export function useChat() {
-    const [messages, setMessages] = React.useState<any[]>([]);
+    const [messages, setMessages] = React.useState<Message[]>([]);
     const [isLoading, setIsLoading] = React.useState(false);
     const { getAIResponseStream } = usePlugin();
 
-    const append = (appendMessages: { role: string, content: string }[]) => {
+    const append = (appendMessages: Message[]) => {
         getAIResponseStream([...messages, ...appendMessages], (id, message, finished: boolean) => {
             const lastMessage = messages[messages.length - 1];
             setIsLoading(!finished);
@@ -21,5 +28,5 @@ export function useChat() {
         );
     };
 
-    return { messages, append, isLoading, setMessages };
+    return { messages, append, isLoading, setMessages, lastMessage: messages[messages.length - 1] as Message | undefined };
 }

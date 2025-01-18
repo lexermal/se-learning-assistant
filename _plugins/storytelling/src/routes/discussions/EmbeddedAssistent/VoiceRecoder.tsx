@@ -3,10 +3,12 @@ import { FaMicrophone } from 'react-icons/fa6';
 import { usePlugin } from 'shared-components';
 
 interface Props {
+  iconSize?: string;
+  className?: string;
   onVoiceRecorded: (message: string) => void;
 }
 
-const VoiceRecorder = forwardRef(({ onVoiceRecorded }: Props, ref) => {
+const VoiceRecorder = forwardRef(({ onVoiceRecorded, iconSize, className }: Props, ref) => {
   const [isRecording, setIsRecording] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -45,9 +47,9 @@ const VoiceRecorder = forwardRef(({ onVoiceRecorded }: Props, ref) => {
   }));
 
   return (
-    <div>
+    <div className={className}>
       <button onClick={isRecording ? stopRecording : startRecording}>
-        <FaMicrophone className={"h-7 w-7 mr-2 " + (isRecording ? "text-red-600" : "")} />
+        <FaMicrophone size={iconSize} className={"h-7 w-7 mr-2 " + (isRecording ? "text-red-600" : "")} />
       </button>
     </div>
   );

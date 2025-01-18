@@ -36,16 +36,16 @@ export default class MessageTTSHandler {
         return result;
     }
 
-    public async handleNewText(currentText: string, isLoading: boolean) {
+    public async handleNewText(currentText: string | undefined, isLoading: boolean) {
+        if (!this.lastLoading && isLoading) {
+            this.reset();
+        }
+        this.lastLoading = isLoading;
+
         if (!currentText) {
             return;
         }
 
-        if (!this.lastLoading && isLoading) {
-            this.reset();
-        }
-
-        this.lastLoading = isLoading;
         const sentences = this.getCompletedSentences(currentText, isLoading);
 
         for (let i = 0; i < sentences.length; i++) {
