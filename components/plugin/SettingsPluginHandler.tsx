@@ -14,6 +14,7 @@ export default function SettingsPluginHandler({ plugin }: { plugin: Plugin }) {
         if (!iframeRef.current) {
             return;
         }
+        iframeRef.current!.style.opacity = "0";
         
         const connection = new CommunicationHandler(supabase, plugin, iframeRef.current, plugin.settingsPage, ["h-full", "bg-gray-950"], new Map([["theme", theme || "system"]]));
         connection.init().then(() => {

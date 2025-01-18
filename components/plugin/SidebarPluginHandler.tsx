@@ -23,6 +23,7 @@ function PluginSidebar({ plugin, contextMenuAction }: { plugin: Plugin, contextM
     useEffect(() => {
         const parent = new CommunicationHandler(supabase, plugin, iframeRef.current, contextMenuAction.url, ["h-full", "dark:bg-gray-920"], new Map([["applicationMode", "sidebar"], ["theme", theme || "system"]]));
         setParent(parent);
+        iframeRef.current!.style.opacity = "0";
 
         parent.init().then(() => {
             parent.emit("toolAction", { action: contextMenuAction.action, text: contextMenuAction.text });

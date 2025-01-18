@@ -20,6 +20,7 @@ export default function MainPluginHandler({ plugin, globalContextMenuActions }: 
         if (!iframeRef.current || !iframeRef.current.children[0] || !plugin || !hash) {
             return;
         }
+        iframeRef.current!.style.opacity = "0";
 
         const connection = new CommunicationHandler(supabase, plugin, iframeRef.current, hash);
         connection.init().then(() => {
