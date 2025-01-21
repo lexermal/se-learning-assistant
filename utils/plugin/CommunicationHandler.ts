@@ -2,6 +2,7 @@ import { SupabaseClient } from "@supabase/supabase-js";
 import { Parent } from "ibridge-flex"
 import { MenuEntry } from "../../components/plugin/ContextMenu";
 import buildSupabaseQuery from "./SelectStatementBuilder";
+import { ToolInvocation } from "ai";
 
 export interface SidebarPage {
     name: string;
@@ -200,10 +201,10 @@ export default class CommunicationHandler {
         });
 
         // get ai response stream
-        this.subscribe("getAIResponseStream", async (callId, messages) => {
+        this.subscribe("getAIResponseStream", async (callId, data) => {
             console.log(`Plugin ${this.plugin.name} wants to get AI response stream.`);
-            streamChatGPT(messages, (id, response, finished) => {
-                this.call("getAIResponseStream", callId, { id, response, finished });
+            streamChatGPT(data.messages, data.tools, (id, response, finished, toolInvocations) => {
+                this.call("getAIResponseStream", callId, { id, response, finished, toolInvocations });
             });
         });
 
@@ -278,14 +279,26 @@ export default class CommunicationHandler {
     }
 }
 
+interface Tool {
+    toolName: string;
+    args: Record<string, string>;
+}
 
-async function streamChatGPT(messages: any[], onResponse: (id: string, response: string, finished: boolean) => void) {
+interface Message {
+    id: string;
+    role: string;
+    content: string;
+    toolInvocations?: Tool[];
+}
+
+async function streamChatGPT(messages: Message[], tools: Tool[], onResponse: (id: string, response: string, finished: boolean, toolInvocations?: Tool[]) => void) {
     const messageId = Math.random().toString(36).substring(3);
     const response = await fetch('/api/chat/stream', {
         method: 'POST',
         body: JSON.stringify({
             // model: 'gpt-4',  // specify the model
-            messages
+            messages,
+            tools
         })
     });
 
@@ -299,6 +312,7 @@ async function streamChatGPT(messages: any[], onResponse: (id: string, response:
 
     let content = "";
     let done = false;
+    let toolInvocations: ToolInvocation[] = [];
     while (!done) {
         const { value } = await reader.read();
 
@@ -321,9 +335,13 @@ async function streamChatGPT(messages: any[], onResponse: (id: string, response:
                     // console.log("AI usage:", JSON.parse(line.substring(2)));
                     done = true;
                     break;
+                } else if (command === '9') {
+                    // console.log("tool call:", JSON.parse(line.substring(2)));
+                    // console.log("tools", tools);
+                    toolInvocations.push(JSON.parse(line.substring(2)));
                 }
             }
         }
     }
-    onResponse(messageId, content.replace(/\\n/g, '\n'), true);
+    onResponse(messageId, content.replace(/\\n/g, '\n'), true, toolInvocations);
 }

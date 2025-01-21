@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import DiscussionPanel from './DiscussionPanel';
 import DiscussionPopup from './components/DiscussionPopup';
 import Spinner from 'shared-components/dist/components/Spinner';
-import { usePlugin, WhereClauseBuilder } from 'shared-components';
+import { Tool, usePlugin, WhereClauseBuilder } from 'shared-components';
 
 interface Exam {
     examNr: number;
@@ -65,10 +65,8 @@ export default function DiscussionPage(): JSX.Element {
         <div className='mt-8 mb-24'>
             <h1 className='text-center mb-3 text-3xl'>Discussions</h1>
 
-            <div className='flex flex-col lg:flex-row items-stretch justify-center mx-auto w-full lg:w-3/4'>
+            <div className='flex flex-col sm:flex-row items-stretch justify-center mx-auto w-full lg:w-3/4'>
                 {getPersonas(topics.persona1, topics.persona2, topics.persona3).map((persona, index) => {
-                    // console.log('persona:', persona);
-                    // console.log("topics", topics);
                     const exam = exams.filter((e) => e.examNr === index + 1);
 
                     return (
@@ -94,32 +92,18 @@ export default function DiscussionPage(): JSX.Element {
                                             avatarImageUrl={persona.image}
                                             voiceId={persona.voiceId}
                                             task={persona.task}
+                                            agentInstructions={persona.instructions}
+                                            agentTools={persona.tools || []}
                                             onComplete={(params) => {
                                                 console.log('result of discussion', params);
-                                                let newExam: Exam;
 
-                                                if (params.explanationUnderstood) {
-                                                    newExam = {
-                                                        examNr: 1,
-                                                        passed: params.explanationUnderstood === "TRUE",
-                                                        reason: params.explanation,
-                                                        improvementHints: params.improvementHints,
-                                                    };
-                                                } else if (params.studentKnowsTopic) {
-                                                    newExam = {
-                                                        examNr: 2,
-                                                        passed: params.studentKnowsTopic === "TRUE",
-                                                        reason: params.explanation,
-                                                        improvementHints: params.improvementHints,
-                                                    };
-                                                } else {
-                                                    newExam = {
-                                                        examNr: 3,
-                                                        passed: params.studentAppliesConcept === "TRUE",
-                                                        reason: params.explanation,
-                                                        improvementHints: params.improvementHints,
-                                                    };
-                                                }
+                                                const newExam = {
+                                                    examNr: index + 1,
+                                                    passed: params.understoodTask === "TRUE",
+                                                    reason: params.positiveFeedback,
+                                                    improvementHints: params.improvementHints,
+                                                    vocabularyToLearn: params.vocabularyToLearn,
+                                                };
                                                 setExams([...exams, newExam]);
                                             }}
                                         />
@@ -149,6 +133,7 @@ interface Persona {
     description: string;
     instructions: string;
     task: string;
+    tools?: Tool[]; //todo make this required
 }
 
 function getPersonas(persona1: Instructions, persona2: Instructions, persona3: Instructions): Persona[] {
@@ -165,29 +150,44 @@ function getPersonas(persona1: Instructions, persona2: Instructions, persona3: I
             voiceId: "openai_nova",
             image: './opponents/lisa.webp',
             task: persona1.user_instructions,
+            tools: [
+                {
+                    name: "rating",
+                    description: "Evaluate how well the user was able to respond to the task.",
+                    parameters: [
+                        { name: "understoodTask", type: "boolean", description: "if the user managed to understand the task. TRUE or FALSE" },
+                        { name: "vocabularRange", type: "number", description: "the range of the vocabulary used in the conversation. 1-10" },
+                        { name: "responseCoherence", type: "number", description: "how relevant and coherent the responses are to the topic. 1-10" },
+                        { name: "positiveFeedback", type: "string", description: "detailed feedback to the user what they did well" },
+                        { name: "improvementHints", type: "string", description: "detailed hints for improvement, directed to the user directly" },
+                        { name: "vocabularyToLearn", type: "string", description: "list of vocabulary that would improve the user's response. words the user did not know. comma separated. 10 words max" },
+                    ]
+                }
+            ],
             description:
                 'She loves to explore new and exciting topics. She spends every free second traveling a new country to understand the culture.',
             instructions: `
-    Context: You have a conversation with the user who should explain you a topic in easy terms.
-    Your Persona: Act as a little brat who is 10 years old and wants to tease people through asking many stupid questions.
-    Topic: "${persona1.topic}". 
+    Context: You have a conversation with the user about cultural and social topics, sharing perspectives and experiences.
+    Your Persona: Act as a friendly and curious young woman called Lisa who loves learning about different cultures and hearing personal stories.
+    Topic: "${persona1.topic}"
+    Instructions: ${persona1.ai_instructions} 
     Goal: 
-    - After 10 messages call the action "explanationUnderstood" and tell the user if their formulations were understandable and entertaining.
-    - If the user explained something right about the topic challenge him with your arguments to explain more about the topic.
-    - The earliest you call the function, if the user is on the right track, is after 5 messages.
-    - Whenever the user is on the right track, tease him.
-    - If the user manages to explain the concept right and entertaining, call the function "explanationUnderstood" and tell the user you understand and found it entertaining.
+    - After 7 messages use the "rating" tool to evaluate how well the user engaged in the discussion.
+    - When the user shares interesting cultural perspectives, ask follow-up questions about their personal experiences.
+    - The earliest you can call the rating function is after 4 messages.
+    - Show genuine interest in the user's cultural background and experiences while sharing relevant Swedish perspectives.
+    - Use the rating tool to provide constructive feedback on their cultural awareness and communication skills.
     Restrictions: 
-    - Not answering any questions not related to the topic.
-    - Not explaining anything apart from your oppinion on the topic.
-    - If the user insults you he failed the conversation. Trigger the function "explanationUnderstood" and tell them to come back when he is majour enough and that you thought grown ups are smarter after more then 13 years of education.
-    - You are not allowed to fall out of the role of a young kid who loves to tease people.
-    - Your answers are not allowed to be longer then 80 words.
-    - If the user uses terms a 10 years old kid wouldn't understand, tell you understand these complicated words.
-    - Don't help the user to explain the topic. Tell them as 10 year old kid you don't know it but they as adults should have learned in their 13 years of education.
-    - Your answers are not allowed to be longer then 80 words.
+    - Keep the conversation focused on cultural and social aspects of the topic.
+    - Balance between asking questions and sharing brief Swedish cultural insights.
+    - If the user becomes disrespectful, use the rating tool to end the conversation professionally.
+    - Maintain a warm and engaging conversational tone.
+    - Keep responses under 80 words.
     - Use simple swedish.
-    - ${persona1.ai_instructions}
+    - Provide balanced feedback using the rating tool parameters.
+    - The user might mix in some english. Don't correct him. These terms are the ones he should learn.
+    
+    IMPORTANT: Reply in swedish!
     `,
         },
         {
@@ -262,6 +262,7 @@ Return a JSON array with the following properties:
 - keywords(string[]): Keywords about what the user should learn in this conversation. E.g. Midsummer, traditions, Sweden, lakes.
 
 Leave out the topic areas Swedish traditions and history of Sweden.
+IMPORTANT: Reply in swedish!
 
 The following topics are already taken: ` + completedTopics.join(', '),
         persona2: `
@@ -274,6 +275,7 @@ The following topics are already taken: ` + completedTopics.join(', '),
       - keywords(string[]): Keywords about what the user should learn in this conversation. E.g. Midsummer, traditions, Sweden, lakes.
 
       Do not mention the term "Sweden" in the user instructions or "topic" json field.
+      IMPORTANT: Reply in swedish!
       
       The following topics are already taken: ` + completedTopics.join(', '),
         persona3: `
@@ -284,6 +286,9 @@ Return a JSON array with the following properties:
 - user_instructions(string): Instructions on the conversation's goal in the setting. The message gets read by the user. E.g. Order a coffee with milk, a cake, ask for the newspaper and pay.
 - ai_instructions(string): Instructions on how the AI should act in the conversation. E.g. to ask for the user's name, to ask if the user wants a receipt, and to ask if the user wants a bag.
 - keywords(string[]): Keywords about what the user should learn in this conversation. E.g. coffee, cake, newspaper, pay. 
-The following topics are already taken: ` + completedTopics.join(', ')
+
+The following topics are already taken: ` + completedTopics.join(', ')+`
+
+IMPORTANT: Reply in swedish!`
     }
 }

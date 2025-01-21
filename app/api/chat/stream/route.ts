@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/server';
 import { openai } from '@ai-sdk/openai';
 import { streamText } from 'ai';
+import ToolBuilder from './ToolBuilder';
 
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
@@ -8,7 +9,7 @@ export const maxDuration = 30;
 export async function POST(req: Request) {
   const supabase = await createClient();
 
-  const { messages } = await req.json();
+  const { messages, tools } = await req.json();
 
   if (!messages) {
     return Response.json({ error: 'No messages provided' }, { status: 400 });
@@ -19,9 +20,25 @@ export async function POST(req: Request) {
   }
 
   const result = streamText({
-    model: openai('gpt-4o-mini'),
     messages,
+    tools: buildTools(tools),
+    model: openai('gpt-4o-mini'),
   });
 
   return result.toDataStreamResponse();
+}
+
+function buildTools(tools?: Tool[]) {
+  if (!tools) return undefined;
+
+  const toolBuilder = new ToolBuilder();
+  tools.forEach(tool => {
+    const builder = toolBuilder.addClientTool(tool.name, tool.description);
+    tool.parameters.forEach(parameter => {
+      builder.addParameter(parameter.name, parameter.type, parameter.description);
+    });
+    builder.build();
+  });
+
+  return toolBuilder.getTools();
 }

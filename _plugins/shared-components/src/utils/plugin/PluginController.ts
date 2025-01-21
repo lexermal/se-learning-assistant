@@ -1,6 +1,21 @@
 import { Child } from "ibridge-flex";
 import { WhereClauseBuilder } from "./WhereClauseBuilder";
 
+export interface Tool {
+    name: string;
+    description: string;
+    parameters: {
+        name: string;
+        type: "string" | "number" | "boolean";
+        description: string;
+    }[];
+}
+
+export interface ToolInvocation {
+    toolName: string;
+    args: Record<string, string>;
+}
+
 export class PluginController {
     private static instance: PluginController;
     private plugin: Child<null, null>;
@@ -146,17 +161,21 @@ export class PluginController {
         return this.emitAndWaitResponse("getAIResponse", messages);
     }
 
-    public async getAIResponseStream(messages: { role: string, content: string }[], onMessage: (id: string, message: string, finished: boolean) => void) {
+    public async getAIResponseStream(
+        messages: { role: string, content: string }[],
+        onMessage: (id: string, message: string, finished: boolean, toolInvocations?: ToolInvocation[]) => void,
+        tools?: Tool[]
+    ) {
         let triggered = false;
 
         // console.log("getAIResponseStream", messages);
 
         const id = Math.random();
-        this.internalEmit("getAIResponseStream", id, messages);
-        this.subscribe("getAIResponseStream", (_id: number, data: { id: string, response: string, finished: boolean }) => {
+        this.internalEmit("getAIResponseStream", id, { messages, tools: tools || [] });
+        this.subscribe("getAIResponseStream", (_id: number, data: { id: string, response: string, finished: boolean, toolInvocations?: ToolInvocation[] }) => {
             if (triggered || (_id !== id && _id !== 0)) return;
             triggered = data.finished;
-            onMessage(data.id, data.response, data.finished);
+            onMessage(data.id, data.response, data.finished, data.toolInvocations);
         })
     }
 
