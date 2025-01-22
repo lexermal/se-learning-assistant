@@ -10,7 +10,7 @@ export default function Card(props: Props): JSX.Element {
   return (
     <div
       className={
-        'max-w-sm overflow-hidden shadow-lg bg-gray-700 p-4 rounded-lg h-full ' +
+        'max-w-sm overflow-hidden shadow-lg bg-gray-400 dark:bg-gray-700 p-4 rounded-lg h-full ' +
         (props.success ? '' : 'cursor-pointer')
       }
       onClick={props.success ? undefined : props.onClick}

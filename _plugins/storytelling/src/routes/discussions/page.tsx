@@ -43,7 +43,7 @@ export default function DiscussionPage(): JSX.Element {
 
         let newTopics = openTopics.map((topic: any) => ({ ...topic, persona }));
         // console.log('newTopics:', newTopics);
-        openTopics = []; //todo remove this line
+        // openTopics = []; //todo remove this line
 
         if (openTopics.length === 0) {
             const reservedTopics = fetchedDiscussionTopics.map((t: any) => `${t.topic}(${JSON.parse(t.keywords).join(",")})`);
@@ -87,7 +87,7 @@ export default function DiscussionPage(): JSX.Element {
                                 onClose={() => setShowDiscussion(0)}>
                                 {
                                     !personaIsLoaded ? (
-                                        <Spinner size="35px" className='mx-auto w-fit py-52 font-bold text-lg text-white' text={persona.name + " is getting ready."} />
+                                        <Spinner size="35px" className='mx-auto w-fit py-52 font-bold text-lg dark:text-white' text={persona.name + " is getting ready."} />
                                     ) : (
                                         <DiscussionPanel
                                             avatarImageUrl={persona.image}

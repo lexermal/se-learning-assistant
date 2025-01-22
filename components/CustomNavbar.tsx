@@ -49,7 +49,7 @@ export default function CustomNavbar() {
         <nav className="flex items-center justify-between flex-wrap border-b border-b-gray-500 z-30 bg-white dark:bg-gray-950 w-full">
             <div className="flex flex-shrink-0 text-white mr-6 items-end cursor-pointer" onClick={() => router.push("/dashboard")}>
                 <img src="/logo.svg" alt="Rimori" className="h-12 w-36 p-1 px-2 rounded dark:invert" />
-                <p className="dark:text-gray-300 text-sm" style={{ marginBottom: "7px" }}>(beta)</p>
+                <p className="text-black dark:text-gray-300 text-xs" style={{ marginBottom: "7px" }}>(beta)</p>
             </div>
             <div className="block md:hidden">
                 <button

@@ -59,11 +59,11 @@ function DiscussionPanel({ avatarImageUrl, voiceId, onComplete, task, agentInstr
 
     return (
         <div className='pb-8'>
-            <p className="text-center mt-5 w-3/4 mx-auto rounded-lg text-gray-100">
+            <p className="text-center mt-5 w-3/4 mx-auto rounded-lg dark:text-gray-100">
                 {task}
             </p>
             <CircleAudioAvatar imageUrl={avatarImageUrl} width={"250px"} className='mx-auto' />
-            <div className='w-16 h-16 flex text-4xl shadow-lg flex-row justify-center items-center rounded-full mx-auto bg-gray-800'>
+            <div className='w-16 h-16 flex text-4xl shadow-lg flex-row justify-center items-center rounded-full mx-auto bg-gray-400 dark:bg-gray-800'>
                 <VoiceRecorder className='w-7' iconSize='300' onVoiceRecorded={(message) => {
                     append([{ role: 'user', content: "Message(" + Math.floor((messages.length + 1) / 2) + "): " + message, id: messages.length }]);
                 }} />

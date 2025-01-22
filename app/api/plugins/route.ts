@@ -111,7 +111,7 @@ export async function GET() {
                     description: "Practice reading with stories you like on your skill level."
                 },
                 {
-                    name: "Discussions",
+                    name: "Discussions (preview)",
                     url: "/discussions",
                     description: "Practice your swedish knowledge."
                 }
