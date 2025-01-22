@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from "react";
 import { SupabaseClient } from "@/utils/supabase/client";
 import ContextMenu, { ContextMenuInfo, MenuEntry } from "./ContextMenu";
 import CommunicationHandler, { Plugin } from "../../utils/plugin/CommunicationHandler";
-import { useTheme } from "next-themes";
 
 export default function MainPluginHandler({ plugin, globalContextMenuActions }: { plugin: Plugin, globalContextMenuActions: MenuEntry[] }) {
     const [contextMenu, setContextMenu] = useState<ContextMenuInfo>({ x: 0, y: 0, open: false, text: "" });
@@ -14,7 +13,6 @@ export default function MainPluginHandler({ plugin, globalContextMenuActions }: 
     const [hash, setHash] = useState<string | null>(null);
     const supabase = SupabaseClient.getClient();
     const router = useRouter();
-    const { theme } = useTheme();
 
     useEffect(() => {
         if (!iframeRef.current || !iframeRef.current.children[0] || !plugin || !hash) {

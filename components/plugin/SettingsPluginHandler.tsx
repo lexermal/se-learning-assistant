@@ -1,6 +1,5 @@
 "use client";
 
-import { useTheme } from "next-themes";
 import { useEffect, useRef } from "react";
 import { SupabaseClient } from "@/utils/supabase/client";
 import CommunicationHandler, { Plugin } from "../../utils/plugin/CommunicationHandler";
@@ -8,7 +7,6 @@ import CommunicationHandler, { Plugin } from "../../utils/plugin/CommunicationHa
 export default function SettingsPluginHandler({ plugin }: { plugin: Plugin }) {
     const iframeRef = useRef(null as HTMLIFrameElement | null);
     const supabase = SupabaseClient.getClient();
-    const { theme } = useTheme();
 
     useEffect(() => {
         if (!iframeRef.current) {
@@ -16,7 +14,7 @@ export default function SettingsPluginHandler({ plugin }: { plugin: Plugin }) {
         }
         iframeRef.current!.style.opacity = "0";
         
-        const connection = new CommunicationHandler(supabase, plugin, iframeRef.current, plugin.settingsPage, ["h-full", "bg-gray-950"], new Map([["theme", theme || "system"]]));
+        const connection = new CommunicationHandler(supabase, plugin, iframeRef.current, plugin.settingsPage, ["h-full", "bg-gray-950"]);
         connection.init().then(() => {
             iframeRef.current!.style.opacity = "1";
         });

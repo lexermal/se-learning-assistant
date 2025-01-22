@@ -6,13 +6,11 @@ import { useEventEmitter } from "@/utils/providers/EventEmitterContext";
 import { Plugin, SidebarPage } from "../../utils/plugin/CommunicationHandler";
 import CommunicationHandler from "../../utils/plugin/CommunicationHandler";
 import { SupabaseClient } from "@/utils/supabase/client";
-import { useTheme } from "next-themes";
 
 function PluginSidebar({ plugin, contextMenuAction }: { plugin: Plugin, contextMenuAction: MenuEntry }) {
     const iframeRef = useRef<HTMLIFrameElement | null>(null);
     const [parent, setParent] = useState<CommunicationHandler | null>(null);
     const supabase = SupabaseClient.getClient();
-    const { theme } = useTheme();
 
     useEffect(() => {
         if (parent) {
@@ -21,7 +19,7 @@ function PluginSidebar({ plugin, contextMenuAction }: { plugin: Plugin, contextM
     }, [contextMenuAction]);
 
     useEffect(() => {
-        const parent = new CommunicationHandler(supabase, plugin, iframeRef.current, contextMenuAction.url, ["h-full", "dark:bg-gray-920"], new Map([["applicationMode", "sidebar"], ["theme", theme || "system"]]));
+        const parent = new CommunicationHandler(supabase, plugin, iframeRef.current, contextMenuAction.url, ["h-full", "dark:bg-gray-920"], new Map([["applicationMode", "sidebar"]]));
         setParent(parent);
         iframeRef.current!.style.opacity = "0";
 
