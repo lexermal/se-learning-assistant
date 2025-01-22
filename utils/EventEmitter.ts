@@ -37,10 +37,8 @@ class EventEmitter {
 
   // Emit an event
   emit<T = any>(eventName: string, event?: T): void {
-    console.log("emitting event", eventName);
     const listeners = this.events.get(eventName);
     if (!listeners) return;
-    console.log("listeners", listeners);
 
     listeners.forEach((listener) => listener(event));
   }

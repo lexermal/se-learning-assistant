@@ -19,7 +19,6 @@ export default function CustomNavbar() {
     const router = useRouter();
 
     function init() {
-        console.log("loging in");
         const supabase = SupabaseClient.getClient();
         supabase.auth.getUser().then(({ data }) => {
             setUser(data.user);
