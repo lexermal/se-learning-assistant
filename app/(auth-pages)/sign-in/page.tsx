@@ -32,11 +32,11 @@ export default function Login() {
     <form className="max-w-36 items-start flex-1 flex flex-col min-w-60 sm:min-w-80 mx-auto mt-12 sm:mt-48 bg-gray-300 dark:bg-gray-800 rounded-xl overflow-hidden shadow-xl">
       <div className="flex flex-row dark:border-b dark:border-gray-600 w-full bg-gray-400 dark:bg-gray-700 cursor-pointer text-center">
         <h1 onClick={() => setActionIsLogin(true)}
-          className={"border-r w-1/2 h-16 border-gray-500 leading-[4rem] " + (actionIsLogin ? "text-2xl sm:text-3xl font-bold bg-gray-400 dark:bg-gray-600" : "text-lg sm:text-2xl")}>
+          className={"flex items-center justify-center border-r w-1/2 h-12 sm:h-16 border-gray-500 " + (actionIsLogin ? "text-2xl sm:text-3xl font-bold bg-gray-400 dark:bg-gray-600" : "text-lg sm:text-2xl")}>
           Login
         </h1>
         <h1 onClick={() => setActionIsLogin(false)}
-          className={"text-center h-16 w-1/2 leading-[4rem] " + (!actionIsLogin ? "text-2xl sm:text-3xl font-bold bg-gray-400 dark:bg-gray-600" : "text-lg sm:text-2xl")}>
+          className={"flex items-center justify-center w-1/2 h-12 sm:h-16 " + (!actionIsLogin ? "text-2xl sm:text-3xl font-bold bg-gray-400 dark:bg-gray-600" : "text-lg sm:text-2xl")}>
           Register
         </h1>
       </div>

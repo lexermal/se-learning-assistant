@@ -19,6 +19,7 @@ export default function CustomNavbar() {
     const router = useRouter();
 
     function init() {
+        console.log("loging in");
         const supabase = SupabaseClient.getClient();
         supabase.auth.getUser().then(({ data }) => {
             setUser(data.user);
@@ -31,7 +32,7 @@ export default function CustomNavbar() {
 
     useEffect(() => {
         init();
-        on("user:signed-in", init);
+        on("user:signed-in", () => setTimeout(init, 1000));
     }, []);
 
     const userMenu = [
@@ -81,7 +82,7 @@ export default function CustomNavbar() {
 }
 
 function AuthComponent() {
-    return <a href="/sign-in" className="dark:text-gray-300 font-bold hover:bg-yellow-500 dark:hover:text-gray-100 bg-yellow-400 dark:bg-gray-800 border border-gray-700 p-2 rounded ml-2">
+    return <a href="/sign-in" className="dark:text-gray-300 font-bold hover:bg-yellow-400 dark:hover:text-gray-100 bg-yellow-300 dark:bg-gray-800 border border-gray-700 p-2 rounded ml-2">
         Get started
     </a>
 }
