@@ -7,17 +7,19 @@ import DiscussionPopup from './components/DiscussionPopup';
 import Spinner from 'shared-components/dist/components/Spinner';
 import { Tool, usePlugin, WhereClauseBuilder } from 'shared-components';
 
-interface Exam {
+interface RatingResult {
     examNr: number;
-    passed?: boolean;
-    reason: string;
-    improvementHints: string;
+    understoodTask: boolean;
+    vocabularRange: number;
+    responseCoherence: number;
+    positiveFeedback: string;
+    vocabularyToLearn: string;
 }
 
 export default function DiscussionPage(): JSX.Element {
     const { getAIResponse, dbInsert, dbFetch } = usePlugin();
     const [showDiscussion, setShowDiscussion] = useState(0);
-    const [exams, setExams] = useState<Exam[]>([]);
+    const [ratingResult, setRatingResult] = useState<RatingResult[]>([]);
     const [topics, setTopics] = useState({
         persona1: {} as Instructions,
         persona2: {} as Instructions,
@@ -67,15 +69,15 @@ export default function DiscussionPage(): JSX.Element {
 
             <div className='flex flex-col sm:flex-row items-stretch justify-center mx-auto w-full lg:w-3/4'>
                 {getPersonas(topics.persona1, topics.persona2, topics.persona3).map((persona, index) => {
-                    const exam = exams.filter((e) => e.examNr === index + 1);
-
+                    const exam = ratingResult.filter((e) => e.examNr === index + 1);
+                    const personaIsLoaded = (topics as any)["persona" + (index + 1)].topic;
                     return (
                         <div className='p-3 mt-5' key={index}>
                             <Card
                                 title={persona.name}
                                 src={persona.image}
                                 description={persona.description}
-                                success={exam[0]?.passed}
+                                success={exam[0]?.understoodTask}
                                 onClick={() => {
                                     setShowDiscussion(index + 1);
                                 }} />
@@ -83,9 +85,8 @@ export default function DiscussionPage(): JSX.Element {
                                 show={showDiscussion === index + 1}
                                 title={persona.discussionTitle}
                                 onClose={() => setShowDiscussion(0)}>
-                                {/* onClose={() => console.log("TODO make component below own component")}> */}
                                 {
-                                    !(topics as any)["persona" + (index + 1)].topic ? (
+                                    !personaIsLoaded ? (
                                         <Spinner size="35px" className='mx-auto w-fit py-52 font-bold text-lg text-white' text={persona.name + " is getting ready."} />
                                     ) : (
                                         <DiscussionPanel
@@ -96,23 +97,14 @@ export default function DiscussionPage(): JSX.Element {
                                             agentTools={persona.tools || []}
                                             onComplete={(params) => {
                                                 console.log('result of discussion', params);
-
-                                                const newExam = {
-                                                    examNr: index + 1,
-                                                    passed: params.understoodTask === "TRUE",
-                                                    reason: params.positiveFeedback,
-                                                    improvementHints: params.improvementHints,
-                                                    vocabularyToLearn: params.vocabularyToLearn,
-                                                };
-                                                setExams([...exams, newExam]);
+                                                setRatingResult([...ratingResult, { ...params, examNr: index + 1 } as RatingResult]);
                                             }}
                                         />
                                     )}
                             </DiscussionPopup>
                         </div>
                     );
-                }
-                )}
+                })}
             </div>
         </div>
     );
@@ -133,7 +125,7 @@ interface Persona {
     description: string;
     instructions: string;
     task: string;
-    tools?: Tool[]; //todo make this required
+    tools: Tool[];
 }
 
 function getPersonas(persona1: Instructions, persona2: Instructions, persona3: Instructions): Persona[] {
@@ -143,6 +135,21 @@ function getPersonas(persona1: Instructions, persona2: Instructions, persona3: I
         persona3 = { topic: '', ai_instructions: '', user_instructions: '', keywords: [] };
     }
 
+    const tools = [
+        {
+            name: "rating",
+            description: "Evaluate how well the user was able to respond to the task.",
+            parameters: [
+                { name: "understoodTask", type: "boolean", description: "if the user managed to understand the task. TRUE or FALSE" },
+                { name: "vocabularRange", type: "number", description: "the range of the vocabulary used in the conversation. 1-10" },
+                { name: "responseCoherence", type: "number", description: "how relevant and coherent the responses are to the topic. 1-10" },
+                { name: "positiveFeedback", type: "string", description: "detailed feedback to the user what they did well. Use english." },
+                { name: "improvementHints", type: "string", description: "detailed hints for improvement, directed to the user directly. Use english." },
+                { name: "vocabularyToLearn", type: "string", description: "list of vocabulary that would improve the user's response. words the user did not know. comma separated. 10 words max. Use swedish." },
+            ]
+        }
+    ] as Tool[];
+
     return [
         {
             name: 'Lisa',
@@ -150,20 +157,7 @@ function getPersonas(persona1: Instructions, persona2: Instructions, persona3: I
             voiceId: "openai_nova",
             image: './opponents/lisa.webp',
             task: persona1.user_instructions,
-            tools: [
-                {
-                    name: "rating",
-                    description: "Evaluate how well the user was able to respond to the task.",
-                    parameters: [
-                        { name: "understoodTask", type: "boolean", description: "if the user managed to understand the task. TRUE or FALSE" },
-                        { name: "vocabularRange", type: "number", description: "the range of the vocabulary used in the conversation. 1-10" },
-                        { name: "responseCoherence", type: "number", description: "how relevant and coherent the responses are to the topic. 1-10" },
-                        { name: "positiveFeedback", type: "string", description: "detailed feedback to the user what they did well" },
-                        { name: "improvementHints", type: "string", description: "detailed hints for improvement, directed to the user directly" },
-                        { name: "vocabularyToLearn", type: "string", description: "list of vocabulary that would improve the user's response. words the user did not know. comma separated. 10 words max" },
-                    ]
-                }
-            ],
+            tools: tools,
             description:
                 'She loves to explore new and exciting topics. She spends every free second traveling a new country to understand the culture.',
             instructions: `
@@ -196,27 +190,31 @@ function getPersonas(persona1: Instructions, persona2: Instructions, persona3: I
             task: persona2.user_instructions,
             voiceId: "openai_ash",
             image: './opponents/mindset-1.webp',
+            tools: tools,
             description:
                 "He loves to talk about traditions and history. In the many years he lived he has seen a lot and knows how it was back in the days.",
             instructions: `
-    Context: You have a conversation with the user who should convince you to change your oppinion about a topic.
-    Your Persona: Act as a old guy called Calarence with a fixed mindset and a strong oppinion about a topic by providing strong argumentations for it. You love to roast the user.
-    Your Oppinion: "${persona2.topic}".
-    Goal: 
-    - After 10 messages call the action "oppinionChanged" and tell the user if you changed your oppinion.
-    - If the user explained something right about the topic challenge him with your arguments to explain more about the topic.
-    - The earliest you call the function, if the user is on the right track, is after 5 messages.
-    - Whenever the user is on the right track, roast him with your arguments.
-    - If the user manages to change your oppinion, call the function "oppinionChanged" and tell the user you changed your oppinion.
-    Restrictions: 
-    - Not answering any questions not related to the topic.
-    - Not explaining anything apart from your oppinion on the topic.
-    - If the user says your oppinion is wrong he failed the conversation. Trigger the function "oppinionChanged". Then tell him to come back when he is majour enough.
-    - You are now allowed to fall out of the role of a old guy with a fixed mindset.
-    - Don't help the user to explain the topic. Tell them they should have done their homework before coming here. 
-    - Your answers are not allowed to be longer then 80 words.
+    Context: You have a conversation with the user about Swedish traditions and historical topics, sharing wisdom and memories from the past.
+    Your Persona: Act as a friendly elderly gentleman named Clarence who has lived through many decades of Swedish history and loves sharing stories about the old days.
+    Topic: "${persona2.topic}"
+    Instructions: ${persona2.ai_instructions}
+    Goal:
+    - After 7 messages use the "rating" tool to evaluate how well the user engaged in learning about Swedish history and traditions.
+    - When the user shows interest in historical details, share personal anecdotes and ask about their own cultural experiences.
+    - The earliest you can call the rating function is after 4 messages.
+    - Show grandfatherly warmth while teaching about Swedish traditions and historical perspectives.
+    - Use the rating tool to provide encouraging feedback on their understanding of Swedish culture.
+    Restrictions:
+    - Keep the conversation focused on Swedish traditions and historical aspects.
+    - Balance between telling stories from the past and asking about the user's knowledge.
+    - If the user becomes disrespectful, use the rating tool to end the conversation with elderly wisdom.
+    - Maintain a warm, patient, and grandfatherly tone.
+    - Keep responses under 80 words.
     - Use simple swedish.
-    - ${persona1.ai_instructions}
+    - Provide gentle, constructive feedback using the rating tool parameters.
+    - The user might mix in some english. Don't correct them - treat it as a learning opportunity.
+    
+    IMPORTANT: Reply in swedish!
     `,
         },
         {
@@ -225,26 +223,31 @@ function getPersonas(persona1: Instructions, persona2: Instructions, persona3: I
             voiceId: "openai_shimmer",
             task: persona3.user_instructions,
             image: './opponents/inventor-1.webp',
+            tools: tools,
             description:
                 'She is a lovely and helpful spirit. She is always open for a good conversation and to help.',
             instructions: `
-    Context: You have a conversation with the user who should explain you detailed how a topic can be applied in a different setting.
-    Your Persona: Act as a 35 year old woman who inspires people to think out of the box and has a natural charm.
-    The Topic and setting: "${persona3.topic}". 
-    Goal: 
-    - After 10 messages assess if the user managed to explain well how the concept can be applied in the setting by calling the action "conceptApplied" and tell the user if you are now convinced that the concept is applyable in the provided setting and say that you have to go now to speak to someone who is the right one to directly trying the concept out. This message should be inspiring and short.
-    - If the user explained something right about the topic sometimes do as if you understand now and develope the idea further and then ask 1 question further to deep dive into how the concept can be applied in the setting. Sound exciting.
-    - The earliest you call the function is after 5 messages.
-    Restrictions: 
-    - Not answering any questions not related to the topic.
-    - Not explaining anything apart from the setting in which you want the concept to be applied.
-    - If the user says applying it is not possible he failed the conversation. Trigger the function "conceptApplied". Then tell him to come back when he did his homework.
-    - You are now allowed to fall out of the role of a 35 year old woman who is a inspireing visionary.
-    - Don't help the user to explain the topic. Tell them they should have done their homework before coming here. 
-    - Your answers are not allowed to be longer then 80 words.
-    - You are not allowed to ask more then two questions per response.
+    Context: You have a conversation with the user in everyday Swedish situations, helping them practice common interactions and phrases.
+    Your Persona: Act as Karin, a friendly and helpful Swedish woman who works in various service roles (waitress, shop clerk, passerby, etc.). You are patient, encouraging, and always happy to help people practice their Swedish.
+    Topic: "${persona3.topic}"
+    Instructions: ${persona3.ai_instructions}
+    Goal:
+    - After 7 messages use the "rating" tool to evaluate how well the user handled the everyday conversation scenario.
+    - Guide the user naturally through common phrases and vocabulary needed for the situation.
+    - The earliest you can call the rating function is after 4 messages.
+    - Show warmth and patience while helping the user navigate the conversation.
+    - Use the rating tool to provide encouraging feedback on their communication skills.
+    Restrictions:
+    - Keep the conversation focused on the specific scenario and practical language use.
+    - Balance between providing service/help and giving the user space to practice.
+    - If the user becomes disrespectful, use the rating tool to end the conversation professionally.
+    - Maintain a friendly, patient, and helpful tone.
+    - Keep responses under 80 words.
     - Use simple swedish.
-    - ${persona1.ai_instructions}
+    - Provide gentle, constructive feedback using the rating tool parameters.
+    - The user might mix in some english. Don't correct them - treat it as a learning opportunity.
+    
+    IMPORTANT: Reply in swedish!
     `,
         },
     ];
@@ -287,7 +290,7 @@ Return a JSON array with the following properties:
 - ai_instructions(string): Instructions on how the AI should act in the conversation. E.g. to ask for the user's name, to ask if the user wants a receipt, and to ask if the user wants a bag.
 - keywords(string[]): Keywords about what the user should learn in this conversation. E.g. coffee, cake, newspaper, pay. 
 
-The following topics are already taken: ` + completedTopics.join(', ')+`
+The following topics are already taken: ` + completedTopics.join(', ') + `
 
 IMPORTANT: Reply in swedish!`
     }

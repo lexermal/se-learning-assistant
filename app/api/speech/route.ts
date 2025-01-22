@@ -17,6 +17,11 @@ export async function POST(request: Request) {
     }
 
     if (model === 'openai') {
+        const validVoices = ['alloy', 'ash', 'coral', 'echo', 'fable', 'onyx', 'nova', 'sage', 'shimmer']
+        if (!validVoices.includes(voiceId)) {
+            return new NextResponse('Invalid voice format or model. The format should look like this: openai_alloy', { status: 400, headers: { 'Content-Type': 'text/plain' } });
+        }
+
         const response = await fetch('https://api.openai.com/v1/audio/speech', {
             method: 'POST',
             headers: {

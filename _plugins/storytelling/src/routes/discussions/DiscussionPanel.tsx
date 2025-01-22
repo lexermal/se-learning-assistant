@@ -44,12 +44,16 @@ function DiscussionPanel({ avatarImageUrl, voiceId, onComplete, task, agentInstr
         const args = invocation.args;
 
         return <div className="px-5 pt-5 overflow-y-auto text-center" style={{ height: "478px" }}>
-            <h1 className='text-center mt-5 mb-5'>
-                {args.understoodTask === "TRUE" ? "Great job!" : "Try again!"}
-            </h1>
-            <p className='mt-4 text-lg font-bold'>🎉{args.positiveFeedback}🎉</p>
-            <p className='mt-4 text-md font-bold'>💡{args.improvementHints}💡</p>
-            <p className='mt-4'>Recommended words to learn: {args.vocabularyToLearn}</p>
+            <p className='mt-4 text-3xl font-bold'>{args.positiveFeedback}</p>
+            <p className='mt-4 text-xl'>Improvement hints: {args.improvementHints}</p>
+            <div className='mt-4 flex flex-row'>
+                <div className='font-bold'>Recommended words to learn:</div>
+                <div className='text-sm flex flex-col'>
+                    {args.vocabularyToLearn.split(',').map((word, index) => (
+                        <div key={index}>{word}</div>
+                    ))}
+                </div>
+            </div>
         </div>
     }
 
@@ -61,7 +65,7 @@ function DiscussionPanel({ avatarImageUrl, voiceId, onComplete, task, agentInstr
             <CircleAudioAvatar imageUrl={avatarImageUrl} width={"250px"} className='mx-auto' />
             <div className='w-16 h-16 flex text-4xl shadow-lg flex-row justify-center items-center rounded-full mx-auto bg-gray-800'>
                 <VoiceRecorder className='w-7' iconSize='300' onVoiceRecorded={(message) => {
-                    append([{ role: 'user', content: "Message("+Math.floor((messages.length+1)/2)+"): "+message, id: messages.length }]);
+                    append([{ role: 'user', content: "Message(" + Math.floor((messages.length + 1) / 2) + "): " + message, id: messages.length }]);
                 }} />
             </div>
         </div>
