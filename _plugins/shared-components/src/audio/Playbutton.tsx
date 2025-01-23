@@ -6,12 +6,14 @@ import { usePlugin } from "../utils/plugin/providers/PluginProvider";
 type AudioPlayerProps = {
     text: string;
     voice?: string;
+    language?: string;
+    initialSpeed?: number;
     enableSpeedAdjustment?: boolean;
 };
 
-export const AudioPlayer: React.FC<AudioPlayerProps> = ({ text, voice = 'openai_alloy', enableSpeedAdjustment = false }) => {
+export const AudioPlayer: React.FC<AudioPlayerProps> = ({ text, voice, enableSpeedAdjustment = false, language, initialSpeed = 1.0 }) => {
     const [audioUrl, setAudioUrl] = useState<string | null>(null);
-    const [speed, setSpeed] = useState(1.0);
+    const [speed, setSpeed] = useState(initialSpeed);
     const [isPlaying, setIsPlaying] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const { getVoiceResponse } = usePlugin();
@@ -20,7 +22,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({ text, voice = 'openai_
     const generateAudio = async () => {
         setIsLoading(true);
 
-        const blob = await getVoiceResponse(text, voice);
+        const blob = await getVoiceResponse(text, voice || (language ? "aws_default" : "openai_alloy"), 1, language);
         setAudioUrl(URL.createObjectURL(blob));
         setIsLoading(false);
     };
@@ -66,9 +68,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({ text, voice = 'openai_
                             onChange={(e) => setSpeed(parseFloat(e.target.value))}
                             disabled={isLoading}>
                             {speedOptions.map((s) => (
-                                <option key={s} value={s}>
-                                    {s}
-                                </option>
+                                <option key={s} value={s}>{s}</option>
                             ))}
                         </select>
                     </div>

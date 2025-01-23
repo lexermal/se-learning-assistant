@@ -103,7 +103,7 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
                         <div className="mr-1">{t.en_ett_word}</div>
                         <div className="font-bold text-5xl dark:text-white">{swedishWord}</div>
                         <div className="ml-1 pb-1">
-                            <AudioPlayer text={"(sverige:) " + swedishWord} />
+                            <AudioPlayer text={swedishWord} language="sv" />
                         </div>
                     </>}
                     {t.plural && <div className='flex flex-row'>

@@ -179,8 +179,8 @@ export class PluginController {
         })
     }
 
-    public getVoiceResponse(text: string, voice = "alloy", speed = 1): Promise<Blob> {
-        return this.emitAndWaitResponse("getVoiceResponse", { text, voice, speed });
+    public getVoiceResponse(text: string, voice = "alloy", speed = 1, language?: string): Promise<Blob> {
+        return this.emitAndWaitResponse("getVoiceResponse", { text, voice, speed, language });
     }
 
     public getVoiceToTextResponse(file: Blob): Promise<string> {

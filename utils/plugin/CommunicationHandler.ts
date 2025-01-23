@@ -39,7 +39,7 @@ export default class CommunicationHandler {
     private plugin: Plugin;
     private parent: Parent;
     private communicationSecret: string | null = null;
-    private voiceQueue: Array<{ callId: number; text: string; voice: string; speed: number }> = [];
+    private voiceQueue: Array<{ callId: number; text: string; voice: string; speed: number; language?: string }> = [];
     private activeVoiceRequests = 0;
     private maxConcurrentVoiceRequests = 3;
     private initialized = false;
@@ -209,8 +209,8 @@ export default class CommunicationHandler {
         });
 
         // create voice response
-        this.subscribe("getVoiceResponse", async (callId, { text, voice = "alloy", speed = 1 }) => {
-            this.voiceQueue.push({ callId, text, voice, speed });
+        this.subscribe("getVoiceResponse", async (callId, { text, voice = "openai_alloy", speed = 1, language = undefined }) => {
+            this.voiceQueue.push({ callId, text, voice, speed, language });
             this.processVoiceQueue();
         });
 
@@ -229,9 +229,9 @@ export default class CommunicationHandler {
 
     private processVoiceQueue() {
         while (this.activeVoiceRequests < this.maxConcurrentVoiceRequests && this.voiceQueue.length) {
-            const { callId, text, voice, speed } = this.voiceQueue.shift()!;
+            const { callId, text, voice, speed, language } = this.voiceQueue.shift()!;
             this.activeVoiceRequests++;
-            this.handleGetVoiceResponse(callId, text, voice, speed)
+            this.handleGetVoiceResponse(callId, text, voice, speed, language)
                 .finally(() => {
                     this.activeVoiceRequests--;
                     this.processVoiceQueue();
@@ -239,12 +239,12 @@ export default class CommunicationHandler {
         }
     }
 
-    private async handleGetVoiceResponse(callId: number, text: string, voice: string, speed: number) {
+    private async handleGetVoiceResponse(callId: number, text: string, voice: string, speed: number, language?: string) {
         try {
             const response = await fetch('/api/speech', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ input: text, voice, speed }),
+                body: JSON.stringify({ input: text, voice, speed, language }),
             });
             const blob = await response.blob();
             this.call("getVoiceResponse", callId, blob);

@@ -23,7 +23,7 @@ interface FlashcardEdit {
 export default function Training() {
     const plugin = usePlugin();
     const [showAnswer, setShowAnswer] = React.useState(false);
-    const [cardController, setCardController] = React.useState(new FlashcardController(plugin));
+    const [cardController] = React.useState(new FlashcardController(plugin));
     const [card, setCard] = React.useState<Flashcard | undefined>(undefined);
     const [remaining, setRemaining] = React.useState({ new: 0, learning: 0, review: 0 });
     const [finished, setFinished] = React.useState(false);
@@ -151,35 +151,46 @@ function RenderFlashcard(props: { card: Flashcard, showAnswer: boolean, editedCa
         <div className={"md:border-l-2 py-4 dark:text-white text-3xl border-gray-700"}>
             <div className="flex flex-row items-center md:ml-4 group">
                 <div className="flex flex-col">
-                    <MarkdownEditor className="rounded" content={editedCard?.new ? "" : card.front} editable={!!editedCard} onUpdate={text => {
-                        setEditedCard({ ...editedCard!, front: text });
-                    }} />
-                    {editedCard && <TagInput className="mb-3 mt-2" initialTags={editedCard.frontTags} onTagsChange={tags => setEditedCard({ ...editedCard, frontTags: tags })} />}
+                    <MarkdownEditor
+                        className="rounded"
+                        content={editedCard?.new ? "" : card.front}
+                        editable={!!editedCard}
+                        onUpdate={text => {
+                            setEditedCard({ ...editedCard!, front: text });
+                        }} />
+                    {editedCard && <TagInput
+                        className="mb-3 mt-2"
+                        initialTags={editedCard.frontTags}
+                        onTagsChange={tags => setEditedCard({ ...editedCard, frontTags: tags })} />}
                 </div>
                 {!editedCard && frontTtsEnabled && <div className="ml-2 opacity-0 group-hover:opacity-100">
-                    <AudioPlayer text={getTTSText(card.front, card.front_tags)} />
+                    <AudioPlayer
+                        text={card.front.replace(/\(.*?\)/g, "")}
+                        language={card.front_tags?.find(tag => tag.startsWith("lang:"))?.replace("lang:", "")} />
                 </div>}
             </div>
             {showAnswer && (
                 <div className="border-t text-3xl pt-1 dark:text-white w-full md:pl-4 border-gray-800 group flex flex-row items-center">
                     <div className="flex flex-col mt-3">
-                        <MarkdownEditor className="rounded mb-1 max-w-1/2" content={editedCard?.new ? "" : card.back} editable={!!editedCard} onUpdate={text => {
-                            setEditedCard({ ...editedCard!, back: text });
-                        }} />
-                        {editedCard && <TagInput initialTags={editedCard.backTags} onTagsChange={tags => setEditedCard({ ...editedCard, backTags: tags })} />}
+                        <MarkdownEditor
+                            className="rounded mb-1 max-w-1/2"
+                            content={editedCard?.new ? "" : card.back}
+                            editable={!!editedCard}
+                            onUpdate={text => {
+                                setEditedCard({ ...editedCard!, back: text });
+                            }} />
+                        {editedCard && <TagInput
+                            initialTags={editedCard.backTags}
+                            onTagsChange={tags => setEditedCard({ ...editedCard, backTags: tags })} />}
                     </div>
                     {!editedCard && backTtsEnabled && <div className="ml-2 opacity-0 group-hover:opacity-100">
-                        <AudioPlayer text={getTTSText(card.back, card.back_tags)} />
+                        <AudioPlayer
+                            text={card.back.replace(/\(.*?\)/g, "")}
+                            language={card.back_tags?.find(tag => tag.startsWith("lang:"))?.replace("lang:", "")} />
                     </div>}
                 </div>)}
         </div>
     </div>
-}
-
-function getTTSText(text: string, tags?: string[]) {
-    const languageTag = tags?.find(tag => tag.startsWith("lang:"));
-
-    return (languageTag ? `(${languageTag.replace("lang:", "")}:) ` : "") + text.replace(/\(.*?\)/g, "");
 }
 
 function renderShowAnswerButton(onClick: () => void) {

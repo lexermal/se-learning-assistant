@@ -7,6 +7,7 @@
   },
   "dependencies": {
     "@ai-sdk/openai": "^1.0.4",
+    "@aws-sdk/client-polly": "^3.731.1",
     "@supabase/ssr": "0.5.2",
     "@supabase/supabase-js": "2.46.2",
     "ai": "^4.0.3",
