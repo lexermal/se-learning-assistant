@@ -21,8 +21,8 @@ export async function POST(request: Request) {
 
     if (model === 'openai') {
         return await openaiTTS(input, voiceId, speed);
-    } else if (model === 'elevenlabs') {
-        return await elevenlabsTTS(input, voiceId, language);
+    // } else if (model === 'elevenlabs') {
+    //     return await elevenlabsTTS(input, voiceId, language);
     } else if (language || model === 'aws') {
         return await awsTTS(input, language, voiceId);
     } else {
