@@ -2,7 +2,7 @@ import { createClient } from '@/utils/supabase/server';
 import { openai } from '@ai-sdk/openai';
 import { streamText } from 'ai';
 import ToolBuilder from './ToolBuilder';
-
+import { Tool } from '@/utils/SharedComponetTypes';
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
 
