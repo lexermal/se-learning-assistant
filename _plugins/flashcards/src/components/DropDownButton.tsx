@@ -10,7 +10,7 @@ interface Props {
 
 const AddToDeckButton = ({ options, onSelect, className }: Props) => {
     const [isOpen, setIsOpen] = useState(false);
-    const [selectedDeck, setSelectedDeck] = useState(options[0].id);
+    const [selectedDeck, setSelectedDeck] = useState(options[0]?.id);
 
     const toggleDropdown = () => {
         setIsOpen(!isOpen);
@@ -20,6 +20,10 @@ const AddToDeckButton = ({ options, onSelect, className }: Props) => {
         setSelectedDeck(option);
         setIsOpen(false);
     };
+
+    if (options.length === 0) {
+        return null;
+    }
 
     return (
         <div className={"relative inline-block " + (className || "")}>
