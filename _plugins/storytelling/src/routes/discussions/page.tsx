@@ -222,7 +222,7 @@ function getPersonas(persona1: Instructions, persona2: Instructions, persona3: I
             discussionTitle: persona3.topic,
             voiceId: "openai_shimmer",
             task: persona3.user_instructions,
-            image: './opponents/inventor-1.webp',
+            image: './opponents/Karin.webp',
             tools: tools,
             description:
                 'She is a lovely and helpful spirit. She is always open for a good conversation and to help.',
