@@ -23,6 +23,9 @@ export async function POST(req: Request) {
     messages,
     tools: buildTools(tools),
     model: openai('gpt-4o-mini'),
+    onFinish(event) {
+      console.log("Usage: ", event.usage);
+    },
   });
 
   return result.toDataStreamResponse();
