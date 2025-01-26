@@ -148,6 +148,7 @@ export class PluginController {
     public async getSettings<T>(defaultSettings: T): Promise<T> {
         const response = await this.emitAndWaitResponse("get_settings", {}) as T;
         if (response === null) {
+            this.setSettings(defaultSettings);
             return defaultSettings;
         }
         return response;

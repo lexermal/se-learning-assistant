@@ -184,7 +184,7 @@ export default class CommunicationHandler {
         });
 
         // set settings
-        this.subscribe("set_settings", async (data: any) => {
+        this.subscribe("set_settings", async (callId, data: any) => {
             console.log(`Plugin ${this.plugin.name} wants to set settings.`);
             await this.supabase.from("plugin_settings").upsert({ plugin_id: this.plugin.id, settings: data });
         });
