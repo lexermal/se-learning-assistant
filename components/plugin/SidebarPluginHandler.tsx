@@ -34,7 +34,7 @@ function PluginSidebar({ plugin, contextMenuAction }: { plugin: Plugin, contextM
         <div className="dark:bg-gray-920 w-full h-full border-l border-gray-600 pt-16">
             {/* For the communication library to use it needs to have the div with the iframe inside!!! */}
             <div ref={iframeRef} className="w-full h-full" style={{ opacity: 0 }}>
-                <iframe className="w-full h-full" scrolling="no" allow="microphone; autoplay; fullscreen" src={plugin.endpoint} />
+                <iframe className="w-full h-full" allow="microphone; autoplay; fullscreen" src={plugin.endpoint} />
             </div>
         </div>
     );
