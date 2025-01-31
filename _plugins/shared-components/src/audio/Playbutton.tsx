@@ -1,7 +1,7 @@
-import { Spinner } from "flowbite-react";
 import React, { useState, useEffect } from 'react';
 import { FaPlayCircle, FaStopCircle } from "react-icons/fa";
 import { usePlugin } from "../utils/plugin/providers/PluginProvider";
+import Spinner from '../components/Spinner';
 
 type AudioPlayerProps = {
     text: string;
