@@ -8,6 +8,8 @@ export interface Instructions {
 export default function getSilentReadingPrompt(instructions: Instructions) {
     const { topic, length, difficulty } = instructions;
 
+    const difficultyLabels = ["A1", "A2", "B1", "B2", "C1", "C2", "University"]
+
     if (difficulty === 1) {
         return `
     Write a short chapter of an adventure story in Swedish using extremely simple vocabulary and present tense. 
@@ -15,16 +17,11 @@ export default function getSilentReadingPrompt(instructions: Instructions) {
     Keep sentences short and direct. The chapter should focus on basic verbs, nouns, and adjectives. 
     The goal is to create engaging content that helps learners build vocabulary and understand basic sentence structure in Swedish.
     `+ getInstructions(topic, length);
-    } else if (difficulty === 2 || true) { //TODO: add more difficulty levels
+    } else {
         return `
-        Write a short chapter of an adventure story in Swedish using simple vocabulary. 
-  The text should be suitable for beginners learning Swedish. Avoid idiomatic expressions. 
-  The chapter should focus on basic verbs, nouns, and adjectives. 
-  The goal is to create engaging content that helps learners build vocabulary and understand sentence structure in Swedish.
+        Write a short chapter of an adventure story in Swedish using the language level ${difficultyLabels[difficulty - 2]}. 
     `+ getInstructions(topic, length);
     }
-
-    throw new Error("Invalid difficulty level");
 }
 
 

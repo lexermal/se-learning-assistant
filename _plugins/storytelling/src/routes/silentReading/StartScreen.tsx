@@ -70,7 +70,7 @@ function DifficultySlider(props: { difficulty: number, setDifficulty: (d: number
             <input
                 type="range"
                 min="1"
-                max="10"
+                max="8"
                 value={props.difficulty}
                 onChange={e => props.setDifficulty(Number(e.target.value))}
                 className="w-full sm:w-1/2"
