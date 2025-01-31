@@ -1,6 +1,6 @@
 import { Card, createEmptyCard, FSRS, fsrs, generatorParameters, Grade, State } from "ts-fsrs";
 import { PluginController } from "shared-components";
-import {WhereClauseBuilder} from "shared-components";
+import { WhereClauseBuilder } from "shared-components";
 import { Deck } from "../DeckOverviewPage";
 
 export interface Flashcard extends Omit<Card, "due" | "last_review" | "state"> {
@@ -143,7 +143,7 @@ export default class FlashcardController {
             card: this.getTodayCards()[0],
             remaining: {
                 new: this.remaining(State.New).length,
-                learning: this.remaining(State.Learning).length,
+                learning: this.remaining(State.Learning).length + this.remaining(State.Relearning).length,
                 review: this.remaining(State.Review).length,
             }
         }
