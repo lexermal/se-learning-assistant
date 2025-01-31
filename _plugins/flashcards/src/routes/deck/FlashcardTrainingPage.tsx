@@ -11,7 +11,7 @@ import Pomodoro from "../../components/Polodoro";
 import { useEventEmitter } from "shared-components";
 import { AudioPlayer } from "shared-components";
 import TagInput from "../../components/form/TagInput";
-
+import { useNavigate } from "react-router-dom";
 interface FlashcardEdit {
     front: string,
     back: string,
@@ -21,16 +21,15 @@ interface FlashcardEdit {
 }
 
 export default function Training() {
-    const plugin = usePlugin();
     const [showAnswer, setShowAnswer] = React.useState(false);
-    const [cardController] = React.useState(new FlashcardController(plugin));
+    const [cardController] = React.useState(new FlashcardController(usePlugin()));
     const [card, setCard] = React.useState<Flashcard | undefined>(undefined);
     const [remaining, setRemaining] = React.useState({ new: 0, learning: 0, review: 0 });
     const [finished, setFinished] = React.useState(false);
     const [deckName, setDeckName] = React.useState("");
     const [editedCard, setEditedCard] = React.useState<FlashcardEdit | undefined>(undefined);
     const { emit } = useEventEmitter();
-
+    const navigate = useNavigate();
     function getNext() {
         const { card, remaining } = cardController.getNext();
         setCard(card);
@@ -93,8 +92,13 @@ export default function Training() {
     return (
         <div className="pb-40 bg-white dark:bg-transparent">
             <TrainingNavbar deckName={deckName} remaining={remaining} />
-            {finished && <div className="text-center text-3xl text-green-500 mt-[25vh]">
-                You learned all flashcards for today!🎉
+            {finished && <div className="text-center mt-[25vh]">
+                <p className="text-3xl text-green-500">You learned all flashcards for today!🎉</p>
+                <button
+                    className="text-blue-600 border border-blue-600 p-2 rounded-lg mt-4"
+                    onClick={() => navigate("/")}>
+                    Back to the decks
+                </button>
             </div>}
             {!finished && card && <RenderFlashcard
                 card={card}
@@ -212,13 +216,16 @@ function renderKnowledgButtons(onClick: (action: Grade) => void) {
     );
 }
 
+
+
 function TrainingNavbar({ deckName, remaining }: { deckName: string, remaining: { new: number, learning: number, review: number } }) {
     const [fullscreen, setFullscreen] = React.useState(isFullscreen());
-
+    const navigate = useNavigate();
     return (
         <div className="flex flex-row border-b-2 border-gray-700 items-end justify-between">
             <div className="flex flex-row max-w-1/3 w-1/3">
-                <span className="text-4xl mr-2 pl-2 pt-1 hidden md:block dark:text-gray-300">{deckName}</span>
+                <span className="text-4xl mr-2 pl-2 pt-1 hidden md:block dark:text-gray-300 cursor-pointer"
+                    onClick={() => navigate("/")}>{deckName}</span>
                 <div className="flex items-end text-sm md:text-base">
                     <span className="mr-2 font-bold text-blue-500">{remaining.new}</span>+
                     <span className="mx-1 font-bold text-red-500">{remaining.learning}</span>+
