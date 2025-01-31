@@ -82,7 +82,23 @@ export function getStoryInspiration(): string {
         'in the present day',
         'during a war',
         'in the early 2000s',
-        'in the near future'
+        'in the near future',
+        '', // this keeps the the time of the setting open
+        '', // this keeps the the time of the setting open
+        '', // this keeps the the time of the setting open
+    ];
+
+    const perspectives = [
+        'told through their own eyes (first-person perspective)',
+        'narrated directly to the reader (second-person perspective)', 
+        'observed by an outside narrator (third-person perspective)',
+        'from multiple characters\' viewpoints (multiple perspectives)',
+        'through diary entries and letters (epistolary perspective)',
+        'as an omniscient observer who knows all (third-person omniscient)',
+        'focusing closely on one character\'s thoughts (third-person limited)',
+        '', // this keeps the perspective open
+        '', // this keeps the perspective open
+        '', // this keeps the perspective open
     ];
 
     const genre = genres[Math.floor(Math.random() * genres.length)];
@@ -90,6 +106,6 @@ export function getStoryInspiration(): string {
     const subordinate = subordinates[Math.floor(Math.random() * subordinates.length)];
     const place = places[Math.floor(Math.random() * places.length)];
     const century = centuries[Math.floor(Math.random() * centuries.length)];
-
-    return `${genre} story about ${actor} who ${subordinate} at ${place} ${century}.`;
+    const perspective = perspectives[Math.floor(Math.random() * perspectives.length)];
+    return `${genre} story about ${actor} who ${subordinate} at ${place} ${century} ${perspective}.`;
 }
