@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { Grade, Rating } from "ts-fsrs";
 import { IoAddCircleOutline } from "react-icons/io5";
 import { MdDelete, MdModeEdit } from "react-icons/md";
-import { usePlugin } from "shared-components";
+import { isFullscreen, triggerFullscreen, usePlugin } from "shared-components";
 import { AiOutlineFullscreen, AiOutlineFullscreenExit } from "react-icons/ai";
 import FlashcardController, { Flashcard } from "./FlashcardController";
 import { MarkdownEditor } from "shared-components";
@@ -213,12 +213,7 @@ function renderKnowledgButtons(onClick: (action: Grade) => void) {
 }
 
 function TrainingNavbar({ deckName, remaining }: { deckName: string, remaining: { new: number, learning: number, review: number } }) {
-    const plugin = usePlugin();
-    const [fullscreen, setFullscreen] = React.useState(false);
-
-    useEffect(() => {
-        plugin.subscribe("triggerFullscreen", (_, data) => setFullscreen(data));
-    }, []);
+    const [fullscreen, setFullscreen] = React.useState(isFullscreen());
 
     return (
         <div className="flex flex-row border-b-2 border-gray-700 items-end justify-between">
@@ -235,7 +230,7 @@ function TrainingNavbar({ deckName, remaining }: { deckName: string, remaining: 
             </div>
             <div className="gap-1 flex font-normal p-1 w-1/3 flex-row-reverse flex-grow-0">
                 <div className="mr-1 text-3xl cursor-pointer" onClick={() => {
-                    plugin.emitAndWaitResponse("triggerFullscreen", !fullscreen)
+                    triggerFullscreen(setFullscreen);
                 }}>{fullscreen ? <AiOutlineFullscreenExit /> : <AiOutlineFullscreen />}</div>
             </div>
         </div>

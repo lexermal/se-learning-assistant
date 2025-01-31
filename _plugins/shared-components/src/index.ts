@@ -9,3 +9,4 @@ export * from "./utils/plugin/providers/PluginProvider";
 export * from "./utils/plugin/providers/EventEmitter";
 export * from "./components/Spinner";
 export * from "./hooks/UseChatHook";
+export * from "./utils/plugin/PluginUtils";

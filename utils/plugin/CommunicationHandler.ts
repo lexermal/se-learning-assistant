@@ -152,29 +152,6 @@ export default class CommunicationHandler {
             this.call("db_call", callId, result);
         });
 
-        // request fullscreen
-        let isFullscreen = false;
-        document.addEventListener("fullscreenchange", () => {
-            isFullscreen = !!document.fullscreenElement;
-            this.call("triggerFullscreen", 0, isFullscreen);
-        });
-
-        this.subscribe("triggerFullscreen", async () => {
-            console.log(`Plugin ${this.plugin.name} wants to ${!isFullscreen ? "enter" : "leave"} fullscreen.`);
-            try {
-                const ref = document.querySelector("iframe")!
-                if (!isFullscreen) {
-                    // @ts-ignore
-                    ref.requestFullscreen() || ref.webkitRequestFullscreen()
-                } else {
-                    // @ts-ignore
-                    document.exitFullscreen() || document.webkitExitFullscreen()
-                }
-            } catch (error: any) {
-                console.error("Failed to enter fullscreen", error.message);
-            }
-        });
-
         const getSettingsId = (genericSettings?: string) => {
             return ["user", "system"].includes(genericSettings || "") ? genericSettings : this.plugin.id;
         }
