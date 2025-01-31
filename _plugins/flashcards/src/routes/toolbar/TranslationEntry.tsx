@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { usePlugin } from "shared-components";
+import { usePlugin, UserSettings } from "shared-components";
 import FlashcardController from "../deck/FlashcardController";
 import { AudioPlayer } from "shared-components";
 import AddToDeckButton from "../../components/DropDownButton";
@@ -45,16 +45,19 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
     const [decks, setDecks] = useState<any[]>([]);
     const plugin = usePlugin();
     const [settings, setSettings] = useState<FlashcardPluginSettings | null>(null);
+    const [language, setLanguage] = useState<string | null>(null);
 
-    // console.log({ settings, translation: basicInfo });
+    console.log({ settings, basicInfo, language });
 
     useEffect(() => {
         plugin.getSettings<FlashcardPluginSettings>({
-            motherTongue: "English",
             translation_term_one: "one",
             translation_term_or: "or",
             ttsTags: ["lang"]
         }).then(setSettings);
+
+        plugin.getSettings<UserSettings>({ motherTongue: "English", languageLevel: "A1" }, "user").then(s => setLanguage(s.motherTongue));
+
         plugin.dbFetch('deck', "id, name, last_used")
             .then(decks => decks.sort((a: any, b: any) => new Date(b.last_used).getTime() - new Date(a.last_used).getTime())).then(setDecks);
     }, []);
@@ -68,7 +71,7 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
             console.log("basic info", info);
             setBasicInfo(info);
 
-            getAdditionalWordInfo(info, settings.motherTongue, plugin).then(moreInfo => {
+            getAdditionalWordInfo(info, language as string, plugin).then(moreInfo => {
                 console.log("additional info", moreInfo);
                 moreInfo.type = info.type;
                 moreInfo.swedish_word = info.swedish_translation;
@@ -93,7 +96,7 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
         alt = "";
     }
 
-    const formattedOtherMeaning = alt ? ` ${settings?.translation_term_or} ${alt}` : "";
+    const formattedOtherMeaning = alt ? `, ${alt}` : "";
 
     return (
         <div className="flex flex-col w-full max-w-3xl pt-6 mx-auto stretch dark:text-gray-200">
@@ -147,7 +150,7 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
                     front: (isEtt ? settings?.translation_term_one + " " : "") + targetTranslation[0] + formattedOtherMeaning,
                     back: getBackPage(t),
                     deckId: id,
-                    frontTags: ["lang", "lang:" + settings?.motherTongue],
+                    frontTags: ["lang", "lang:" + language],
                     backTags: ["lang", "lang:swedish"],
                 })
                 onAddedToFlashcard();
@@ -196,6 +199,8 @@ You are a language assistant specialized in Swedish vocabulary. For the given wo
 5. If gramatically mistakes are found in the input fix them and return the corrected sentence.
 
 Ensure the JSON is correctly structured and free of errors.
+
+English can also be the input language.
 
 ### Examples:
 
@@ -275,7 +280,7 @@ You are a language assistant specialized in Swedish vocabulary. Provide a JSON-f
     - "swedish": A short, easy example sentence using the word in Swedish, with the word highlighted using **.
     - "english": The example sentence translated into English, with the word highlighted using **.
     - "mother_tongue": The example sentence translated into ${targetLanguage}, with the word highlighted using **.
-- "explanation": A clear explanation of the word in ${targetLanguage}.
+- "explanation": A clear explanation of the word in ${(targetLanguage || "").toUpperCase()}.
 
 Include additional fields based on the word's type to fit the Translation interface:
 
@@ -292,6 +297,8 @@ Include additional fields based on the word's type to fit the Translation interf
     - Only include the "translation", "explanation" and "example_sentence" fields.
 
 Ensure the JSON is correctly structured and matches the Translation interface on line 9, including all necessary fields. If a field is not applicable, include it with an appropriate value or an empty string.
+
+The target language to translate to is ${targetLanguage}.
 
 ### Example Outputs (when translation target language is "German"):
 

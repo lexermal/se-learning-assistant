@@ -175,18 +175,27 @@ export default class CommunicationHandler {
             }
         });
 
+        const getSettingsId = (genericSettings?: string) => {
+            return ["user", "system"].includes(genericSettings || "") ? genericSettings : this.plugin.id;
+        }
+
         // get settings
-        this.subscribe("get_settings", async (callId) => {
+        this.subscribe("get_settings", async (callId, { genericSettings }: { genericSettings?: string }) => {
             console.log(`Plugin ${this.plugin.name} wants to get settings.`);
-            const { data } = await this.supabase.from("plugin_settings").select("*").eq("plugin_id", this.plugin.id);
+
+            const id = getSettingsId(genericSettings);
+
+            const { data } = await this.supabase.from("plugin_settings").select("*").eq("plugin_id", id);
             console.log("fetched Settings", data);
             this.call("get_settings", callId, data?.length ? data[0].settings : null);
         });
 
         // set settings
-        this.subscribe("set_settings", async (callId, data: any) => {
+        this.subscribe("set_settings", async (callId, { genericSettings, settings }: { genericSettings?: string, settings: any }) => {
             console.log(`Plugin ${this.plugin.name} wants to set settings.`);
-            await this.supabase.from("plugin_settings").upsert({ plugin_id: this.plugin.id, settings: data });
+
+            const id = getSettingsId(genericSettings);
+            await this.supabase.from("plugin_settings").upsert({ plugin_id: id, settings: settings });
         });
 
         // get ai response
@@ -291,7 +300,11 @@ interface Message {
     toolInvocations?: Tool[];
 }
 
-async function streamChatGPT(messages: Message[], tools: Tool[], onResponse: (id: string, response: string, finished: boolean, toolInvocations?: Tool[]) => void) {
+async function streamChatGPT(
+    messages: Message[],
+    tools: Tool[],
+    onResponse: (id: string, response: string, finished: boolean, toolInvocations?: Tool[]) => void
+) {
     const messageId = Math.random().toString(36).substring(3);
     const response = await fetch('/api/chat/stream', {
         method: 'POST',

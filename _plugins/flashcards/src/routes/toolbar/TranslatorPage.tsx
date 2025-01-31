@@ -18,7 +18,7 @@ export default function TranslationSidebar() {
     const [inputText, setInputText] = useState("");
     const [messages, setMessages] = useState<Message[]>([
         { id: '1', role: "system", content: supportPrompt },
-        { id: '2', role: "assistant", content: "The word that gets currently discussed:" + JSON.stringify(translation) }
+        { id: '2', role: "assistant", content: "The word that gets currently discussed: " + JSON.stringify(translation) }
     ]);
 
     useEffect(() => {

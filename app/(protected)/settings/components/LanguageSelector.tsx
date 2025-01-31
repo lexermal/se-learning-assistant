@@ -3,34 +3,40 @@ import React, { useState, useEffect } from 'react';
 export type Language = keyof typeof languages;
 
 interface LanguageSelectorProps {
-    initLang: Language;
-    setLanguage: (lang: Language) => void;
+    initLang?: Language;
     className?: string;
+    setLanguage: (lang: Language) => void;
 }
 
 const LanguageSelector: React.FC<LanguageSelectorProps> = ({ initLang, setLanguage, className }) => {
     const [selectedLanguage, setSelectedLanguage] = useState(initLang);
 
     useEffect(() => {
-        setLanguage(selectedLanguage);
-    }, [selectedLanguage]);
+        initLang && setSelectedLanguage(initLang);
+    }, [initLang]);
 
     const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         if (event.target.value === selectedLanguage) return;
-        setSelectedLanguage(event.target.value as keyof typeof languages);
+        const lang = event.target.value as Language;
+        setSelectedLanguage(lang);
+        setLanguage(lang);
     };
 
     return (
-        <select
-            value={selectedLanguage}
-            onChange={handleChange}
-            className={"w-full dark:bg-gray-800 border-0 px-4 py-2 pr-8 rounded leading-tight focus:outline-none " + (className || "")}>
-            {Object.entries(languages)
+        <div className="flex flex-col mt-6">
+            <h1 className="text-xl font-bold mb-2">Language</h1>
+            <p className="text-sm mb-2">The language you most familiar with.</p>
+            <select
+                value={selectedLanguage}
+                onChange={handleChange}
+                className={"w-full dark:bg-gray-800 border-0 px-2 py-2 pr-8 rounded leading-tight focus:outline-none max-w-md " + (className || "")}>
+                {Object.entries(languages)
                 .sort(([, a], [, b]) => a.localeCompare(b))
                 .map(([key, value]) => (
                     <option key={key} value={key}>{value}</option>
                 ))}
-        </select>
+            </select>
+        </div>
     );
 };
 

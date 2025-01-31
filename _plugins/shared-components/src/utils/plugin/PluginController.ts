@@ -1,5 +1,6 @@
 import { Child } from "ibridge-flex";
 import { WhereClauseBuilder } from "./WhereClauseBuilder";
+import { LanguageLevel } from "../difficultyConverter";
 
 export interface Tool {
     name: string;
@@ -145,17 +146,23 @@ export class PluginController {
         return await this.emitAndWaitResponse("db_call", { name, data });
     }
 
-    public async getSettings<T>(defaultSettings: T): Promise<T> {
-        const response = await this.emitAndWaitResponse("get_settings", {}) as T;
+    /**
+     * Get the settings for the plugin. T can be any type of settings, UserSettings or SystemSettings.
+     * @param defaultSettings The default settings to use if no settings are found.
+     * @param genericSettings The type of settings to get.
+     * @returns The settings for the plugin. 
+     */
+    public async getSettings<T>(defaultSettings: T, genericSettings?: "user" | "system"): Promise<T> {
+        const response = await this.emitAndWaitResponse("get_settings", { genericSettings }) as T;
         if (response === null) {
-            this.setSettings(defaultSettings);
+            this.setSettings(defaultSettings, genericSettings);
             return defaultSettings;
         }
         return response;
     }
 
-    public async setSettings(settings: any) {
-        await this.emitAndWaitResponse("set_settings", settings);
+    public async setSettings(settings: any, genericSettings?: "user" | "system") {
+        await this.emitAndWaitResponse("set_settings", { settings, genericSettings });
     }
 
     public async getAIResponse(messages: { role: string, content: string }[]): Promise<string> {
@@ -187,4 +194,14 @@ export class PluginController {
     public getVoiceToTextResponse(file: Blob): Promise<string> {
         return this.emitAndWaitResponse("getSTTResponse", file);
     }
+}
+
+
+export interface UserSettings {
+    motherTongue: string;
+    languageLevel: LanguageLevel;
+}
+
+export interface SystemSettings {
+    // TODO: add system settings
 }

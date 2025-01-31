@@ -1,10 +1,9 @@
 "use client";
 
-import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
 import { Plugin } from "../../../utils/plugin/CommunicationHandler";
-import SettingsPluginHandler from '@/components/plugin/SettingsPluginHandler';
-import ResetPassword from '@/app/(protected)/settings/ResetPassword';
+import { GeneralSettings } from './GeneralSettings';
+import { PluginSettings } from './components/PluginSettings';
 
 const SettingsPage = () => {
     const [plugins, setPlugins] = useState<Plugin[]>([]);
@@ -36,33 +35,5 @@ const SettingsPage = () => {
         </div>
     );
 };
-
-function PluginSettings(props: { plugin: Plugin }) {
-    const { title, settingsPage } = props.plugin;
-    return (
-        <div>
-            <h1 className="text-3xl font-bold">{title} Settings</h1>
-            <div>
-                {!settingsPage ? <div>No settings available</div> : <SettingsPluginHandler plugin={props.plugin} />}
-            </div>
-        </div>
-    );
-}
-
-function GeneralSettings() {
-    const { setTheme } = useTheme();
-    const params = new URLSearchParams(window.location.search);
-    console.log(params);
-    return (
-        <div>
-            <h1 className="text-xl font-bold">General Settings</h1>
-            <p>Change the theme</p>
-            <button className={"p-2 text-white rounded-l bg-blue-500 dark:bg-blue-600"} onClick={() => setTheme('light')}>Light</button>
-            <button className={"p-2 text-white rounded-r bg-blue-600 dark:bg-blue-800"} onClick={() => setTheme('dark')}>Dark</button>
-            {/* based on query parameters define the search params */}
-            <ResetPassword searchParams={params} />
-        </div>
-    );
-}
 
 export default SettingsPage;
