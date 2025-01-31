@@ -11,6 +11,9 @@ type AudioPlayerProps = {
     enableSpeedAdjustment?: boolean;
 };
 
+export const AudioPlayOptions = [0.8, 0.9, 1.0, 1.1, 1.2, 1.5];
+export type AudioPlayOptionType = 0.8 | 0.9 | 1.0 | 1.1 | 1.2 | 1.5;
+
 export const AudioPlayer: React.FC<AudioPlayerProps> = ({ text, voice, enableSpeedAdjustment = false, language, initialSpeed = 1.0 }) => {
     const [audioUrl, setAudioUrl] = useState<string | null>(null);
     const [speed, setSpeed] = useState(initialSpeed);
@@ -51,8 +54,6 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({ text, voice, enableSpe
         }
     };
 
-    const speedOptions = [0.8, 0.9, 1.0, 1.1, 1.2, 1.5];
-
     return (
         <div className="group relative">
             <div className='flex flex-row items-end'>
@@ -67,7 +68,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({ text, voice, enableSpe
                             className='appearance-none cursor-pointer pr-0 p-0 rounded shadow leading-tight focus:outline-none focus:bg-gray-800 focus:ring bg-transparent border-0'
                             onChange={(e) => setSpeed(parseFloat(e.target.value))}
                             disabled={isLoading}>
-                            {speedOptions.map((s) => (
+                            {AudioPlayOptions.map((s) => (
                                 <option key={s} value={s}>{s}</option>
                             ))}
                         </select>

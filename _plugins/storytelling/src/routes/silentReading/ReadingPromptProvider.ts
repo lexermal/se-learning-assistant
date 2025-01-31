@@ -20,6 +20,7 @@ export default function getSilentReadingPrompt(instructions: Instructions) {
     } else {
         return `
         Write a short chapter of an adventure story in Swedish using the language level ${difficultyLabels[difficulty - 2]}. 
+        The chapter should have between 200 and 250 words.
     `+ getInstructions(topic, length);
     }
 }
