@@ -1,34 +1,29 @@
 import { useEffect, useState } from 'react';
 import { RiRobot3Fill } from "react-icons/ri";
 import { FaUserCircle } from "react-icons/fa";
-import { usePlugin } from 'shared-components';
 import TranslationEntry, { Translation } from './TranslationEntry';
-import { MarkdownEditor } from 'shared-components';
-
-interface Message {
-    id: string;
-    role: string;
-    content: string;
-}
+import { useChat, usePlugin, MarkdownEditor } from 'shared-components';
 
 export default function TranslationSidebar() {
     const [translation, setTranslation] = useState<Translation | null>(null);
     const [word, setWord] = useState("");
-    const plugin = usePlugin();
+    const { subscribe } = usePlugin();
     const [inputText, setInputText] = useState("");
-    const [messages, setMessages] = useState<Message[]>([
-        { id: '1', role: "system", content: supportPrompt },
-        { id: '2', role: "assistant", content: "The word that gets currently discussed: " + JSON.stringify(translation) }
-    ]);
+    const { messages, setMessages, append } = useChat();
 
     useEffect(() => {
-        plugin.subscribe("toolAction", (_id: number, data: { action: string, text: string }) => {
-            if (data.action === 'translate') {
-                console.log('translate', data.text);
-                setWord(data.text);
-            }
+        subscribe("toolAction", (_id: number, data: { action: string, text: string }) => {
+            if (data.action !== 'translate') return;
+            setWord(data.text);
         });
     }, []);
+
+    useEffect(() => {
+        setMessages([
+            { id: '1', role: "system", content: supportPrompt },
+            { id: '2', role: "assistant", content: "The word that gets currently discussed: " + JSON.stringify(translation) }
+        ]);
+    }, [translation]);
 
     const reset = () => {
         setWord("");
@@ -78,18 +73,7 @@ export default function TranslationSidebar() {
                         if (e.key !== 'Enter') return;
 
                         setInputText("");
-                        const submittedMessages = [...messages, { role: 'user', content: inputText, id: messages.length.toString() }];
-
-                        plugin.getAIResponseStream(submittedMessages, (id: string, message: any) => {
-                            // console.log({ messages })
-                            const lastMessage = messages[messages.length - 1];
-                            if (lastMessage.id === id) {
-                                lastMessage.content = message;
-                                setMessages([...messages.splice(0, messages.length - 1), lastMessage]);
-                                return;
-                            }
-                            setMessages([...submittedMessages, { id, role: 'assistant', content: message }]);
-                        })
+                        append([{ role: 'user', content: inputText, id: messages.length.toString() }]);
                     }} />
             </div>
         </div>
