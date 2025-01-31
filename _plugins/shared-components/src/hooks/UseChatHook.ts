@@ -1,7 +1,8 @@
 import React from "react";
-import { ToolInvocation, Tool, usePlugin } from "shared-components";
+import { ToolInvocation, Tool } from "../utils/plugin/PluginController";
+import { usePlugin } from "../utils/plugin/providers/PluginProvider";
 
-interface Message {
+export interface Message {
     role: string;
     content: string;
     id: string | number;

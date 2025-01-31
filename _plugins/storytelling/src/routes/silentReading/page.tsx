@@ -1,16 +1,14 @@
 import { useEffect } from 'react';
 import { useState } from 'react';
 import Markdown from 'react-markdown'
-import { AudioPlayer, AudioPlayOptionType, usePlugin } from 'shared-components';
+import { AudioPlayer, AudioPlayOptionType, useChat, usePlugin } from 'shared-components';
 import getSilentReadingPrompt from './ReadingPromptProvider';
 import { StartScreen } from './StartScreen';
 import { FlashcardPluginSettings } from '../settings/SettingsPage';
 
 export default function SilentReading() {
     const [isFinalChapter, setIsFinalChapter] = useState(false);
-    const { getAIResponseStream } = usePlugin();
-    const [messages, setMessages] = useState<any[]>([]);
-    const [isLoading, setIsLoading] = useState(false);
+    const { messages, append, isLoading, lastMessage, setMessages } = useChat();
     const { getSettings } = usePlugin();
     const [readingSpeed, setReadingSpeed] = useState<AudioPlayOptionType | null>(null);
 
@@ -21,37 +19,19 @@ export default function SilentReading() {
     }, []);
 
     useEffect(() => {
-        if (messages.length > 0) {
-            const lastMessage = messages[messages.length - 1];
-            if (lastMessage.role === "assistant" && lastMessage.content.includes("Hur det slutar")) {
-                setIsFinalChapter(true);
-            }
+        if (messages.length === 0) return;
+
+        if (lastMessage?.role === "assistant" && lastMessage?.content?.includes("Hur det slutar")) {
+            setIsFinalChapter(true);
         }
     }, [messages]);
 
-    const append = (appendMessages: { role: string, content: string }[]) => {
-        getAIResponseStream([...messages, ...appendMessages], (id, message, finished: boolean) => {
-            const lastMessage = messages[messages.length - 1];
-            setIsLoading(!finished);
-
-            if (lastMessage?.id === id) {
-                lastMessage.content = message;
-                setMessages([...messages, lastMessage]);
-            } else {
-                setMessages([...messages, ...appendMessages, { id, role: 'assistant', content: message }]);
-            }
-        }
-        );
-    };
-
     if (messages.length === 0) {
         return <StartScreen onStart={instructions => {
-            const initMessages = [
+            append([
                 { id: "1", role: 'system', content: getSilentReadingPrompt(instructions) },
                 { id: "2", role: 'assistant', content: "Let's start" }
-            ];
-
-            append(initMessages);
+            ]);
         }} />;
     }
 
@@ -72,7 +52,7 @@ export default function SilentReading() {
             ))}
 
             {!isLoading && !isFinalChapter && <button className="p-2 mt-4 bg-blue-500 dark:bg-blue-950 dark:text-gray-300 rounded w-fit px-5"
-                onClick={() => append([{ role: 'user', content: "Next chapter" }])}
+                onClick={() => append([{ role: 'user', content: "Next chapter", id: messages.length + 1 }])}
             >Next chapter</button>}
 
             {!isLoading && isFinalChapter && <button className="p-2 mt-4 bg-blue-500 dark:bg-blue-950 dark:text-gray-300 rounded"

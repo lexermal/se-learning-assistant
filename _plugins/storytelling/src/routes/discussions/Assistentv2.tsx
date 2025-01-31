@@ -3,7 +3,7 @@ import CircleAudioAvatar from './EmbeddedAssistent/CircleAudioAvatar';
 import AudioInputField from './EmbeddedAssistent/AudioInputField';
 import MessageSender from './EmbeddedAssistent/TTS/MessageSender';
 import { usePlugin, EmitterSingleton } from 'shared-components';
-import { useChat } from './EmbeddedAssistent/UseChatHook';
+import { useChat } from 'shared-components';
 import Markdown from 'react-markdown';
 
 const emitter = EmitterSingleton;
