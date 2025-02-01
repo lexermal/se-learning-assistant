@@ -35,15 +35,10 @@ export default function Training() {
 
     React.useEffect(() => {
         getSettings<FlashcardPluginSettings>({
-            ttsTags: ["lang"],
-            translation_term_or: "or",
-            translation_term_one: "one",
             autoPlayForeignNewFlashcards: true,
         }).then(settings => {
-            // console.log("Settings", settings);
             if (!settings.autoPlayForeignNewFlashcards) return;
             getSettings<UserSettings>({ languageLevel: "A1", motherTongue: "English" }, "user").then(settings => {
-                // console.log("user Settings", settings);
                 setMotherTongue(settings.motherTongue);
             });
         });
@@ -76,19 +71,19 @@ export default function Training() {
             } else if (showAnswer) {
                 switch (event.key) {
                     case '1':
-                    case '7':
+                    case 'z':
                         handleKnowledgeButtonClick(Rating.Again);
                         break;
                     case '2':
-                    case '8':
+                    case '7':
                         handleKnowledgeButtonClick(Rating.Hard);
                         break;
                     case '3':
-                    case '9':
+                    case '8':
                         handleKnowledgeButtonClick(Rating.Good);
                         break;
                     case '4':
-                    case '0':
+                    case '9':
                         handleKnowledgeButtonClick(Rating.Easy);
                         break;
                 }

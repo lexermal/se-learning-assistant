@@ -25,9 +25,6 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
 
     useEffect(() => {
         plugin.getSettings<FlashcardPluginSettings>({
-            translation_term_one: "one",
-            translation_term_or: "or",
-            ttsTags: ["lang"],
             autoPlayForeignNewFlashcards: false
         }).then(setSettings);
 

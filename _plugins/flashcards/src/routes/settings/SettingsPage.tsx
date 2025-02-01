@@ -1,65 +1,29 @@
 import { useState } from "react";
-import TagInput from "../../components/form/TagInput";
-import { usePlugin } from "shared-components";
 import { useEffect } from "react";
+import { usePlugin } from "shared-components";
 
 export interface FlashcardPluginSettings {
-    ttsTags: string[];
     autoPlayForeignNewFlashcards: boolean;
-    translation_term_or: string;
-    translation_term_one: string;
 }
 
 export default function SettingsPage() {
     const [settings, setPageSettings] = useState<Partial<FlashcardPluginSettings> | null>(null);
-    const { getSettings, setSettings, getAIResponse } = usePlugin();
-    const [isLoading, setIsLoading] = useState(true);
+    const { getSettings, setSettings } = usePlugin();
 
-    function setSettingsWrapper(key: keyof FlashcardPluginSettings, value: any) {
+    function setSettingState(key: keyof FlashcardPluginSettings, value: any) {
         if (settings && settings[key] === value) return;
 
-        // if (key === "motherTongue") {
-        //     getFlashcardTerms(value, getAIResponse).then(terms => {
-        //         // console.log("Terms", terms);
-        //         const newSettings = { ...settings, translation_term_or: terms.or, translation_term_one: terms.one, motherTongue: value };
-        //         setPageSettings(newSettings);
-        //         setSettings(newSettings);
-        //     });
-        // } else {
-            setPageSettings({ ...settings, [key]: value });
-            setSettings({ ...settings, [key]: value });
-        // }
+        setPageSettings({ ...settings, [key]: value });
+        setSettings({ ...settings, [key]: value });
     }
 
     useEffect(() => {
         getSettings<FlashcardPluginSettings>({
-            translation_term_one: "one",
-            translation_term_or: "or",
-            ttsTags: ["init"],
             autoPlayForeignNewFlashcards: true
-        }).then(data => {
-            // console.log("Settings", data);
-            setPageSettings(data);
-            setIsLoading(false);
-
-            if (data.ttsTags[0] === "init") {
-                setSettingsWrapper("ttsTags", ["lang"]);
-            }
-        }
-        );
+        }).then(setPageSettings);
     }, []);
 
-    if (isLoading) return <div />;
-
     return <div className="text-lg flex flex-row flex-wrap items-center py-1 mt-2">
-        <SettingsEntry
-            title="Text-to-speech tags"
-            description="These are the tags specifying which cards should support TTS.">
-            <TagInput
-                initialTags={settings?.ttsTags ?? ["lang"]}
-                onTagsChange={(tags) => setSettingsWrapper("ttsTags", tags)}
-                className="w-full pt-0 mt-0 pl-0" />
-        </SettingsEntry>
         <SettingsEntry
             title="Auto-play new flashcards"
             description="If enabled, new flashcards with foreign language will automatically be played.">
@@ -67,7 +31,7 @@ export default function SettingsPage() {
                 <input type="checkbox"
                     className="mr-2"
                     checked={settings?.autoPlayForeignNewFlashcards ?? true}
-                    onChange={(e) => setSettingsWrapper("autoPlayForeignNewFlashcards", e.target.checked)} />
+                    onChange={(e) => setSettingState("autoPlayForeignNewFlashcards", e.target.checked)} />
                 <p className="text-sm">Activate auto-play for new flashcards with foreign language?</p>
             </div>
         </SettingsEntry>
@@ -82,29 +46,4 @@ function SettingsEntry(props: { title: string, description: string, children: Re
             {props.children}
         </div>
     </div>
-}
-
-async function getFlashcardTerms(lang: string, getResponse: (messages: { role: string, content: string }[]) => Promise<string>) {
-    // console.log("Getting terms for", lang);
-
-    if (lang === "English") {
-        return { one: "one", or: "or" };
-    }
-
-    const prompt = `
-Thranslate the following words to ${lang}: "one" and "or"
-
-Example:
-\`\`\`json
-{
-  "one": "una",
-  "or": "o"
-}
-\`\`\`
-Just type the words and their translations in the same format.
-`
-
-    return await getResponse([{ role: 'system', content: prompt }])
-        //remove first and last line
-        .then((text: string) => JSON.parse(text.split('\n').slice(1, -1).join('\n')));
 }
