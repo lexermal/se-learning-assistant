@@ -32,7 +32,7 @@ export default function MainPluginHandler({ plugin, globalContextMenuActions }: 
             const iframe = (iframeRef.current.children[0] as HTMLIFrameElement);
 
             // console.log("adjusting height", height);
-            iframe.style.minHeight = `calc(100vh - 300px)`;
+            iframe.style.minHeight = `calc(100vh - 80px)`;
             iframe.style.height = `${height}px`;
         });
 
