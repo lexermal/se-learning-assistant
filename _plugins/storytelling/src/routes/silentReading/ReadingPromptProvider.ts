@@ -30,13 +30,8 @@ function getInstructions(topic: string, length: number) {
     return `
     Include only the text of the chapter, without explanations or translations.
   
-    Example of a chapter:
-    \`\`\`
-    # Chapter 1: The Forest
-    The text of this chapter.
-    \`\`\`
-  
     The chapter should be written in Markdown format. Make use of italic for direct speech.
+    Every chapter starts with a chapter number and title.
     The last chapter has the title: "Hur det slutar" and the final text of the story.
     Per message, only one chapter should be submitted.
     The story consists of ${length} chapers in total.

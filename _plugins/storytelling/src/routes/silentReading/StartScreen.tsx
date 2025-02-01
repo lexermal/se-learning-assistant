@@ -29,11 +29,9 @@ export function StartScreen(props: { onStart: (i: Instructions) => void }) {
             <div className="text-4xl text-center mb-8 flex flex-row justify-center items-end group">Storytelling</div>
             <div className="w-full h-0">
                 <div className="ml-auto h-10 w-7 mt-1">
-                    <div className="absolute cursor-pointer" onClick={() => {
-                        setTopic(getStoryInspiration());
-                    }}>
+                    {!topic && <div className="absolute cursor-pointer" onClick={() => setTopic(getStoryInspiration())}>
                         <GiPerspectiveDiceSixFacesRandom size={"24px"} />
-                    </div>
+                    </div>}
                 </div>
             </div>
             <textarea
