@@ -49,7 +49,6 @@ export default function CustomNavbar() {
         <nav className="flex items-center justify-between flex-wrap border-b border-b-gray-500 z-30 bg-white dark:bg-gray-950 w-full">
             <div className="flex flex-shrink-0 text-white mr-6 items-end cursor-pointer" onClick={() => router.push("/dashboard")}>
                 <img src="/logo.svg" alt="Rimori" className="h-12 w-36 p-1 px-2 rounded dark:invert" />
-                <p className="text-black dark:text-gray-300 text-xs" style={{ marginBottom: "7px" }}>(beta)</p>
             </div>
             <div className="block md:hidden">
                 <button
@@ -68,7 +67,7 @@ export default function CustomNavbar() {
                         return <DropDownMenu key={index} items={items} title={plugin.title} onClick={() => setIsMobileMenuOpen(false)} />;
                     })}
                     {!isLoading && !user && <div className="hover:text-gray-300 transition p-4">
-                        <Link href={"/waitlist"}>Waitlist</Link>
+                        <Link href={"/newsletter"}>Newsletter</Link>
                     </div>}
                 </div>
                 <div className="flex items-center gap-2">

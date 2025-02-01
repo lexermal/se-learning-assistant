@@ -10,7 +10,7 @@ enum Status {
     Error,
 }
 
-const WaitlistPage = () => {
+const NewsletterPage = () => {
     const [email, setEmail] = useState("");
     const [statusMessage, setStatusMessage] = useState({ status: Status.Idle, message: '' });
 
@@ -29,13 +29,13 @@ const WaitlistPage = () => {
             if (!error) {
                 setStatusMessage({
                     status: Status.Success,
-                    message: 'You have been added to the waitlist!',
+                    message: 'You have been added to the Newsletter!',
                 });
                 setEmail('');
             } else {
-                let errorMessage = 'Failed to add you to the waitlist. Please try again.';
+                let errorMessage = 'Failed to add you to the newsletter. Please try again.';
                 if (error.code === '23505') {
-                    errorMessage = 'You have already been registered to the waitlist. We will contact you when Rimori is available.';
+                    errorMessage = 'You have already been registered to the newsletter. We will contact you when Rimori is available.';
                 }
                 setStatusMessage({
                     status: Status.Error,
@@ -93,4 +93,4 @@ const WaitlistPage = () => {
     );
 };
 
-export default WaitlistPage;
+export default NewsletterPage;
