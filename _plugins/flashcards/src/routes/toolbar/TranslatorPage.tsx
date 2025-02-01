@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { RiRobot3Fill } from "react-icons/ri";
 import { FaUserCircle } from "react-icons/fa";
-import TranslationEntry, { Translation } from './TranslationEntry';
+import TranslationEntry from './TranslationEntry';
+import { Translation } from '../../types/translation';
 import { useChat, usePlugin, MarkdownEditor } from 'shared-components';
 
 export default function TranslationSidebar() {
