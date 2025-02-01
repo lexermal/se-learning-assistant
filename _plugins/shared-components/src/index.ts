@@ -1,6 +1,6 @@
-export * from "./MarkdownEditor";
-export * from "./CRUDModal";
-export * from "./audio/Playbutton";
+export * from "./components/MarkdownEditor";
+export * from "./components/CRUDModal";
+export * from "./components/audio/Playbutton";
 export * from "./utils/plugin/PluginController";
 export * from "./utils/plugin/ThemeSetter";
 export * from "./utils/plugin/WhereClauseBuilder";
@@ -9,4 +9,4 @@ export * from "./utils/plugin/providers/PluginProvider";
 export * from "./utils/plugin/providers/EventEmitter";
 export * from "./components/Spinner";
 export * from "./hooks/UseChatHook";
-export * from "./utils/plugin/PluginUtils";
+export * from "./utils/PluginUtils";
