@@ -33,6 +33,7 @@ The application is accessible via port 3000.
 
 ## Release process
 
+0. Check light theme and responsive design looks good
 1. Update version in package.json
 2. Update the license in the LICENSE file
 3. Update the docker-compose.yml file with the new version
