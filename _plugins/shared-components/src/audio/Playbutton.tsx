@@ -7,6 +7,7 @@ type AudioPlayerProps = {
     text: string;
     voice?: string;
     language?: string;
+    playOnMount?: boolean;
     initialSpeed?: number;
     enableSpeedAdjustment?: boolean;
 };
@@ -14,7 +15,16 @@ type AudioPlayerProps = {
 export const AudioPlayOptions = [0.8, 0.9, 1.0, 1.1, 1.2, 1.5];
 export type AudioPlayOptionType = 0.8 | 0.9 | 1.0 | 1.1 | 1.2 | 1.5;
 
-export const AudioPlayer: React.FC<AudioPlayerProps> = ({ text, voice, enableSpeedAdjustment = false, language, initialSpeed = 1.0 }) => {
+let isFetchingAudio = false;
+
+export const AudioPlayer: React.FC<AudioPlayerProps> = ({
+    text,
+    voice,
+    language,
+    initialSpeed = 1.0,
+    playOnMount = false,
+    enableSpeedAdjustment = false,
+}) => {
     const [audioUrl, setAudioUrl] = useState<string | null>(null);
     const [speed, setSpeed] = useState(initialSpeed);
     const [isPlaying, setIsPlaying] = useState(false);
@@ -33,11 +43,16 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({ text, voice, enableSpe
     // Effect to play audio when audioUrl changes and play state is true
     useEffect(() => {
         if (!audioUrl || !isPlaying) return;
-
         const audio = new Audio(audioUrl);
         audio.playbackRate = speed;
         audio.play().then(() => {
-            audio.onended = () => setIsPlaying(false);
+            audio.onended = () => {
+                setIsPlaying(false);
+                isFetchingAudio = false;
+            };
+        }).catch(e => {
+            console.warn("Error playing audio:", e);
+            setIsPlaying(false);
         });
 
         return () => {
@@ -53,6 +68,13 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({ text, voice, enableSpe
             setIsPlaying((prev) => !prev);
         }
     };
+
+    useEffect(() => {
+        if (!playOnMount || isFetchingAudio) return;
+        isFetchingAudio = true;
+        // console.log("playOnMount", playOnMount);
+        togglePlayback();
+    }, [playOnMount]);
 
     return (
         <div className="group relative">

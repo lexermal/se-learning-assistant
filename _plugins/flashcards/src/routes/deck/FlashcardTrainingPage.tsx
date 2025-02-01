@@ -1,18 +1,18 @@
 import React, { useEffect } from "react";
-import { Grade, Rating } from "ts-fsrs";
+import { Grade, Rating, State } from "ts-fsrs";
 import { IoAddCircleOutline } from "react-icons/io5";
 import { MdDelete, MdModeEdit } from "react-icons/md";
-import { isFullscreen, triggerFullscreen, usePlugin } from "shared-components";
+import { isFullscreen, triggerFullscreen, usePlugin, UserSettings } from "shared-components";
 import { AiOutlineFullscreen, AiOutlineFullscreenExit } from "react-icons/ai";
 import FlashcardController, { Flashcard } from "./FlashcardController";
-import { MarkdownEditor } from "shared-components";
 import { FaSave } from "react-icons/fa";
 import Pomodoro from "../../components/Polodoro";
 import { useEventEmitter } from "shared-components";
-import { AudioPlayer } from "shared-components";
-import TagInput from "../../components/form/TagInput";
 import { useNavigate } from "react-router-dom";
-interface FlashcardEdit {
+import { RenderFlashcard } from "./Flashcard";
+import { FlashcardPluginSettings } from "../settings/SettingsPage";
+
+export interface FlashcardEdit {
     front: string,
     back: string,
     new: boolean,
@@ -30,6 +30,25 @@ export default function Training() {
     const [editedCard, setEditedCard] = React.useState<FlashcardEdit | undefined>(undefined);
     const { emit } = useEventEmitter();
     const navigate = useNavigate();
+    const { getSettings } = usePlugin();
+    const [motherTongue, setMotherTongue] = React.useState("");
+
+    React.useEffect(() => {
+        getSettings<FlashcardPluginSettings>({
+            ttsTags: ["lang"],
+            translation_term_or: "or",
+            translation_term_one: "one",
+            autoPlayForeignNewFlashcards: true,
+        }).then(settings => {
+            // console.log("Settings", settings);
+            if (!settings.autoPlayForeignNewFlashcards) return;
+            getSettings<UserSettings>({ languageLevel: "A1", motherTongue: "English" }, "user").then(settings => {
+                // console.log("user Settings", settings);
+                setMotherTongue(settings.motherTongue);
+            });
+        });
+    }, []);
+
     function getNext() {
         const { card, remaining } = cardController.getNext();
         setCard(card);
@@ -57,15 +76,19 @@ export default function Training() {
             } else if (showAnswer) {
                 switch (event.key) {
                     case '1':
+                    case '7':
                         handleKnowledgeButtonClick(Rating.Again);
                         break;
                     case '2':
+                    case '8':
                         handleKnowledgeButtonClick(Rating.Hard);
                         break;
                     case '3':
+                    case '9':
                         handleKnowledgeButtonClick(Rating.Good);
                         break;
                     case '4':
+                    case '0':
                         handleKnowledgeButtonClick(Rating.Easy);
                         break;
                 }
@@ -104,7 +127,9 @@ export default function Training() {
                 card={card}
                 showAnswer={showAnswer}
                 editedCard={editedCard}
-                setEditedCard={setEditedCard} />}
+                setEditedCard={setEditedCard}
+                motherTongue={motherTongue}
+                autoPlayForeignNewFlashcards={!!motherTongue} />}
             <div className="fixed bottom-0 w-full p-4 flex flex-row justify-between items-center flex-wrap">
                 <div className="text-2xl p-2 cursor-pointer" onClick={() => {
                     setEditedCard({ front: "", back: "", new: true, frontTags: [], backTags: [] });
@@ -146,57 +171,6 @@ export default function Training() {
     );
 }
 
-function RenderFlashcard(props: { card: Flashcard, showAnswer: boolean, editedCard?: FlashcardEdit, setEditedCard: (editedCard: FlashcardEdit) => void }) {
-    const { card, showAnswer, editedCard, setEditedCard } = props;
-    const frontTtsEnabled = card.front_tags?.includes("lang")
-    const backTtsEnabled = card.back_tags?.includes("lang");
-
-    return <div className="pt-8 md:pt-[25vh] w-full md:px-[29%]">
-        <div className={"md:border-l-2 py-4 dark:text-white text-3xl border-gray-700"}>
-            <div className="flex flex-row items-center md:ml-4 group">
-                <div className="flex flex-col">
-                    <MarkdownEditor
-                        className="rounded"
-                        content={editedCard?.new ? "" : card.front}
-                        editable={!!editedCard}
-                        onUpdate={text => {
-                            setEditedCard({ ...editedCard!, front: text });
-                        }} />
-                    {editedCard && <TagInput
-                        className="mb-3 mt-2"
-                        initialTags={editedCard.frontTags}
-                        onTagsChange={tags => setEditedCard({ ...editedCard, frontTags: tags })} />}
-                </div>
-                {!editedCard && frontTtsEnabled && <div className="ml-2 opacity-0 group-hover:opacity-100">
-                    <AudioPlayer
-                        text={card.front.replace(/\(.*?\)/g, "")}
-                        language={card.front_tags?.find(tag => tag.startsWith("lang:"))?.replace("lang:", "")} />
-                </div>}
-            </div>
-            {showAnswer && (
-                <div className="border-t text-3xl pt-1 dark:text-white w-full md:pl-4 border-gray-800 group flex flex-row items-center">
-                    <div className="flex flex-col mt-3">
-                        <MarkdownEditor
-                            className="rounded mb-1 max-w-1/2"
-                            content={editedCard?.new ? "" : card.back}
-                            editable={!!editedCard}
-                            onUpdate={text => {
-                                setEditedCard({ ...editedCard!, back: text });
-                            }} />
-                        {editedCard && <TagInput
-                            initialTags={editedCard.backTags}
-                            onTagsChange={tags => setEditedCard({ ...editedCard, backTags: tags })} />}
-                    </div>
-                    {!editedCard && backTtsEnabled && <div className="ml-2 opacity-0 group-hover:opacity-100">
-                        <AudioPlayer
-                            text={card.back.replace(/\(.*?\)/g, "")}
-                            language={card.back_tags?.find(tag => tag.startsWith("lang:"))?.replace("lang:", "")} />
-                    </div>}
-                </div>)}
-        </div>
-    </div>
-}
-
 function renderShowAnswerButton(onClick: () => void) {
     return <button
         onClick={onClick}
@@ -215,8 +189,6 @@ function renderKnowledgButtons(onClick: (action: Grade) => void) {
         </div>
     );
 }
-
-
 
 function TrainingNavbar({ deckName, remaining }: { deckName: string, remaining: { new: number, learning: number, review: number } }) {
     const [fullscreen, setFullscreen] = React.useState(isFullscreen());

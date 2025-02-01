@@ -5,6 +5,7 @@ import { useEffect } from "react";
 
 export interface FlashcardPluginSettings {
     ttsTags: string[];
+    autoPlayForeignNewFlashcards: boolean;
     translation_term_or: string;
     translation_term_one: string;
 }
@@ -34,7 +35,8 @@ export default function SettingsPage() {
         getSettings<FlashcardPluginSettings>({
             translation_term_one: "one",
             translation_term_or: "or",
-            ttsTags: ["init"]
+            ttsTags: ["init"],
+            autoPlayForeignNewFlashcards: true
         }).then(data => {
             // console.log("Settings", data);
             setPageSettings(data);
@@ -57,6 +59,17 @@ export default function SettingsPage() {
                 initialTags={settings?.ttsTags ?? ["lang"]}
                 onTagsChange={(tags) => setSettingsWrapper("ttsTags", tags)}
                 className="w-full pt-0 mt-0 pl-0" />
+        </SettingsEntry>
+        <SettingsEntry
+            title="Auto-play new flashcards"
+            description="If enabled, new flashcards with foreign language will automatically be played.">
+            <div className="flex flex-row items-center">
+                <input type="checkbox"
+                    className="mr-2"
+                    checked={settings?.autoPlayForeignNewFlashcards ?? true}
+                    onChange={(e) => setSettingsWrapper("autoPlayForeignNewFlashcards", e.target.checked)} />
+                <p className="text-sm">Activate auto-play for new flashcards with foreign language?</p>
+            </div>
         </SettingsEntry>
     </div>
 }

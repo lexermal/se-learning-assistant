@@ -157,6 +157,15 @@ export class PluginController {
         if (response === null) {
             this.setSettings(defaultSettings, genericSettings);
             return defaultSettings;
+        //if the settings are not the same, merge the settings
+        } else if (Object.keys(response as Partial<T>).length !== Object.keys(defaultSettings as Partial<T>).length) {
+            const existingKeys = Object.fromEntries(
+                Object.entries(response as object).filter(([k]) => k in (defaultSettings as object))
+            );
+            const mergedSettings = { ...defaultSettings, ...existingKeys };
+            console.warn("Settings mismatch", { response, defaultSettings, mergedSettings });
+            this.setSettings(mergedSettings, genericSettings);
+            return mergedSettings;
         }
         return response;
     }

@@ -53,7 +53,8 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
         plugin.getSettings<FlashcardPluginSettings>({
             translation_term_one: "one",
             translation_term_or: "or",
-            ttsTags: ["lang"]
+            ttsTags: ["lang"],
+            autoPlayForeignNewFlashcards: false
         }).then(setSettings);
 
         plugin.getSettings<UserSettings>({ motherTongue: "English", languageLevel: "A1" }, "user").then(s => setLanguage(s.motherTongue));
