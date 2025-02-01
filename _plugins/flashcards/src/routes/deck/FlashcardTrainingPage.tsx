@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Grade, Rating, State } from "ts-fsrs";
+import { Grade, Rating } from "ts-fsrs";
 import { IoAddCircleOutline } from "react-icons/io5";
 import { MdDelete, MdModeEdit } from "react-icons/md";
 import { isFullscreen, triggerFullscreen, usePlugin, UserSettings } from "shared-components";
@@ -51,6 +51,7 @@ export default function Training() {
 
         if (!card) {
             setFinished(true);
+            emit("pomodoro_stop");
         }
     }
 
@@ -63,13 +64,14 @@ export default function Training() {
     }, []);
 
     React.useEffect(() => {
-        function handleKeyDown(event: KeyboardEvent) {
+        function handleKeyDown({ key }: KeyboardEvent) {
+            console.log("handleKeyDown", finished);
             if (finished) return;
 
-            if (event.key === ' ') {
+            if (key === ' ') {
                 setShowAnswer(true);
             } else if (showAnswer) {
-                switch (event.key) {
+                switch (key) {
                     case '1':
                     case 'z':
                         handleKnowledgeButtonClick(Rating.Again);
@@ -88,9 +90,9 @@ export default function Training() {
                         break;
                 }
             }
-            if (["5", "t"].includes(event.key)) {
+            if (["5", "t"].includes(key)) {
                 emit("flashcard_play_front");
-            } else if (["h", "r"].includes(event.key)) {
+            } else if (["h", "r"].includes(key)) {
                 emit("flashcard_play_back");
             }
         }
@@ -102,7 +104,7 @@ export default function Training() {
 
 
     useEffect(() => {
-        emit("pomodoro_start", "");
+        emit("pomodoro_start");
     }, [showAnswer]);
 
     function handleKnowledgeButtonClick(action: Grade) {
@@ -112,18 +114,24 @@ export default function Training() {
         getNext();
     }
 
-    return (
-        <div className="pb-40 bg-white dark:bg-transparent">
+    if (finished) {
+        return <div className="pb-40 bg-white dark:bg-transparent">
             <TrainingNavbar deckName={deckName} remaining={remaining} />
-            {finished && <div className="text-center mt-[25vh]">
+            <div className="text-center mt-[25vh]">
                 <p className="text-3xl text-green-500">You learned all flashcards for today!🎉</p>
                 <button
                     className="text-blue-600 border border-blue-600 p-2 rounded-lg mt-4"
                     onClick={() => navigate("/")}>
                     Back to the decks
                 </button>
-            </div>}
-            {!finished && card && <RenderFlashcard
+            </div>
+        </div>
+    }
+
+    return (
+        <div className="pb-40 bg-white dark:bg-transparent">
+            <TrainingNavbar deckName={deckName} remaining={remaining} />
+            {card && <RenderFlashcard
                 card={card}
                 showAnswer={showAnswer}
                 editedCard={editedCard}
@@ -136,8 +144,8 @@ export default function Training() {
                     setShowAnswer(true);
                 }
                 }><IoAddCircleOutline /></div>
-                {(!finished && !showAnswer) && renderShowAnswerButton(() => setShowAnswer(true))}
-                {(!finished && showAnswer && !editedCard) && renderKnowledgButtons(handleKnowledgeButtonClick)}
+                {(!showAnswer) && renderShowAnswerButton(() => setShowAnswer(true))}
+                {(showAnswer && !editedCard) && renderKnowledgButtons(handleKnowledgeButtonClick)}
                 <div className="flex flex-row items-end">
                     <div className="text-2xl mr-1 cursor-pointer" onClick={() => {
                         if (!editedCard) {
