@@ -88,6 +88,11 @@ export default function Training() {
                         break;
                 }
             }
+            if (["5", "t"].includes(event.key)) {
+                emit("flashcard_play_front");
+            } else if (["h", "r"].includes(event.key)) {
+                emit("flashcard_play_back");
+            }
         }
         window.addEventListener('keydown', handleKeyDown);
         return () => {

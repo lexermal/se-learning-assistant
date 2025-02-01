@@ -52,7 +52,8 @@ export function RenderFlashcard(props: FlashcardProps) {
                     <AudioPlayer
                         language={frontLanguage}
                         text={card.front.replace(/\(.*?\)/g, "")}
-                        playOnMount={autoPlayFront} />
+                        playOnMount={autoPlayFront}
+                        playListenerEvent="flashcard_play_front" />
                 </div>}
             </div>
             {showAnswer && (
@@ -73,7 +74,8 @@ export function RenderFlashcard(props: FlashcardProps) {
                         <AudioPlayer
                             language={backLanguage}
                             text={card.back.replace(/\(.*?\)/g, "")}
-                            playOnMount={autoPlayBack} />
+                            playOnMount={autoPlayBack}
+                            playListenerEvent="flashcard_play_back" />
                     </div>}
                 </div>)}
         </div>

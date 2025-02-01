@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FaPlayCircle, FaStopCircle } from "react-icons/fa";
 import { usePlugin } from "../utils/plugin/providers/PluginProvider";
 import Spinner from '../components/Spinner';
+import { EmitterSingleton } from '../utils/plugin/providers/EventEmitter';
 
 type AudioPlayerProps = {
     text: string;
@@ -10,6 +11,7 @@ type AudioPlayerProps = {
     playOnMount?: boolean;
     initialSpeed?: number;
     enableSpeedAdjustment?: boolean;
+    playListenerEvent?: string;
 };
 
 export const AudioPlayOptions = [0.8, 0.9, 1.0, 1.1, 1.2, 1.5];
@@ -21,6 +23,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
     text,
     voice,
     language,
+    playListenerEvent,
     initialSpeed = 1.0,
     playOnMount = false,
     enableSpeedAdjustment = false,
@@ -29,7 +32,13 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
     const [speed, setSpeed] = useState(initialSpeed);
     const [isPlaying, setIsPlaying] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const { getVoiceResponse } = usePlugin();
+    const { getVoiceResponse, } = usePlugin();
+    const emitter = EmitterSingleton;
+
+    useEffect(() => {
+        if (!playListenerEvent) return;
+        emitter.on(playListenerEvent, () => togglePlayback());
+    }, [playListenerEvent]);
 
     // Function to generate audio from text using API
     const generateAudio = async () => {

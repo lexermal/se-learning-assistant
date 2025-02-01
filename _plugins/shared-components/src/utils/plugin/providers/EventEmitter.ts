@@ -36,11 +36,12 @@ export class EventEmitter {
   }
 
   // Emit an event
-  emit<T = any>(eventName: string, event: T): void {
+  emit<T = any>(eventName: string, data?: T): void {
     const listeners = this.events.get(eventName);
+    console.log("emit", eventName, data, listeners);
     if (!listeners) return;
 
-    listeners.forEach((listener) => listener(event));
+    listeners.forEach((listener) => listener(data));
   }
 }
 const emitter = new EventEmitter();
