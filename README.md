@@ -1,4 +1,4 @@
-# Rimori 2.0
+# Rimori
 
 ## Building
 
@@ -30,6 +30,16 @@ The application is accessible via port 3000.
    ```
 
    The starter kit should now be running on [localhost:3000](http://localhost:3000/).
+
+## Release process
+
+1. Update version in package.json
+2. Update the license in the LICENSE file
+3. Update the docker-compose.yml file with the new version
+4. Run `docker compose up --build`
+5. Run `docker push registry.rimori.se/language/rimori-ui:vX.X.X`
+6. Run `docker push registry.rimori.se/language/rimori-plugins:vX.X.X`
+7. Deploy Rimori to production
 
 ## Attributions
 
