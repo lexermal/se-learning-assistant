@@ -73,23 +73,26 @@ function DeckCrudModal(props: { onComplete: (deck: string) => void, deckName?: s
     setDeck(props.deckName || "");
   }, [props.deckName]);
 
+  const handleClose = () => setDeck("");
+
   return <CRUDModal
     className={props.className}
     buttonText={props.buttonText}
     title={props.deckName ? "Edit deck" : "Add deck"}
+    onClose={handleClose}
     actionbuttons={[
       {
         text: "Save", onClick: () => {
           props.onComplete(deck);
-          setDeck("");
+          handleClose();
         }
       },
-      { text: "Cancel", onClick: () => setDeck("") },
+      { text: "Cancel", onClick: handleClose },
     ]}>
     <div className="flex flex-col gap-4">
       <input
         className="bg-gray-300 dark:bg-gray-500 rounded p-2 dark:text-white focus:outline-none"
-        placeholder="Deck name" defaultValue={deck} onChange={e => setDeck(e.target.value)} />
+        placeholder="Deck name" value={deck} onChange={e => setDeck(e.target.value)} />
     </div>
   </CRUDModal>
 }
