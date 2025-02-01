@@ -1,7 +1,7 @@
 import { env } from "@/utils/constants";
 import { NextResponse } from "next/server";
 
-export async function openaiTTS(text: string, voiceId: string, speed: number) {
+export async function openaiTTS(text: string, voiceId: string) {
     const validVoices = ['alloy', 'ash', 'coral', 'echo', 'fable', 'onyx', 'nova', 'sage', 'shimmer']
     if (!validVoices.includes(voiceId)) {
         return new NextResponse('Invalid voice format or model. The format should look like this: openai_alloy', { status: 400, headers: { 'Content-Type': 'text/plain' } });
@@ -13,7 +13,7 @@ export async function openaiTTS(text: string, voiceId: string, speed: number) {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${env.OPENAI_API_KEY}`,
         },
-        body: JSON.stringify({ model: 'tts-1', input: text, voice: voiceId, speed })
+        body: JSON.stringify({ model: 'tts-1', input: text, voice: voiceId, speed: 1 })
     });
     if (!response.ok) {
         let errorMessage = "An internal server error occurred. Please try again later.";

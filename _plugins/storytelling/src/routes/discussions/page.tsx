@@ -17,7 +17,7 @@ interface RatingResult {
 }
 
 export default function DiscussionPage(): JSX.Element {
-    const { getAIResponse, dbInsert, dbFetch } = usePlugin();
+    const { getAIResponse, dbInsert, dbFetch,getSettings } = usePlugin();
     const [showDiscussion, setShowDiscussion] = useState(0);
     const [ratingResult, setRatingResult] = useState<RatingResult[]>([]);
     const [topics, setTopics] = useState({
@@ -25,6 +25,11 @@ export default function DiscussionPage(): JSX.Element {
         persona2: {} as Instructions,
         persona3: {} as Instructions,
     });
+    const [languageLevel, setLanguageLevel] = useState("A1");
+
+    useEffect(() => {
+        getSettings({ languageLevel: "A1" }, "user").then((settings) => setLanguageLevel(settings.languageLevel));
+    }, []);
 
     useEffect(() => {
         setTopicForPersona('persona1');
@@ -68,7 +73,7 @@ export default function DiscussionPage(): JSX.Element {
             <h1 className='text-center mb-3 text-3xl'>Discussions</h1>
 
             <div className='flex flex-col sm:flex-row items-stretch justify-center mx-auto w-full lg:w-3/4'>
-                {getPersonas(topics.persona1, topics.persona2, topics.persona3).map((persona, index) => {
+                {getPersonas(topics.persona1, topics.persona2, topics.persona3, languageLevel).map((persona, index) => {
                     const exam = ratingResult.filter((e) => e.examNr === index + 1);
                     const personaIsLoaded = (topics as any)["persona" + (index + 1)].topic;
                     return (
@@ -128,7 +133,7 @@ interface Persona {
     tools: Tool[];
 }
 
-function getPersonas(persona1: Instructions, persona2: Instructions, persona3: Instructions): Persona[] {
+function getPersonas(persona1: Instructions, persona2: Instructions, persona3: Instructions, languageLevel: string): Persona[] {
     if (!persona1) {
         persona1 = { topic: '', ai_instructions: '', user_instructions: '', keywords: [] };
         persona2 = { topic: '', ai_instructions: '', user_instructions: '', keywords: [] };
@@ -177,7 +182,7 @@ function getPersonas(persona1: Instructions, persona2: Instructions, persona3: I
     - If the user becomes disrespectful, use the rating tool to end the conversation professionally.
     - Maintain a warm and engaging conversational tone.
     - Keep responses under 80 words.
-    - Use simple swedish.
+    - Use simple swedish on ${languageLevel.toUpperCase()} level!!!!
     - Provide balanced feedback using the rating tool parameters.
     - The user might mix in some english. Don't correct him. These terms are the ones he should learn.
     
@@ -210,7 +215,7 @@ function getPersonas(persona1: Instructions, persona2: Instructions, persona3: I
     - If the user becomes disrespectful, use the rating tool to end the conversation with elderly wisdom.
     - Maintain a warm, patient, and grandfatherly tone.
     - Keep responses under 80 words.
-    - Use simple swedish.
+    - Use simple swedish on ${languageLevel.toUpperCase()} level!!!!
     - Provide gentle, constructive feedback using the rating tool parameters.
     - The user might mix in some english. Don't correct them - treat it as a learning opportunity.
     
@@ -243,7 +248,7 @@ function getPersonas(persona1: Instructions, persona2: Instructions, persona3: I
     - If the user becomes disrespectful, use the rating tool to end the conversation professionally.
     - Maintain a friendly, patient, and helpful tone.
     - Keep responses under 80 words.
-    - Use simple swedish.
+    - Use simple swedish on ${languageLevel.toUpperCase()} level!!!!
     - Provide gentle, constructive feedback using the rating tool parameters.
     - The user might mix in some english. Don't correct them - treat it as a learning opportunity.
     

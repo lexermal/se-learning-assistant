@@ -20,7 +20,8 @@ export async function POST(request: Request) {
     console.log("Creating speech for: ", { input, voiceId, speed, language });
 
     if (model === 'openai') {
-        return await openaiTTS(input, voiceId, speed);
+        console.log("speed: ", speed);
+        return await openaiTTS(input, voiceId);
     // } else if (model === 'elevenlabs') {
     //     return await elevenlabsTTS(input, voiceId, language);
     } else if (language || model === 'aws') {
