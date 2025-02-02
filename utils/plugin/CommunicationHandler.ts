@@ -32,6 +32,7 @@ export interface Plugin {
     }[];
     sidebarPages: SidebarPage[];
     settingsPage: string;
+    unmanaged?: boolean;
 }
 
 export default class CommunicationHandler {
@@ -57,17 +58,21 @@ export default class CommunicationHandler {
     }
 
     private getUrl(endpoint: string, hash?: string, queryParams?: Map<string, string>) {
-        hash = "#" + (hash || "").replace("#", "");
+        console.log({endpoint, hash, queryParams})
+        const fullEndpoint = endpoint + (hash || "");
 
-        const url = new URL(endpoint);
+        const url = new URL(fullEndpoint);
 
-        url.hash = hash;
-        url.searchParams.append("secret", this.communicationSecret!);
+        if (!this.plugin.unmanaged) {
+            url.searchParams.append("secret", this.communicationSecret!);
+        }
+
+        if (!url.href.startsWith(endpoint)) {
+            console.error("The url does not start with the endpoint. External pages are not supported.", url.href, fullEndpoint);
+        }
 
         if (queryParams) {
-            queryParams.forEach((value, key) => {
-                url.searchParams.append(key, value);
-            });
+            queryParams.forEach((value, key) => url.searchParams.append(key, value));
         }
 
         return url.toString();
@@ -89,16 +94,18 @@ export default class CommunicationHandler {
         this.parent.destroy();
     }
 
-    async init() {
-        if (this.initialized) {
-            return;
+    async init(): Promise<boolean> {
+        if (this.initialized || this.plugin.unmanaged) {
+            return true;
         }
 
         // Wait for the plugin to be ready
-        await this.parent.handshake().then(() => {
+        return await this.parent.handshake().then(() => {
             this.initialized = true;
+            return true;
         }).catch((error: any) => {
             console.error("Failed to initialize the plugin communication:", error);
+            return false;
         });
     }
 

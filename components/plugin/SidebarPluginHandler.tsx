@@ -31,10 +31,10 @@ function PluginSidebar({ plugin, contextMenuAction }: { plugin: Plugin, contextM
     }, [plugin, contextMenuAction]);
 
     return (
-        <div className="dark:bg-gray-920 w-full h-full border-l border-gray-600 pt-16">
+        <div className="dark:bg-gray-920 w-full h-full border-l border-gray-600 pt-[50px]">
             {/* For the communication library to use it needs to have the div with the iframe inside!!! */}
             <div ref={iframeRef} className="w-full h-full" style={{ opacity: 0 }}>
-                <iframe className="w-full h-full" allow="microphone; autoplay; fullscreen" src={plugin.endpoint} />
+                <iframe className="w-full" style={{ height: "calc(100vh - 50px)" }} allow="microphone; autoplay; fullscreen" src={plugin.endpoint} />
             </div>
         </div>
     );
@@ -76,33 +76,40 @@ export function SidebarPluginHandler({ plugins }: { plugins: Plugin[] }) {
 
 
     const isOpen = openPlugin > -1;
-    const width = isOpen ? 500 : 40;
+    const width = isOpen ? 460 : 0;
 
     return (
         <div className="flex flex-row">
-            <div style={{ paddingLeft: width + "px" }} className={isOpen && isMdScreen ? 'absolute' : ''}>
-                <div style={isOpen && isMdScreen ? { width: '100%' } : { width: width + "px" }}
-                    className={`fixed bottom-0 right-0 top-0 flex flex-row`}>
-                    <div className="flex flex-col gap-1 w-10 pt-[4.3rem]">
+            <div style={{ paddingLeft: width + "px", height: "calc(100vh - 50px)" }} className={isOpen && isMdScreen ? 'absolute' : ''}>
+                <div
+                    style={{ width: isOpen ? (isMdScreen ? "100%" : "500px") : "40px" }}
+                    className="fixed right-0 top-0 flex flex-row h-fgggull">
+                    <div className="flex flex-col gap-1 w-0 pt-[4.3rem] h-fit" style={{ marginRight: "40px" }}>
                         {sidebarPlugins.map(({ name, url, iconUrl, pluginName }, index) => {
                             const plugin = plugins.find(p => p.name === pluginName)!;
                             return (
-                                <button key={index} style={{ background: index === openPlugin ? "rgb(94, 102, 115)" : "rgb(44, 52, 65)" }} onClick={() => {
-                                    setOpenPlugin(index === openPlugin ? -1 : index);
-                                    setSidebarPlugin(plugin);
-                                    setPluginAction({ pluginName, action: url, text: "", url: url });
-                                }} className={"flex flex-col items-center rounded-l-lg py-3 brightness-200 dark:brightness-100"}>
-                                    <img src={iconUrl || plugin.iconUrl} className="w-6 h-6 brightness-75" title={plugin.title + " - " + name} />
+                                <button
+                                    style={{ width: "40px", background: index === openPlugin ? "rgb(94, 102, 115)" : "rgb(44, 52, 65)" }}
+                                    onClick={() => {
+                                        setOpenPlugin(index === openPlugin ? -1 : index);
+                                        setSidebarPlugin(plugin);
+                                        setPluginAction({ pluginName, action: url, text: "", url });
+                                    }}
+                                    className="flex flex-col items-center rounded-l-lg py-3 brightness-200 dark:brightness-100">
+                                    <img
+                                        src={iconUrl || plugin.iconUrl}
+                                        className="w-6 h-6 brightness-75"
+                                        title={`${plugin.title} - ${name}`}
+                                    />
                                 </button>
                             );
                         })}
                     </div>
-                    {sidebarPlugin && pluginAction && openPlugin > -1 &&
+                    {sidebarPlugin && pluginAction && openPlugin > -1 && (
                         <PluginSidebar plugin={sidebarPlugin} contextMenuAction={pluginAction} />
-                    }
+                    )}
                 </div>
             </div>
         </div>
     );
-
 }

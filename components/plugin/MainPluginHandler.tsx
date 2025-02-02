@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { SupabaseClient } from "@/utils/supabase/client";
 import ContextMenu, { ContextMenuInfo, MenuEntry } from "./ContextMenu";
 import CommunicationHandler, { Plugin } from "../../utils/plugin/CommunicationHandler";
+import { useTheme } from "next-themes";
 
 export default function MainPluginHandler({ plugin, globalContextMenuActions }: { plugin: Plugin, globalContextMenuActions: MenuEntry[] }) {
     const [contextMenu, setContextMenu] = useState<ContextMenuInfo>({ x: 0, y: 0, open: false, text: "" });
@@ -13,6 +14,7 @@ export default function MainPluginHandler({ plugin, globalContextMenuActions }: 
     const [hash, setHash] = useState<string | null>(null);
     const supabase = SupabaseClient.getClient();
     const router = useRouter();
+    const theme = useTheme();
 
     useEffect(() => {
         if (!iframeRef.current || !iframeRef.current.children[0] || !plugin || !hash) {
@@ -20,10 +22,17 @@ export default function MainPluginHandler({ plugin, globalContextMenuActions }: 
         }
         iframeRef.current!.style.opacity = "0";
 
-        const connection = new CommunicationHandler(supabase, plugin, iframeRef.current, hash);
+        const connection = new CommunicationHandler(supabase, plugin, iframeRef.current, hash, [], new Map([["rm_theme", theme.theme || "light"]]));
         connection.init().then(() => {
             iframeRef.current!.style.opacity = "1";
+            const iframe = (iframeRef.current?.children[0] as HTMLIFrameElement);
+            iframe.style.minHeight = `calc(100vh - 50px)`;
+            // iframeRef.current!.style.height = `calc(100vh - 80px)`;
         });
+
+        if (plugin.unmanaged) {
+            return;
+        }
 
         connection.subscribe("heightAdjustment", (_id, height: number) => {
             if (!iframeRef.current) {
@@ -32,7 +41,6 @@ export default function MainPluginHandler({ plugin, globalContextMenuActions }: 
             const iframe = (iframeRef.current.children[0] as HTMLIFrameElement);
 
             // console.log("adjusting height", height);
-            iframe.style.minHeight = `calc(100vh - 80px)`;
             iframe.style.height = `${height}px`;
         });
 
@@ -54,13 +62,13 @@ export default function MainPluginHandler({ plugin, globalContextMenuActions }: 
     //url hash changed
     useEffect(() => {
         let lastHash = window.location.hash;
-        setHash(lastHash);
+        setHash(lastHash.substring(1));
 
         setInterval(() => {
             if (lastHash !== window.location.hash) {
                 lastHash = window.location.hash;
                 console.log('url changed based on main application navigation changed:', lastHash);
-                setHash(lastHash);
+                setHash(lastHash.substring(1));
             }
         }, 100);
     }, []);
@@ -70,7 +78,10 @@ export default function MainPluginHandler({ plugin, globalContextMenuActions }: 
             <ContextMenu contextMenu={contextMenu} actions={constextActions} />
             {/* For the communication library to use it needs to have the div with the iframe inside!!! */}
             <div ref={iframeRef} className="w-full" style={{ opacity: 0 }}>
-                <iframe className="w-full" scrolling="no" allow="microphone; autoplay; fullscreen" src={plugin.endpoint} />
+                <iframe className="w-full"
+                    scrolling={plugin.unmanaged ? "auto" : "no"}
+                    allow="microphone; autoplay; fullscreen"
+                    src={plugin.endpoint + "?rm_theme=dark"} />
             </div>
         </div>
     );
