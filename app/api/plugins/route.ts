@@ -28,6 +28,7 @@ export interface Plugin {
     }[];
     iconUrl: string;
     settingsPage: string;
+    unmanaged?: boolean;
 }
 
 export async function GET() {
@@ -53,12 +54,12 @@ export async function GET() {
             pluginPages: [
                 {
                     name: "Training",
-                    url: "/",
+                    url: "#/",
                     description: "Quickly memorizing info by using flashcards."
                 },
                 {
                     name: "Translation",
-                    url: "/sidebar/translate",
+                    url: "#/sidebar/translate",
                     description: "Translating words into mutliple languages and quickly adding them to your flashcards."
                 },
             ],
@@ -67,30 +68,30 @@ export async function GET() {
                     text: "Add to flashcards",
                     pluginName: "flashcards",
                     action: "add",
-                    url: "/sidebar/add"
+                    url: "#/sidebar/add"
                 },
                 {
                     text: "Translate",
                     pluginName: "flashcards",
                     action: "translate",
-                    url: "/sidebar/translate"
+                    url: "#/sidebar/translate"
                 }
             ],
             sidebarPages: [
                 {
                     name: "Translate",
-                    url: "/sidebar/translate",
+                    url: "#/sidebar/translate",
                     iconUrl: "translate.png",
                     description: "Translate words."
                 },
                 {
                     name: "Quick add",
-                    url: "/sidebar/add",
+                    url: "#/sidebar/add",
                     description: "Quickly add a word to your flashcards.",
                     iconUrl: "logo.png",
                 },
             ],
-            settingsPage: "/settings",
+            settingsPage: "#/settings",
         },
         {
             id: "2",
@@ -107,18 +108,93 @@ export async function GET() {
             pluginPages: [
                 {
                     name: "Silent reading",
-                    url: "/silent-reading",
+                    url: "#/silent-reading",
                     description: "Practice reading with stories you like on your skill level."
                 },
                 {
                     name: "Discussions (preview)",
-                    url: "/discussions",
+                    url: "#/discussions",
                     description: "Practice your swedish knowledge."
                 }
             ],
             contextMenuActions: [],
             sidebarPages: [],
             settingsPage: "/settings",
+        },
+        {
+            id: "3",
+            name: "resources",
+            title: "Resources",
+            description: "Useful resources to learn swedish.",
+            version: "1.0.0",
+            author: "lexermal",
+            endpoint:  "https://wiki.rimori.se/books",
+            endpointDev: "https://wiki.rimori.se/books",
+            pluginRepo: "https://github.com/lexermal/se-learning-assistant",
+            pluginWebsite: "https://lexermal.github.io/se-learning-assistant/",
+            iconUrl: "logo.png",
+            pluginPages: [
+                {
+                    name: "Grammar",
+                    url: "/grammar",
+                    description: "Learn swedish grammar."
+                },
+                {
+                    name: "Vocabulary",
+                    url: "/vocabulary",
+                    description: "Learn swedish vocabulary."
+                },
+                {
+                    name: "Reading",
+                    url: "/reading",
+                    description: "Learn swedish reading."
+                },
+                {
+                    name: "Listening",
+                    url: "/listening",
+                    description: "Learn swedish listening."
+                },
+                {
+                    name: "Speaking",
+                    url: "/speaking",
+                    description: "Learn swedish speaking."
+                },
+                {
+                    name: "Writing",
+                    url: "/writing",
+                    description: "Learn swedish writing."
+                },
+            ],
+            contextMenuActions: [
+                // {
+                //     text: "Add to flashcards",
+                //     pluginName: "flashcards",
+                //     action: "add",
+                //     url: "/sidebar/add"
+                // },
+                // {
+                //     text: "Translate",
+                //     pluginName: "flashcards",
+                //     action: "translate",
+                //     url: "/sidebar/translate"
+                // }
+            ],
+            sidebarPages: [
+                // {
+                //     name: "Translate",
+                //     url: "/sidebar/translate",
+                //     iconUrl: "translate.png",
+                //     description: "Translate words."
+                // },
+                // {
+                //     name: "Quick add",
+                //     url: "/sidebar/add",
+                //     description: "Quickly add a word to your flashcards.",
+                //     iconUrl: "logo.png",
+                // },
+            ],
+            settingsPage: "/settings",
+            unmanaged: true,
         },
     ];
 
