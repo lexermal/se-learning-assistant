@@ -175,6 +175,12 @@ export async function GET() {
                     description: "Writing guides, example texts, and common phrases in Swedish.",
                     root: "Resources"
                 },
+                {
+                    name: "Watching",
+                    url: "watching",
+                    description: "Tv shows and movies to watch to improve your swedish.",
+                    root: "Resources"
+                }
             ],
             contextMenuActions: [
                 // {
