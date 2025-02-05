@@ -29,6 +29,7 @@ export interface Plugin {
         name: string;
         url: string;
         description: string;
+        root: string;
     }[];
     sidebarPages: SidebarPage[];
     settingsPage: string;

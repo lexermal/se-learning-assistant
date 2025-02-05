@@ -19,6 +19,7 @@ export interface Plugin {
         name: string;
         url: string;
         description: string;
+        root: string;
     }[];
     sidebarPages: {
         name: string;
@@ -53,15 +54,17 @@ export async function GET() {
             iconUrl: "logo.png",
             pluginPages: [
                 {
-                    name: "Training",
+                    name: "Flashcards",
                     url: "#/",
-                    description: "Quickly memorizing info by using flashcards."
+                    description: "Quickly memorizing info by using flashcards.",
+                    root: "Memorizing"
                 },
-                {
-                    name: "Translation",
-                    url: "#/sidebar/translate",
-                    description: "Translating words into mutliple languages and quickly adding them to your flashcards."
-                },
+                // {
+                //     name: "Translation",
+                //     url: "#/sidebar/translate",
+                //     description: "Translating words into mutliple languages and quickly adding them to your flashcards.",
+                //     root: "Tools"
+                // },
             ],
             contextMenuActions: [
                 {
@@ -107,14 +110,16 @@ export async function GET() {
             iconUrl: "logo.png",
             pluginPages: [
                 {
-                    name: "Silent reading",
+                    name: "Stories",
                     url: "#/silent-reading",
-                    description: "Practice reading with stories you like on your skill level."
+                    description: "Practice reading with stories you like on your skill level.",
+                    root: "Reading"
                 },
                 {
-                    name: "Discussions (preview)",
+                    name: "Discussions",
                     url: "#/discussions",
-                    description: "Practice your swedish knowledge."
+                    description: "Practice your swedish knowledge.",
+                    root: "Speaking"
                 }
             ],
             contextMenuActions: [],
@@ -128,41 +133,47 @@ export async function GET() {
             description: "Useful resources to learn swedish.",
             version: "1.0.0",
             author: "lexermal",
-            endpoint:  "https://wiki.rimori.se/books",
-            endpointDev: "https://wiki.rimori.se/books",
+            endpoint: "https://wiki.rimori.se/books/",
+            endpointDev: "https://wiki.rimori.se/books/",
             pluginRepo: "https://github.com/lexermal/se-learning-assistant",
             pluginWebsite: "https://lexermal.github.io/se-learning-assistant/",
-            iconUrl: "logo.png",
+            iconUrl: "../logo.png",
             pluginPages: [
                 {
                     name: "Grammar",
-                    url: "/grammar",
-                    description: "Learn swedish grammar."
+                    url: "grammar",
+                    description: "Comprehensive guide to Swedish grammar rules and patterns.",
+                    root: "Resources"
                 },
                 {
                     name: "Vocabulary",
-                    url: "/vocabulary",
-                    description: "Learn swedish vocabulary."
+                    url: "vocabulary",
+                    description: "Curated lists of essential Swedish vocabulary by topic.",
+                    root: "Resources"
                 },
                 {
                     name: "Reading",
-                    url: "/reading",
-                    description: "Learn swedish reading."
+                    url: "reading",
+                    description: "Collection of Swedish texts and reading materials for all levels.",
+                    root: "Resources"
                 },
                 {
                     name: "Listening",
-                    url: "/listening",
-                    description: "Learn swedish listening."
+                    url: "listening",
+                    description: "Curated collection of Swedish podcasts, radio shows, and audio content.",
+                    root: "Resources"
                 },
                 {
                     name: "Speaking",
-                    url: "/speaking",
-                    description: "Learn swedish speaking."
+                    url: "speaking",
+                    description: "Guide to pronunciation and speaking practice resources.",
+                    root: "Resources"
                 },
                 {
                     name: "Writing",
-                    url: "/writing",
-                    description: "Learn swedish writing."
+                    url: "writing",
+                    description: "Writing guides, example texts, and common phrases in Swedish.",
+                    root: "Resources"
                 },
             ],
             contextMenuActions: [

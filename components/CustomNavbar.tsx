@@ -10,6 +10,24 @@ import { Plugin } from "../utils/plugin/CommunicationHandler";
 import { useEventEmitter } from "@/utils/providers/EventEmitterContext";
 import Link from "next/link";
 
+interface MenuItem {
+    name: string,
+    url?: string
+    onClick?: () => void
+    children?: MenuItem[] | React.ReactNode
+}
+
+interface RootMenuItem extends MenuItem {
+    children?: MenuItem[];
+}
+
+interface DropMenuProps {
+    title: string | React.ReactNode,
+    items: RootMenuItem[],
+    rightAligned?: boolean
+    onClick: () => void
+}
+
 export default function CustomNavbar() {
     const [isLoading, setIsLoading] = useState(true);
     const [user, setUser] = useState<User | null>(null);
@@ -45,9 +63,34 @@ export default function CustomNavbar() {
         }
     ] as MenuItem[];
 
+    const organizePluginPages = (plugins: Plugin[]): RootMenuItem[] => {
+        // Create a map of root -> menu items
+        const rootMap = new Map<string, MenuItem[]>();
+
+        plugins.forEach(plugin => {
+            plugin.pluginPages.forEach(page => {
+                const menuItem = {
+                    name: page.name,
+                    url: `/plugin/${plugin.name}${page.url}`
+                };
+
+                if (!rootMap.has(page.root)) {
+                    rootMap.set(page.root, []);
+                }
+                rootMap.get(page.root)!.push(menuItem);
+            });
+        });
+
+        // Convert map to array of root menu items
+        return Array.from(rootMap.entries()).map(([root, items]) => ({
+            name: root,
+            children: items
+        }));
+    };
+
     return (
         <nav className="flex items-center justify-between flex-wrap border-b border-b-gray-500 z-30 bg-white dark:bg-gray-950 w-full">
-            <div className="flex flex-shrink-0 text-white mr-6 items-end cursor-pointer" onClick={() => router.push("/dashboard")}>
+            <div className="flex flex-shrink-0 text-white mr-1 items-end cursor-pointer" onClick={() => router.push("/dashboard")}>
                 <img src="/logo.svg" alt="Rimori" className="h-12 w-36 p-1 px-2 rounded dark:invert" />
             </div>
             <div className="block md:hidden">
@@ -62,16 +105,20 @@ export default function CustomNavbar() {
             </div>
             <div className={`w-full block flex-grow px-2 pb-3 md:pb-0 md:flex md:items-center md:w-auto ${isMobileMenuOpen ? 'block' : 'hidden'}`}>
                 <div className="text-sm md:flex-grow">
-                    {user && plugins && plugins.map((plugin, index) => {
-                        const items = plugin.pluginPages.map(p => ({ ...p, url: `/plugin/${plugin.name}#${p.url}` }));
-                        return <DropDownMenu key={index} items={items} title={plugin.title} onClick={() => setIsMobileMenuOpen(false)} />;
-                    })}
+                    {user && plugins && organizePluginPages(plugins).map((rootMenu, index) => (
+                        <DropDownMenu
+                            key={index}
+                            items={rootMenu.children as RootMenuItem[]}
+                            title={rootMenu.name}
+                            onClick={() => setIsMobileMenuOpen(false)}
+                        />
+                    ))}
                     {!isLoading && !user && <div className="hover:text-gray-300 transition p-4">
                         <Link href={"/newsletter"}>Newsletter</Link>
                     </div>}
                 </div>
                 <div className="flex items-center gap-2">
-                    {isLoading ? "" : (user ? <DropDownMenu title={<FaUserCircle size={24} />} items={userMenu} rightAligned={!isMobileMenuOpen} onClick={() => setIsMobileMenuOpen(false)} />
+                    {isLoading ? "" : (user ? <DropDownMenu title={<FaUserCircle size={24} />} items={userMenu as RootMenuItem[]} rightAligned={!isMobileMenuOpen} onClick={() => setIsMobileMenuOpen(false)} />
                         : <AuthComponent />)}
                 </div>
             </div>
@@ -85,42 +132,32 @@ function AuthComponent() {
     </a>
 }
 
-interface MenuItem {
-    name: string,
-    url?: string
-    onClick?: () => void
-    children?: React.ReactNode
-}
-
-interface DropMenuProps {
-    title: string | React.ReactNode,
-    items: MenuItem[],
-    rightAligned?: boolean
-    onClick: () => void
-}
-
 function DropDownMenu(props: DropMenuProps) {
-    return <ul className="block mt-4 md:inline-block md:mt-0 mr-4 space-x-8 cursor-default">
-        <li className="group relative">
-            <div className="dark:hover:text-gray-300 hover:text-gray-700 transition">
-                {props.title}
-            </div>
-            <div className={"absolute hidden w-max group-hover:block bg-gray-300 dark:bg-gray-700 rounded shadow-lg z-50 overflow-hidden " + (props.rightAligned ? " right-0" : "left-0")}>
-                <ul className="">
-                    {props.items.map((item, index) => {
-                        return (
+    return (
+        <ul className="block mt-4 md:inline-block md:mt-0 mr-4 space-x-8 cursor-default">
+            <li className="group relative">
+                <div className="dark:hover:text-gray-300 hover:text-gray-700 transition">
+                    {props.title}
+                </div>
+                <div className={"absolute hidden w-max group-hover:block bg-gray-300 dark:bg-gray-700 rounded shadow-lg z-50 overflow-hidden " + (props.rightAligned ? " right-0" : "left-0")}>
+                    <ul>
+                        {props.items.map((item, index) => (
                             <li key={index}>
-                                <DropDownMenuItem name={item.name} url={item.url} onClick={() => {
-                                    props.onClick();
-                                    item.onClick && item.onClick();
-                                }} />
+                                <DropDownMenuItem
+                                    name={item.name}
+                                    url={item.url}
+                                    onClick={() => {
+                                        props.onClick();
+                                        item.onClick && item.onClick();
+                                    }}
+                                />
                             </li>
-                        );
-                    })}
-                </ul>
-            </div>
-        </li>
-    </ul>
+                        ))}
+                    </ul>
+                </div>
+            </li>
+        </ul>
+    );
 }
 
 function DropDownMenuItem(props: { name: string, url?: string, children?: React.ReactNode, onClick: () => void }) {
