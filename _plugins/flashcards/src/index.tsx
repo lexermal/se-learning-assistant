@@ -21,7 +21,7 @@ const SettingsPage = lazy(() => import('./routes/settings/SettingsPage'));
 const TranslationSidebar = lazy(() => import('./routes/toolbar/TranslatorPage'));
 
 root.render(
-  <React.StrictMode>
+  // <React.StrictMode>
     <PluginProvider>
       <div className='text-gray-900 dark:text-gray-200 min-h-[600px]'>
         <EventEmitterProvider>
@@ -37,7 +37,7 @@ root.render(
         </EventEmitterProvider>
       </div>
     </PluginProvider>
-  </React.StrictMode>
+  // </React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function

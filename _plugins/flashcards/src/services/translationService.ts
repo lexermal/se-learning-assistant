@@ -14,7 +14,7 @@ export async function getBasicWordInfo(word: string, targetLanguage: string, plu
     
     Ensure the JSON is correctly structured and free of errors.
     
-    English can also be the input language.
+    Often the input language is English, Swedish or ${targetLanguage}.
     
     ### Examples:
 
@@ -26,7 +26,7 @@ export async function getBasicWordInfo(word: string, targetLanguage: string, plu
     \`\`\`json
     {
         "gramatically_corrected_input_text": "Jag sover i huset.",
-        "input_word_language": "swedish",
+        "detected_input_word_language": "swedish",
         "type": "sentence",
         "swedish_base_word_translation": "Jag söva i huset.",
         "translation": "Ich schlafe im Haus."
@@ -41,7 +41,7 @@ export async function getBasicWordInfo(word: string, targetLanguage: string, plu
     \`\`\`json
     {
         "gramatically_corrected_input_text": "to sleep",
-        "input_word_language": "english",
+        "detected_input_word_language": "english",
         "type": "verb",
         "swedish_base_word_translation": "söva",
         "translation": "dormir"
@@ -56,10 +56,10 @@ export async function getBasicWordInfo(word: string, targetLanguage: string, plu
     \`\`\`json
     {
         "gramatically_corrected_input_text": "laga mat",
-        "input_word_language": "swedish",
+        "detected_input_word_language": "swedish",
         "type": "phrase",
         "swedish_base_word_translation": "laga mat",
-        "translation": "Cooking"
+        "translation": "cooking"
     }
     \`\`\`
     
@@ -71,7 +71,7 @@ export async function getBasicWordInfo(word: string, targetLanguage: string, plu
     \`\`\`json
     {
         "gramatically_corrected_input_text": "Flöte",
-        "input_word_language": "german",
+        "detected_input_word_language": "german",
         "type": "noun",
         "swedish_base_word_translation": "flöjt",
         "translation": "Flöte"
@@ -86,7 +86,7 @@ export async function getBasicWordInfo(word: string, targetLanguage: string, plu
         { role: 'user', content: "Look up the word or phrase: " + word }
     ]).then(json => JSON.parse(json.split('\n').slice(1, -1).join('\n'))).then((json: any) => ({
         input: json.gramatically_corrected_input_text,
-        language: json.input_word_language,
+        language: json.detected_input_word_language,
         type: json.type,
         swedish_translation: json.swedish_base_word_translation,
         translation: json.translation

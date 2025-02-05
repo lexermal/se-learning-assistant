@@ -21,23 +21,27 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
     const [settings, setSettings] = useState<FlashcardPluginSettings | null>(null);
     const [language, setLanguage] = useState<string | null>(null);
 
-    console.log({ settings, basicInfo, language, additionalInfo: t });
+    // console.log({ settings, basicInfo, language, additionalInfo: t });
 
     useEffect(() => {
         plugin.getSettings<FlashcardPluginSettings>({
             autoPlayForeignNewFlashcards: false
         }).then(setSettings);
 
-        plugin.getSettings<UserSettings>({ motherTongue: "English", languageLevel: "A1" }, "user").then(s => setLanguage(s.motherTongue));
+        plugin.getSettings<UserSettings>({ motherTongue: "English", languageLevel: "A1" }, "user")
+            .then(s => setLanguage(s.motherTongue));
 
         plugin.dbFetch('deck', "id, name, last_used")
-            .then(decks => decks.sort((a: any, b: any) => new Date(b.last_used).getTime() - new Date(a.last_used).getTime())).then(setDecks);
+            .then(decks => decks.sort((a: any, b: any) => new Date(b.last_used).getTime() - new Date(a.last_used).getTime()))
+            .then(setDecks);
     }, []);
 
     useEffect(() => {
         setBasicInfo(null);
         setAdditionalInfo({});
-        if (!word || !settings) return;
+        if (!word || !settings || !language) return;
+
+        console.log({ word, settings, language });
 
         getBasicWordInfo(word, language as string, plugin).then(info => {
             // console.log("basic info", info);
@@ -83,7 +87,7 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
                         <div className="text-3xl">({t.adjective.comparative}, {t.adjective.superlative})</div>
                     </div>}
                 </div>
-                {t.en_ett_word ? <button className="hidden sm:block bg-blue-300 dark:bg-gray-700 p-1 px-2 rounded" style={{ marginBottom: "2px" }} onClick={() => onAddedToFlashcard()}>
+                {isLoaded ? <button className="hidden sm:block bg-blue-300 dark:bg-gray-700 p-1 px-2 rounded" style={{ marginBottom: "2px" }} onClick={() => onAddedToFlashcard()}>
                     New Search
                 </button> : ""}
             </div>

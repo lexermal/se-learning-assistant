@@ -89,6 +89,7 @@ export function SidebarPluginHandler({ plugins }: { plugins: Plugin[] }) {
                             const plugin = plugins.find(p => p.name === pluginName)!;
                             return (
                                 <button
+                                    key={name}
                                     style={{ width: "40px", background: index === openPlugin ? "rgb(94, 102, 115)" : "rgb(44, 52, 65)" }}
                                     onClick={() => {
                                         setOpenPlugin(index === openPlugin ? -1 : index);
