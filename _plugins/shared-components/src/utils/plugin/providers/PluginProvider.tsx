@@ -7,33 +7,9 @@ interface PluginProviderProps {
 
 const PluginContext = createContext<PluginController | null>(null);
 
-let currentHeight = 0;
-
 const plugin = PluginController.getInstance();
 
 export const PluginProvider: React.FC<PluginProviderProps> = ({ children }) => {
-    //resizing
-    useEffect(() => {
-        const handleResize = () => {
-            const height = document.body.scrollHeight;
-            if (height === currentHeight) return;
-            currentHeight = height;
-
-            plugin.emit('heightAdjustment', height);
-        };
-
-        handleResize();
-        setTimeout(handleResize, 500);
-
-        const root = document.getElementById('root')
-
-        new ResizeObserver(handleResize).observe(root!);
-        root?.addEventListener('resize', handleResize);
-        window.addEventListener('resize', handleResize);
-
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
-
     //route change
     useEffect(() => {
         let lastHash = window.location.hash;

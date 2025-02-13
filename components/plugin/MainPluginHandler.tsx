@@ -34,16 +34,6 @@ export default function MainPluginHandler({ plugin, globalContextMenuActions }: 
             return;
         }
 
-        connection.subscribe("heightAdjustment", (_id, height: number) => {
-            if (!iframeRef.current) {
-                return;
-            }
-            const iframe = (iframeRef.current.children[0] as HTMLIFrameElement);
-
-            // console.log("adjusting height", height);
-            iframe.style.height = `${height}px`;
-        });
-
         connection.subscribe("urlChange", async (_id, url: string) => {
             console.log("urlChange", url);
             router.push(url);
@@ -79,7 +69,6 @@ export default function MainPluginHandler({ plugin, globalContextMenuActions }: 
             {/* For the communication library to use it needs to have the div with the iframe inside!!! */}
             <div ref={iframeRef} className="w-full" style={{ opacity: 0 }}>
                 <iframe className="w-full"
-                    scrolling={plugin.unmanaged ? "auto" : "no"}
                     allow="microphone; autoplay; fullscreen"
                     src={plugin.endpoint + "?rm_theme=dark"} />
             </div>
