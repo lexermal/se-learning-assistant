@@ -15,6 +15,9 @@ module.exports = {
           920: 'rgb(6 12 30);', //sidebar background
         },
       },
+      boxShadow: {
+        'custom': '0 4px 35px rgba(0, 0, 0, 0.5)', // Custom shadow with 25px blur radius
+      },
     },
   },
   plugins: [

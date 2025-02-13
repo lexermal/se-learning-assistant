@@ -25,7 +25,7 @@ function App() {
   useEffect(fetchDecks, []);
 
   return (
-    <div className="mx-auto bg-gray-200 dark:bg-gray-800 sm:w-96 p-4 rounded-lg mt-24">
+    <div className="mx-auto bg-yellow-300 dark:bg-gray-800 sm:w-96 p-4 rounded-2xl mt-24 shadow-custom">
       <h1 className='text-4xl mb-3 text-center'>Decks</h1>
       {
         decks.map((deck, index) => (

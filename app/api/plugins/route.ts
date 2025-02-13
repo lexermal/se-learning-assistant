@@ -47,8 +47,8 @@ export async function GET() {
             description: "Memorize words, phrases, and more with flashcards.",
             version: "1.0.0",
             author: "lexermal",
-            endpoint: env.DEFAULT_PLUGIN_ENDPOINT + "/plugins/flashcards/",
-            endpointDev: "http://localhost:3001/plugins/flashcards/",
+            endpoint: env.DEFAULT_PLUGIN_ENDPOINT + "/plugins/flashcards/#",
+            endpointDev: "http://localhost:3001/plugins/flashcards/#",
             pluginRepo: "https://github.com/lexermal/se-learning-assistant",
             pluginWebsite: "https://lexermal.github.io/se-learning-assistant/",
             iconUrl: "logo.png",
@@ -71,30 +71,30 @@ export async function GET() {
                     text: "Add to flashcards",
                     pluginName: "flashcards",
                     action: "add",
-                    url: "#/sidebar/add"
+                    url: "/sidebar/add"
                 },
                 {
                     text: "Translate",
                     pluginName: "flashcards",
                     action: "translate",
-                    url: "#/sidebar/translate"
+                    url: "/sidebar/translate"
                 }
             ],
             sidebarPages: [
                 {
                     name: "Translate",
-                    url: "#/sidebar/translate",
+                    url: "/sidebar/translate",
                     iconUrl: "translate.png",
                     description: "Translate words."
                 },
                 {
                     name: "Quick add",
-                    url: "#/sidebar/add",
+                    url: "/sidebar/add",
                     description: "Quickly add a word to your flashcards.",
                     iconUrl: "logo.png",
                 },
             ],
-            settingsPage: "#/settings",
+            settingsPage: "/settings",
         },
         {
             id: "2",
