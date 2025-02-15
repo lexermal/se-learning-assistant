@@ -1,10 +1,8 @@
 import { useEffect, useMemo } from 'react';
-import CircleAudioAvatar from './EmbeddedAssistent/CircleAudioAvatar';
-import MessageSender from './EmbeddedAssistent/TTS/MessageSender';
-import { usePlugin, EmitterSingleton} from 'shared-components';
 import VoiceRecorder from './EmbeddedAssistent/VoiceRecoder';
-import { useChat } from 'shared-components';
-import { Tool } from 'shared-components/dist/plugin/PluginController';
+import MessageSender from './EmbeddedAssistent/TTS/MessageSender';
+import CircleAudioAvatar from './EmbeddedAssistent/CircleAudioAvatar';
+import { usePlugin, EmitterSingleton, Tool, useChat } from 'shared-components';
 
 interface Props {
     task: string;
@@ -26,7 +24,7 @@ function DiscussionPanel({ avatarImageUrl, voiceId, onComplete, task, agentInstr
 
     useEffect(() => {
         sender.setOnLoudnessChange((value: number) => EmitterSingleton.emit('loudness', value));
-        setMessages([{ role: 'system', content: agentInstructions, id: 0 }]);
+        setMessages([{ role: 'system', content: agentInstructions, id: "0" }]);
     }, []);
 
     useEffect(() => {
@@ -66,7 +64,7 @@ function DiscussionPanel({ avatarImageUrl, voiceId, onComplete, task, agentInstr
             <CircleAudioAvatar imageUrl={avatarImageUrl} width={"250px"} className='mx-auto' />
             <div className='w-16 h-16 flex text-4xl shadow-lg flex-row justify-center items-center rounded-full mx-auto bg-gray-400 dark:bg-gray-800'>
                 <VoiceRecorder className='w-7' iconSize='300' onVoiceRecorded={(message) => {
-                    append([{ role: 'user', content: "Message(" + Math.floor((messages.length + 1) / 2) + "): " + message, id: messages.length }]);
+                    append([{ role: 'user', content: "Message(" + Math.floor((messages.length + 1) / 2) + "): " + message, id: messages.length.toString() }]);
                 }} />
             </div>
         </div>

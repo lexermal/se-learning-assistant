@@ -1,7 +1,6 @@
 import { createJWT } from "../_shared/JWT.ts";
-import { JWTPayload } from "https://deno.land/x/djwt@v2.8/mod.ts";
-import { serve, WebServerResponse } from "../_shared/WebServer.ts";
 import { getNumericDate } from "https://deno.land/x/djwt@v2.8/mod.ts";
+import { serve, WebServerResponse, JWTPayload } from "../_shared/WebServer.ts";
 
 serve("POST", async (_, payload: JWTPayload) => {
   payload.user_role = "plugin";

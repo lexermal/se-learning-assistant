@@ -87,7 +87,7 @@ function Assistentv2({ avatarImageUrl, voiceId, onComplete, autoStartConversatio
             <AudioInputField
                 blockSubmission={isLoading}
                 onSubmit={message => {
-                    append([{ role: 'user', content: message, id: messages.length }]);
+                    append([{ role: 'user', content: message, id: messages.length.toString() }]);
                 }}
                 onAudioControl={voice => {
                     setOralCommunication(voice);

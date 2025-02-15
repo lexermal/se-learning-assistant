@@ -9,3 +9,4 @@ export * from "./components/Spinner";
 export * from "./hooks/UseChatHook";
 export * from "./utils/PluginUtils";
 export * from "./plugin/RimoriClient";
+export * from "./plugin/AIController";

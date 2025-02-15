@@ -1,6 +1,16 @@
-import { z } from "zod";
+import { z } from "npm:zod";
 
 type BasicType = string | number | boolean;
+
+export interface Tool {
+  name: string;
+  description: string;
+  parameters: {
+      name: string;
+      type: string;
+      description: string;
+  }[];
+}
 
 export default class ToolBuilder {
 

@@ -1,8 +1,6 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 import { Parent } from "ibridge-flex"
 import { MenuEntry } from "../../components/plugin/ContextMenu";
-import buildSupabaseQuery from "./SelectStatementBuilder";
-import { ToolInvocation } from "ai";
 import { env } from "../client-constants";
 
 export interface SidebarPage {
@@ -142,55 +140,6 @@ export default class CommunicationHandler {
             });
         });
 
-        this.subscribe("db_fetch", async (callId, data: { table: string, select: string, filter: any }) => {
-            console.log(`Plugin ${this.plugin.name} wants to fetch data from: ${data.table}`);
-
-            const query = await buildSupabaseQuery(this.supabase, this.getTableName(data.table), data.select, data.filter);
-            this.call("db_fetch", callId, query.data);
-        });
-
-        // insert
-        this.subscribe("db_insert", async (callId, data: { table: string, values: any | any[], returnValues?: string }) => {
-            console.log("Plugin " + this.plugin.name + " wants to insert data into: ", data.table);
-
-            if (data.returnValues) {
-                console.log("Plugin " + this.plugin.name + " wants to return response after insert");
-                const date = await this.getTable(data.table).insert(data.values).select(data.returnValues);
-                return this.call("db_insert", callId, date.data);
-            }
-
-            await this.getTable(data.table).insert(data.values);
-        });
-
-        // update
-        this.subscribe("db_update", async (callId, data: { table: string, values: any, filter: any, returnValues?: string }) => {
-            console.log("Plugin " + this.plugin.name + " wants to update data in: ", data.table);
-
-            if (data.returnValues) {
-                console.log("Plugin " + this.plugin.name + " wants to return response after update");
-                return await this.getTable(data.table).update(data.values).match(data.filter).select(data.returnValues);
-            }
-
-
-            return await this.getTable(data.table).update(data.values).match(data.filter);
-        });
-
-        // delete
-        this.subscribe("db_delete", async (callId, data: { table: string, filter: any }) => {
-            console.log("Plugin " + this.plugin.name + " wants to delete data from: ", data.table);
-
-            return await this.getTable(data.table).delete().match(data.filter);
-        });
-
-        // call function
-        this.subscribe("db_call", async (callId, data: { name: string, data?: any }) => {
-            console.log("Plugin " + this.plugin.name + " wants to call: ", data.name);
-
-            const { data: result } = await this.supabase.rpc(this.getTableName(data.name), data.data);
-            // console.log("db call result: ", result);
-            this.call("db_call", callId, result);
-        });
-
         const getSettingsId = (genericSettings?: string) => {
             return ["user", "system"].includes(genericSettings || "") ? genericSettings : this.plugin.id;
         }
@@ -212,25 +161,6 @@ export default class CommunicationHandler {
 
             const id = getSettingsId(genericSettings);
             await this.supabase.from("plugin_settings").upsert({ plugin_id: id, settings: settings });
-        });
-
-        // get ai response
-        this.subscribe("getAIResponse", async (callId, messages) => {
-            console.log(`Plugin ${this.plugin.name} wants to get AI response.`);
-            fetch('/api/chat', {
-                method: 'POST',
-                body: JSON.stringify({ messages })
-            }).then(r => r.json()).then(r => {
-                this.call("getAIResponse", callId, r.messages[0].content[0].text);
-            });
-        });
-
-        // get ai response stream
-        this.subscribe("getAIResponseStream", async (callId, data) => {
-            console.log(`Plugin ${this.plugin.name} wants to get AI response stream.`);
-            streamChatGPT(data.messages, data.tools, (id, response, finished, toolInvocations) => {
-                this.call("getAIResponseStream", callId, { id, response, finished, toolInvocations });
-            });
         });
 
         // create voice response
@@ -302,75 +232,4 @@ export default class CommunicationHandler {
         await this.init();
         this.call(topic, 0, data);
     }
-}
-
-interface Tool {
-    toolName: string;
-    args: Record<string, string>;
-}
-
-interface Message {
-    id: string;
-    role: string;
-    content: string;
-    toolInvocations?: Tool[];
-}
-
-async function streamChatGPT(
-    messages: Message[],
-    tools: Tool[],
-    onResponse: (id: string, response: string, finished: boolean, toolInvocations?: Tool[]) => void
-) {
-    const messageId = Math.random().toString(36).substring(3);
-    const response = await fetch('/api/chat/stream', {
-        method: 'POST',
-        body: JSON.stringify({
-            // model: 'gpt-4',  // specify the model
-            messages,
-            tools
-        })
-    });
-
-    if (!response.body) {
-        console.error('No response body.');
-        return;
-    }
-
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder('utf-8');
-
-    let content = "";
-    let done = false;
-    let toolInvocations: ToolInvocation[] = [];
-    while (!done) {
-        const { value } = await reader.read();
-
-        if (value) {
-            const chunk = decoder.decode(value, { stream: true });
-            const lines = chunk.split('\n').filter(line => line.trim() !== '');
-
-            for (const line of lines) {
-                const data = line.substring(3, line.length - 1);
-                const command = line.substring(0, 1);
-                // console.log("data: ", { line, data, command });
-
-                if (command === '0') {
-                    content += data;
-                    // console.log("AI response:", content);
-
-                    //content \n\n should be real line break when message is displayed
-                    onResponse(messageId, content.replace(/\\n/g, '\n'), false);
-                } else if (command === 'd') {
-                    // console.log("AI usage:", JSON.parse(line.substring(2)));
-                    done = true;
-                    break;
-                } else if (command === '9') {
-                    // console.log("tool call:", JSON.parse(line.substring(2)));
-                    // console.log("tools", tools);
-                    toolInvocations.push(JSON.parse(line.substring(2)));
-                }
-            }
-        }
-    }
-    onResponse(messageId, content.replace(/\\n/g, '\n'), true, toolInvocations);
 }

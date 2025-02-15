@@ -5,8 +5,7 @@ import { useEffect, useState } from 'react';
 import DiscussionPanel from './DiscussionPanel';
 import DiscussionPopup from './components/DiscussionPopup';
 import Spinner from 'shared-components/dist/components/Spinner';
-import { usePlugin } from 'shared-components';
-import { Tool } from 'shared-components/dist/plugin/PluginController';
+import { usePlugin, Tool } from 'shared-components';
 
 interface RatingResult {
     examNr: number;
@@ -55,7 +54,7 @@ export default function DiscussionPage(): JSX.Element {
             const reservedTopics = fetchedDiscussionTopics.data!.map((t: any) => `${t.topic}(${JSON.parse(t.keywords).join(",")})`);
             const instructions = getTopics(reservedTopics)[persona];
             // console.log('instructions:', instructions);
-            newTopics = await getAIResponse([{ role: "system", content: instructions }]).then((response) => {
+            newTopics = await getAIResponse([{ id: "1", role: "system", content: instructions }]).then((response) => {
                 // console.log('response:', response);
 
                 //remove the first and last line and convert everything to json

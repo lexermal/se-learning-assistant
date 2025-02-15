@@ -2,21 +2,6 @@ import { Child } from "ibridge-flex";
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import { RimoriClient } from "./RimoriClient";
 
-export interface Tool {
-    name: string;
-    description: string;
-    parameters: {
-        name: string;
-        type: "string" | "number" | "boolean";
-        description: string;
-    }[];
-}
-
-export interface ToolInvocation {
-    toolName: string;
-    args: Record<string, string>;
-}
-
 export class PluginController {
     private static instance: PluginController;
     private static client: RimoriClient;
@@ -28,7 +13,7 @@ export class PluginController {
     private supabase: SupabaseClient | null = null;
     private tablePrefix: string | null = null;
     private accessTokenExpiration: Date | null = null;
-
+    private token: string | null = null;
     private constructor() {
         // localStorage.debug = "*";
 
@@ -102,12 +87,26 @@ export class PluginController {
         }>("getSupabaseAccess");
 
         this.accessTokenExpiration = response.expiration;
+        this.token = response.token;
 
         this.supabase = createClient(response.url, response.key, {
-            accessToken: () => Promise.resolve(response.token)
+            accessToken: () => Promise.resolve(this.getToken())
         });
 
         return { supabase: this.supabase, tablePrefix: response.tablePrefix };
+    }
+
+    public async getToken() {
+        if (this.token && this.accessTokenExpiration && this.accessTokenExpiration > new Date()) {
+            return this.token;
+        }
+
+        const response = await this.request<{ token: string, expiration: Date }>("getSupabaseAccess");
+
+        this.token = response.token;
+        this.accessTokenExpiration = response.expiration;
+
+        return this.token;
     }
 
     public emit(eventName: string, data?: any) {

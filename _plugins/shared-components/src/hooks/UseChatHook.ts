@@ -1,13 +1,6 @@
 import React from "react";
-import { ToolInvocation, Tool } from "../plugin/PluginController";
 import { usePlugin } from "../providers/PluginProvider";
-
-export interface Message {
-    role: string;
-    content: string;
-    id: string | number;
-    toolInvocations?: ToolInvocation[];
-}
+import { ToolInvocation, Tool, Message } from "../plugin/AIController";
 
 export function useChat(tools?: Tool[]) {
     const [messages, setMessages] = React.useState<Message[]>([]);

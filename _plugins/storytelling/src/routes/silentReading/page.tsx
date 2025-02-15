@@ -52,7 +52,7 @@ export default function SilentReading() {
             ))}
 
             {!isLoading && !isFinalChapter && <button className="p-2 mt-4 bg-blue-500 dark:bg-blue-950 dark:text-gray-300 rounded w-fit px-5"
-                onClick={() => append([{ role: 'user', content: "Next chapter", id: messages.length + 1 }])}
+                onClick={() => append([{ role: 'user', content: "Next chapter", id: (messages.length + 1).toString() }])}
             >Next chapter</button>}
 
             {!isLoading && isFinalChapter && <button className="p-2 mt-4 bg-blue-500 dark:bg-blue-950 dark:text-gray-300 rounded"

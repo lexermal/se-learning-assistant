@@ -1,8 +1,9 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 import { GenericSchema } from "@supabase/supabase-js/dist/module/lib/types";
 import { PostgrestQueryBuilder, PostgrestFilterBuilder } from "@supabase/postgrest-js";
-import { PluginController, Tool, ToolInvocation } from "./PluginController";
+import { PluginController } from "./PluginController";
 import { LanguageLevel } from "../utils/difficultyConverter";
+import { streamChatGPT, Message, Tool, ToolInvocation, OnLLMResponse, generateText } from "./AIController";
 
 export class RimoriClient {
     private static instance: RimoriClient;
@@ -11,6 +12,7 @@ export class RimoriClient {
     public functions: SupabaseClient["functions"];
     public storage: SupabaseClient["storage"];
     public tablePrefix: string;
+
     private constructor(pluginController: PluginController, superbase: SupabaseClient, tablePrefix: string) {
         this.superbase = superbase;
         this.plugin = pluginController;
@@ -135,27 +137,14 @@ export class RimoriClient {
         await this.plugin.request("set_settings", { settings, genericSettings });
     }
 
-    public async getAIResponse(messages: { role: string, content: string }[]): Promise<string> {
-        return this.plugin.request("getAIResponse", messages);
+    public async getAIResponse(messages: Message[], tools?: Tool[]): Promise<string> {
+        const token = await this.plugin.getToken();
+        return generateText(messages, tools || [], token);
     }
 
-    public async getAIResponseStream(
-        messages: { role: string, content: string }[],
-        onMessage: (id: string, message: string, finished: boolean, toolInvocations?: ToolInvocation[]) => void,
-        tools?: Tool[]
-    ) {
-        // throw new Error("Not implemented");
-        let triggered = false;
-
-        console.log("getAIResponseStream", messages);
-
-        const id = Math.random();
-        this.plugin.emit("getAIResponseStream", { id, messages, tools: tools || [] });
-        this.subscribe("getAIResponseStream", (_id: number, data: { id: string, response: string, finished: boolean, toolInvocations?: ToolInvocation[] }) => {
-            if (triggered || (_id !== id && _id !== 0)) return;
-            triggered = data.finished;
-            onMessage(data.id, data.response, data.finished, data.toolInvocations);
-        })
+    public async getAIResponseStream(messages: Message[], onMessage: OnLLMResponse, tools?: Tool[]) {
+        const token = await this.plugin.getToken();
+        streamChatGPT(messages, tools || [], onMessage, token);
     }
 
     public getVoiceResponse(text: string, voice = "alloy", speed = 1, language?: string): Promise<Blob> {

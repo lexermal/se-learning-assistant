@@ -1,9 +1,11 @@
 import { verifyJWT } from "../_shared/JWT.ts";
 import { getCorsHeaders } from "../_shared/Cors.ts";
-import { JWTPayload } from "https://deno.land/x/djwt@v2.8/mod.ts";
+import { JWTPayload as DenoJWTPayload } from "https://deno.land/x/djwt@v2.8/mod.ts";
 import { serve as denoServe } from "https://deno.land/std@0.140.0/http/server.ts";
 
-type Handler<T> = (reqData: T, payload: JWTPayload) => Promise<WebServerResponse>;
+export type JWTPayload = DenoJWTPayload
+
+type Handler<T> = (reqData: T, payload: JWTPayload) => Promise<WebServerResponse | Response>;
 
 export function serve<T>(allowedMethods: string | string[], handler: Handler<T>) {
     if (typeof allowedMethods === "string") {
@@ -59,12 +61,13 @@ export function serve<T>(allowedMethods: string | string[], handler: Handler<T>)
                     headers: corsHeaders,
                 });
             }
-            console.log("made it here");
 
             let query = await parseRequestBody(req);
-            console.log("Query:", query);
             const response = await handler(query, payload);
-            console.log("Response:", response);
+
+            if (response instanceof Response) {
+                return response;
+            }
 
             return new Response(response.getBody(), {
                 status: response.status,
@@ -95,8 +98,10 @@ async function parseRequestBody(req: Request): Promise<any> {
     return {};
 }
 
+type ResponseType = "json" | "text" | "stream";
+
 export class WebServerResponse {
-    constructor(response: any, status = 200, responseType: "json" | "text" = "json", headers: Record<string, string> = {}) {
+    constructor(response: any, status = 200, responseType: ResponseType = "json", headers: Record<string, string> = {}) {
         this.response = response;
         this.status = status;
         this.responseType = responseType;
@@ -105,7 +110,7 @@ export class WebServerResponse {
 
     response: any;
     status: number;
-    responseType: "json" | "text";
+    responseType: ResponseType;
     headers: Record<string, string>;
 
     getBody() {
@@ -113,9 +118,15 @@ export class WebServerResponse {
     }
 
     getHeaders() {
+        const eventTypeMap = {
+            "text": "text/plain",
+            "json": "application/json",
+            "stream": "text/event-stream"
+        }
+
         return {
             ...getCorsHeaders(),
-            "Content-Type": this.responseType === "json" ? "application/json" : "text/plain",
+            "Content-Type": eventTypeMap[this.responseType],
             ...this.headers
         };
     }
