@@ -1,7 +1,6 @@
 export * from "./components/MarkdownEditor";
 export * from "./components/CRUDModal";
 export * from "./components/audio/Playbutton";
-export * from "./plugin/PluginController";
 export * from "./plugin/ThemeSetter";
 export * from "./providers/EventEmitterContext";
 export * from "./providers/PluginProvider";

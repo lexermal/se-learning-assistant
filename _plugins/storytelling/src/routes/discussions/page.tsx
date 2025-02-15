@@ -5,7 +5,8 @@ import { useEffect, useState } from 'react';
 import DiscussionPanel from './DiscussionPanel';
 import DiscussionPopup from './components/DiscussionPopup';
 import Spinner from 'shared-components/dist/components/Spinner';
-import { Tool, usePlugin, WhereClauseBuilder } from 'shared-components';
+import { usePlugin } from 'shared-components';
+import { Tool } from 'shared-components/dist/plugin/PluginController';
 
 interface RatingResult {
     examNr: number;
@@ -17,7 +18,7 @@ interface RatingResult {
 }
 
 export default function DiscussionPage(): JSX.Element {
-    const { getAIResponse, dbInsert, dbFetch,getSettings } = usePlugin();
+    const { getAIResponse, from, getSettings } = usePlugin();
     const [showDiscussion, setShowDiscussion] = useState(0);
     const [ratingResult, setRatingResult] = useState<RatingResult[]>([]);
     const [topics, setTopics] = useState({
@@ -39,11 +40,11 @@ export default function DiscussionPage(): JSX.Element {
 
     const setTopicForPersona = async (persona: 'persona1' | 'persona2' | 'persona3') => {
         //todo write a function to get the topics from the db without fetching the already completed ones
-        const fetchedDiscussionTopics = await dbFetch('discussion_topics', "*", new WhereClauseBuilder().eq('persona', persona));
+        const fetchedDiscussionTopics = await from('discussion_topics').select('*').eq('persona', persona);
         // console.log('topics:', fetchedDiscussionTopics);
-        const finishedTopics = await dbFetch('discussion_result').then((result) => result.map((r: any) => r.discussion_topic_id));
+        const finishedTopics = await from('discussion_result').select('discussion_topic_id').then((result) => result.data!.map((r: any) => r.discussion_topic_id));
         // console.log('finishedTopics:', finishedTopics);
-        let openTopics = fetchedDiscussionTopics.filter((topic: any) => !finishedTopics.includes(topic.id));
+        let openTopics = fetchedDiscussionTopics.data!.filter((topic: any) => !finishedTopics.includes(topic.id));
         // console.log('openTopics:', openTopics);
 
         let newTopics = openTopics.map((topic: any) => ({ ...topic, persona }));
@@ -51,7 +52,7 @@ export default function DiscussionPage(): JSX.Element {
         // openTopics = []; //todo remove this line
 
         if (openTopics.length === 0) {
-            const reservedTopics = fetchedDiscussionTopics.map((t: any) => `${t.topic}(${JSON.parse(t.keywords).join(",")})`);
+            const reservedTopics = fetchedDiscussionTopics.data!.map((t: any) => `${t.topic}(${JSON.parse(t.keywords).join(",")})`);
             const instructions = getTopics(reservedTopics)[persona];
             // console.log('instructions:', instructions);
             newTopics = await getAIResponse([{ role: "system", content: instructions }]).then((response) => {
@@ -60,7 +61,8 @@ export default function DiscussionPage(): JSX.Element {
                 //remove the first and last line and convert everything to json
                 const topics = JSON.parse(response.split('\n').slice(1, -1).join('\n'));
                 // console.log('topics:', topics);
-                dbInsert('discussion_topics', topics.map((topic: any) => ({ ...topic, persona, keywords: JSON.stringify(topic.keywords) })));
+                // dbInsert('discussion_topics', topics.map((topic: any) => ({ ...topic, persona, keywords: JSON.stringify(topic.keywords) })));
+                from('discussion_topics').insert(topics.map((topic: any) => ({ ...topic, persona, keywords: JSON.stringify(topic.keywords) })));
                 return topics;
             });
         }

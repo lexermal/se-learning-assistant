@@ -1,9 +1,10 @@
 import { useEffect, useMemo } from 'react';
 import CircleAudioAvatar from './EmbeddedAssistent/CircleAudioAvatar';
 import MessageSender from './EmbeddedAssistent/TTS/MessageSender';
-import { usePlugin, EmitterSingleton, Tool, } from 'shared-components';
+import { usePlugin, EmitterSingleton} from 'shared-components';
 import VoiceRecorder from './EmbeddedAssistent/VoiceRecoder';
 import { useChat } from 'shared-components';
+import { Tool } from 'shared-components/dist/plugin/PluginController';
 
 interface Props {
     task: string;
