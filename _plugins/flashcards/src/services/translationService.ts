@@ -1,7 +1,7 @@
-import { PluginController } from "shared-components";
+import { RimoriClient } from "shared-components";
 import { BasicWordInfo, Translation } from "../types/translation";
 
-export async function getBasicWordInfo(word: string, targetLanguage: string, plugin: PluginController): Promise<BasicWordInfo> {
+export async function getBasicWordInfo(word: string, targetLanguage: string, plugin: RimoriClient): Promise<BasicWordInfo> {
     const prompt = `
     You are a language assistant specialized in Swedish vocabulary. For the given word or phrase, provide a JSON-formatted output with the following information:
     
@@ -93,7 +93,7 @@ export async function getBasicWordInfo(word: string, targetLanguage: string, plu
     }));
 }
 
-export async function getAdditionalWordInfo(i: BasicWordInfo, targetLanguage: string, plugin: PluginController): Promise<Partial<Translation>> {
+export async function getAdditionalWordInfo(i: BasicWordInfo, targetLanguage: string, plugin: RimoriClient): Promise<Partial<Translation>> {
     const prompt = `
 You are a language assistant specialized in Swedish vocabulary. Provide a JSON-formatted output with the following information for the given word:
 

@@ -1,15 +1,15 @@
-import React, { createContext, useContext, ReactNode, useEffect } from 'react';
-import { PluginController } from '../PluginController';
-
+import React, { createContext, useContext, ReactNode, useEffect, useState } from 'react';
+import { PluginController } from '../plugin/PluginController';
+import { RimoriClient } from '../plugin/RimoriClient';
 interface PluginProviderProps {
     children: ReactNode;
 }
 
-const PluginContext = createContext<PluginController | null>(null);
+const PluginContext = createContext<RimoriClient | null>(null);
 
-const plugin = PluginController.getInstance();
 
 export const PluginProvider: React.FC<PluginProviderProps> = ({ children }) => {
+    const [plugin, setPlugin] = useState<RimoriClient | null>(null);
     //route change
     useEffect(() => {
         let lastHash = window.location.hash;
@@ -18,9 +18,10 @@ export const PluginProvider: React.FC<PluginProviderProps> = ({ children }) => {
             if (lastHash !== window.location.hash) {
                 lastHash = window.location.hash;
                 console.log('url changed:', lastHash);
-                plugin.emit('urlChange', window.location.hash);
+                plugin?.emit('urlChange', window.location.hash);
             }
         }, 100);
+        PluginController.getInstance().then(setPlugin);
     }, []);
 
     //context menu
@@ -31,13 +32,13 @@ export const PluginProvider: React.FC<PluginProviderProps> = ({ children }) => {
             if (selection) {
                 e.preventDefault();
                 // console.log('context menu', selection);
-                plugin.emit('contextMenu', { text: selection, x: e.clientX, y: e.clientY, open: true });
+                plugin?.emit('contextMenu', { text: selection, x: e.clientX, y: e.clientY, open: true });
                 isOpen = true;
             }
         };
 
         // Hide the menu on click outside
-        const handleClick = () => isOpen && plugin.emit('contextMenu', { text: '', x: 0, y: 0, open: false });
+        const handleClick = () => isOpen && plugin?.emit('contextMenu', { text: '', x: 0, y: 0, open: false });
 
         document.addEventListener("click", handleClick);
         document.addEventListener('contextmenu', handleContextMenu);
@@ -45,7 +46,11 @@ export const PluginProvider: React.FC<PluginProviderProps> = ({ children }) => {
             document.removeEventListener("click", handleClick);
             document.removeEventListener('contextmenu', handleContextMenu);
         };
-    }, []);
+    }, [plugin]);
+
+    if(!plugin){
+        return ""
+    }
 
     return (
         <PluginContext.Provider value={plugin}>

@@ -16,12 +16,10 @@ type DeckSummary = Deck & {
 
 function App() {
   const [decks, setDecks] = React.useState([] as DeckSummary[]);
-  const { dbUpdate, dbInsert, dbDelete, getClient } = usePlugin();
+  const { from, rpc } = usePlugin();
 
   const fetchDecks = async () => {
-    const supabase = await getClient();
-
-    supabase.rpc("pl_flashcards_due_today_summary").then(({ data }) => setDecks(data));
+    rpc<any, any>("due_today_summary").then(({ data }) => setDecks(data));
   }
 
   useEffect(() => {
@@ -34,16 +32,14 @@ function App() {
       {
         decks.map((deck, index) => (
           <DeckRow key={index} deck={deck} onEdit={(id, name) => {
-            dbUpdate("deck", { id }, { name });
-            setDecks(decks.map(d => d.id === id ? { ...d, name } : d));
+            from("deck").update({ name }).eq("id", id).then(fetchDecks);
           }} onDelete={id => {
-            dbDelete("deck", { id });
-            setDecks(decks.filter(d => d.id !== id));
+            from("deck").delete().eq("id", id).then(fetchDecks);
           }} />
         ))
       }
       <DeckCrudModal className='mt-6 block' buttonText='Add deck' onComplete={name => {
-        dbInsert("deck", { name }, "id, name").then(fetchDecks);
+        from("deck").insert({ name }).then(fetchDecks);
       }} />
     </div>
   );

@@ -16,7 +16,10 @@ export default function AddCard() {
 
     useEffect(() => {
         // Fetch decks from an API or other source
-        plugin.dbFetch('deck').then(setDecks);
+        // plugin.dbFetch('deck').then(setDecks);
+        plugin.from("pl_flashcards_decks").select("name").then(({ data }) => {
+            setDecks(data as Deck[]);
+        });
         plugin.subscribe("toolAction", (_id, data: { action: string, text: string }) => {
             // console.log("data received from parent:", data);
             setInitValue(data.text);
@@ -44,9 +47,9 @@ export default function AddCard() {
         const [deckName, setDeckName] = useState('');
         return <CRUDModal title="Add Deck" show={true} actionbuttons={[{
             text: "Submit",
-            onClick: () => plugin.dbInsert('deck', { name: deckName }, "id,name").then(([newDeck]: Deck[]) => {
-                setDecks([...decks, newDeck]);
-                setSelectedDeck(newDeck.id);
+            onClick: () => plugin.from("pl_flashcards_decks").insert({ name: deckName }).select("id,name").single().then(({ data }) => {
+                setDecks([...decks, data as Deck]);
+                setSelectedDeck(data!.id as string);
             })
         }]}>
             <input className='w-full border-0 border-b p-0 border-gray-400' placeholder="Name..." onChange={e => setDeckName(e.target.value)} />

@@ -1,6 +1,6 @@
 import React from "react";
-import { ToolInvocation, Tool } from "../utils/plugin/PluginController";
-import { usePlugin } from "../utils/plugin/providers/PluginProvider";
+import { ToolInvocation, Tool } from "../plugin/PluginController";
+import { usePlugin } from "../providers/PluginProvider";
 
 export interface Message {
     role: string;

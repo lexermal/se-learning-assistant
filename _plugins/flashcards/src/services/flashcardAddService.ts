@@ -1,8 +1,8 @@
-import { PluginController } from "shared-components";
+import { RimoriClient } from "shared-components";
 import FlashcardController from "../routes/deck/FlashcardController";
 import { Translation } from "../types/translation";
 
-export function addFlashcard(plugin: PluginController, t: Translation, id: string, language: string) {
+export function addFlashcard(plugin: RimoriClient, t: Translation, id: string, language: string) {
     const controller = new FlashcardController(plugin);
 
     controller.add({

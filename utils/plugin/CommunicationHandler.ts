@@ -137,7 +137,8 @@ export default class CommunicationHandler {
                 token,
                 url: env.SUPABASE_URL,
                 key: env.SUPABASE_ANON_KEY,
-                expiration: new Date(Date.now() + 1000 * 60 * 60 * 1.5) // 1.5 hours
+                tablePrefix: "pl_" + this.plugin.name,
+                expiration: new Date(Date.now() + 1000 * 60 * 60 * 1.5), // 1.5 hours
             });
         });
 

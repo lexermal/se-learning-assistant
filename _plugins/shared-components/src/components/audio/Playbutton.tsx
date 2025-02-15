@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { FaPlayCircle, FaStopCircle } from "react-icons/fa";
-import { usePlugin } from "../../utils/plugin/providers/PluginProvider";
+import { usePlugin } from "../../providers/PluginProvider";
 import Spinner from '../Spinner';
-import { EmitterSingleton } from '../../utils/plugin/providers/EventEmitter';
+import { EmitterSingleton } from '../../providers/EventEmitter';
 
 type AudioPlayerProps = {
     text: string;

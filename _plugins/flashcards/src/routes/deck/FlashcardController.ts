@@ -1,7 +1,11 @@
 import { Card, createEmptyCard, FSRS, fsrs, generatorParameters, Grade, State } from "ts-fsrs";
-import { PluginController } from "shared-components";
-import { WhereClauseBuilder } from "shared-components";
-import { Deck } from "../DeckOverviewPage";
+import { RimoriClient } from "shared-components";
+// import { Deck } from "../DeckOverviewPage";
+
+interface Deck extends Record<string, unknown> {
+    id: string;
+    name: string;
+}
 
 export interface Flashcard extends Omit<Card, "due" | "last_review" | "state"> {
     id: string;
@@ -31,20 +35,25 @@ interface CrudCard {
 
 export default class FlashcardController {
     private f: FSRS;
-    private db: PluginController;
+    private client: RimoriClient;
     private cards: Flashcard[] = [];
     private deck_id: string | undefined;
     private deckName: string | undefined;
 
-    constructor(pluginController: PluginController) {
-        this.db = pluginController;
+    constructor(client: RimoriClient) {
+        this.client = client;
         this.f = fsrs(generatorParameters({ enable_fuzz: true, enable_short_term: true }));
     }
 
     async init(deck_id: string) {
         this.deck_id = deck_id;
+        const response = await this.client.rpc("due_today", { use_deck: deck_id });
 
-        this.cards = (await this.db.dbFunctionCall("due_today", { use_deck: deck_id })).map((card: Flashcard) => {
+        if (response.error) {
+            throw new Error(response.error.message);
+        }
+
+        this.cards = (response.data as any[]).map((card: Flashcard) => {
             return {
                 ...card,
                 due: new Date(card.due),
@@ -84,19 +93,24 @@ export default class FlashcardController {
         this.cards[0].front_tags = editCard.frontTags;
         this.cards[0].back_tags = editCard.backTags;
 
-        this.db.dbUpdate("cards", { id: this.cards[0].id }, this.cards[0]);
+        // this.client.dbUpdate("cards", { id: this.cards[0].id }, this.cards[0]);
+        this.client.from("pl_flashcards_cards").update(this.cards[0] as any).eq("id", this.cards[0].id);
         this.sortCards();
     }
 
     delete() {
-        this.db.dbDelete("cards", { id: this.cards[0].id });
+        // this.client.dbDelete("cards", { id: this.cards[0].id });
+        this.client.from("pl_flashcards_cards").delete().eq("id", this.cards[0].id);
         this.cards.shift();
     }
 
     async getDeckName(): Promise<string> {
         if (!this.deckName) {
-            await this.db.dbFetch("deck", "name", new WhereClauseBuilder().eq("id", this.deck_id))
-                .then((result: Deck[]) => { this.deckName = result[0].name });
+            const response = await this.client.from("pl_flashcards_decks").select("name").eq("id", this.deck_id!).limit(1);
+            if (response.error) {
+                throw new Error(response.error.message);
+            }
+            this.deckName = response.data[0].name as string;
         }
         return this.deckName!;
     }
@@ -105,10 +119,13 @@ export default class FlashcardController {
         const id = card.id!;
         delete card.id;
 
-        const [response] = await this.db.dbInsert("cards", card, "id");
+        const { data: response, error } = await this.client.from("pl_flashcards_cards").insert(card).select("id").single();
+        if (error) {
+            throw new Error(error.message);
+        }
 
         const { index } = this.getCard(id);
-        this.cards[index].id = response.id;
+        this.cards[index].id = response.id as string;
     }
 
     private getCard(id: string) {
@@ -126,7 +143,8 @@ export default class FlashcardController {
 
         this.cards[result.index] = this.f.next(result.card, new Date(), grade, ({ card }) => card as unknown as Flashcard);
 
-        this.db.dbUpdate("cards", { id: result.card.id }, this.cards[result.index]);
+        // this.client.dbUpdate("cards", { id: result.card.id }, this.cards[result.index]);
+        this.client.from("pl_flashcards_cards").update(this.cards[result.index] as any).eq("id", result.card.id);
         this.sortCards();
     }
 
