@@ -144,18 +144,18 @@ export class RimoriClient {
         onMessage: (id: string, message: string, finished: boolean, toolInvocations?: ToolInvocation[]) => void,
         tools?: Tool[]
     ) {
-        throw new Error("Not implemented");
-        // let triggered = false;
+        // throw new Error("Not implemented");
+        let triggered = false;
 
-        // console.log("getAIResponseStream", messages);
+        console.log("getAIResponseStream", messages);
 
-        // const id = Math.random();
-        // this.internalEmit("getAIResponseStream", id, { messages, tools: tools || [] });
-        // this.subscribe("getAIResponseStream", (_id: number, data: { id: string, response: string, finished: boolean, toolInvocations?: ToolInvocation[] }) => {
-        //     if (triggered || (_id !== id && _id !== 0)) return;
-        //     triggered = data.finished;
-        //     onMessage(data.id, data.response, data.finished, data.toolInvocations);
-        // })
+        const id = Math.random();
+        this.plugin.emit("getAIResponseStream", { id, messages, tools: tools || [] });
+        this.subscribe("getAIResponseStream", (_id: number, data: { id: string, response: string, finished: boolean, toolInvocations?: ToolInvocation[] }) => {
+            if (triggered || (_id !== id && _id !== 0)) return;
+            triggered = data.finished;
+            onMessage(data.id, data.response, data.finished, data.toolInvocations);
+        })
     }
 
     public getVoiceResponse(text: string, voice = "alloy", speed = 1, language?: string): Promise<Blob> {
