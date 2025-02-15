@@ -1,6 +1,7 @@
 import { Child } from "ibridge-flex";
 import { WhereClauseBuilder } from "./WhereClauseBuilder";
 import { LanguageLevel } from "../difficultyConverter";
+import { createClient, SupabaseClient } from '@supabase/supabase-js'
 
 export interface Tool {
     name: string;
@@ -24,6 +25,8 @@ export class PluginController {
     private listeners: Map<string, any[]> = new Map();
     private communicationSecret: string | null = null;
     private initialized = false;
+    private supabase: SupabaseClient | null = null;
+    private accessTokenExpiration: Date | null = null;
 
     private constructor() {
         // localStorage.debug = "*";
@@ -44,6 +47,7 @@ export class PluginController {
         this.dbInsert = this.dbInsert.bind(this);
         this.dbUpdate = this.dbUpdate.bind(this);
         this.dbDelete = this.dbDelete.bind(this);
+        this.getClient = this.getClient.bind(this);
         this.subscribe = this.subscribe.bind(this);
         this.setSettings = this.setSettings.bind(this);
         this.getSettings = this.getSettings.bind(this);
@@ -83,6 +87,27 @@ export class PluginController {
             this.communicationSecret = secret;
         }
         return this.communicationSecret;
+    }
+
+    public async getClient() {
+        if (this.supabase && this.accessTokenExpiration && this.accessTokenExpiration > new Date()) {
+            return this.supabase;
+        }
+
+        const response = await this.emitAndWaitResponse<{
+            url: string,
+            key: string,
+            token: string,
+            expiration: Date
+        }>("getSupabaseAccess", {});
+
+        this.accessTokenExpiration = response.expiration;
+        
+        this.supabase = createClient(response.url, response.key, {
+            accessToken: () => Promise.resolve(response.token)
+        });
+
+        return this.supabase;
     }
 
     public emit(eventName: string, data?: any) {
@@ -157,7 +182,7 @@ export class PluginController {
         if (response === null) {
             this.setSettings(defaultSettings, genericSettings);
             return defaultSettings;
-        //if the settings are not the same, merge the settings
+            //if the settings are not the same, merge the settings
         } else if (Object.keys(response as Partial<T>).length !== Object.keys(defaultSettings as Partial<T>).length) {
             const existingKeys = Object.fromEntries(
                 Object.entries(response as object).filter(([k]) => k in (defaultSettings as object))

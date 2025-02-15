@@ -3,6 +3,7 @@ import { Parent } from "ibridge-flex"
 import { MenuEntry } from "../../components/plugin/ContextMenu";
 import buildSupabaseQuery from "./SelectStatementBuilder";
 import { ToolInvocation } from "ai";
+import { env } from "../client-constants";
 
 export interface SidebarPage {
     name: string;
@@ -59,7 +60,7 @@ export default class CommunicationHandler {
     }
 
     private getUrl(endpoint: string, hash?: string, queryParams?: Map<string, string>) {
-        console.log({endpoint, hash, queryParams})
+        console.log({ endpoint, hash, queryParams })
         const fullEndpoint = endpoint + (hash || "");
 
         const url = new URL(fullEndpoint);
@@ -77,6 +78,25 @@ export default class CommunicationHandler {
         }
 
         return url.toString();
+    }
+
+    private async getPluginToken() {
+        const { data: { session } } = await this.supabase.auth.getSession();
+        if (!session) {
+            throw new Error("User not logged in");
+        }
+
+        // Extract the full-access token for authorization with the Edge Function
+        const { data, error } = await this.supabase.functions.invoke(
+            "plugin-token",
+        );
+
+        if (error) {
+            console.error("Failed to get plugin token", error);
+            throw new Error("Failed to get plugin token");
+        }
+
+        return data.token;
     }
 
     private call(topic: string, callId: number, data: any) {
@@ -111,6 +131,16 @@ export default class CommunicationHandler {
     }
 
     async initSubscribers() {
+        this.subscribe("getSupabaseAccess", async (callId) => {
+            const token = await this.getPluginToken();
+            this.call("getSupabaseAccess", callId, {
+                token,
+                url: env.SUPABASE_URL,
+                key: env.SUPABASE_ANON_KEY,
+                expiration: new Date(Date.now() + 1000 * 60 * 60 * 1.5) // 1.5 hours
+            });
+        });
+
         this.subscribe("db_fetch", async (callId, data: { table: string, select: string, filter: any }) => {
             console.log(`Plugin ${this.plugin.name} wants to fetch data from: ${data.table}`);
 

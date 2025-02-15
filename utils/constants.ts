@@ -11,7 +11,7 @@ if (typeof window !== "undefined") {
 export type Env = typeof env;
 
 export const env = {
-    APP_DOMAIN: getEnv('APP_DOMAIN'),
+    APP_DOMAIN: getEnv('NEXT_PUBLIC_APP_DOMAIN'),
     SUPABASE_URL: getEnv('SUPABASE_URL'),
     SUPABASE_ANON_KEY: getEnv('SUPABASE_ANON_KEY'),
     DEFAULT_PLUGIN_ENDPOINT: getEnv('DEFAULT_PLUGIN_ENDPOINT'),

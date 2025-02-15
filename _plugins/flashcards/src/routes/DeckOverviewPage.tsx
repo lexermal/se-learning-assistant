@@ -16,13 +16,17 @@ type DeckSummary = Deck & {
 
 function App() {
   const [decks, setDecks] = React.useState([] as DeckSummary[]);
-  const { dbUpdate, dbInsert, dbDelete, dbFunctionCall } = usePlugin();
+  const { dbUpdate, dbInsert, dbDelete, getClient } = usePlugin();
 
-  const fetchDecks = () => {
-    dbFunctionCall("due_today_summary").then(setDecks);
+  const fetchDecks = async () => {
+    const supabase = await getClient();
+
+    supabase.rpc("pl_flashcards_due_today_summary").then(({ data }) => setDecks(data));
   }
 
-  useEffect(fetchDecks, []);
+  useEffect(() => {
+    fetchDecks();
+  }, []);
 
   return (
     <div className="mx-auto bg-yellow-300 dark:bg-gray-800 sm:w-96 p-4 rounded-2xl mt-24 shadow-custom">
