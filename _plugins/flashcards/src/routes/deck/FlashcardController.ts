@@ -94,19 +94,19 @@ export default class FlashcardController {
         this.cards[0].back_tags = editCard.backTags;
 
         // this.client.dbUpdate("cards", { id: this.cards[0].id }, this.cards[0]);
-        this.client.from("pl_flashcards_cards").update(this.cards[0] as any).eq("id", this.cards[0].id);
+        this.client.from("cards").update(this.cards[0] as any).eq("id", this.cards[0].id);
         this.sortCards();
     }
 
     delete() {
         // this.client.dbDelete("cards", { id: this.cards[0].id });
-        this.client.from("pl_flashcards_cards").delete().eq("id", this.cards[0].id);
+        this.client.from("cards").delete().eq("id", this.cards[0].id);
         this.cards.shift();
     }
 
     async getDeckName(): Promise<string> {
         if (!this.deckName) {
-            const response = await this.client.from("pl_flashcards_decks").select("name").eq("id", this.deck_id!).limit(1);
+            const response = await this.client.from("deck").select("name").eq("id", this.deck_id!).limit(1);
             if (response.error) {
                 throw new Error(response.error.message);
             }
@@ -119,7 +119,7 @@ export default class FlashcardController {
         const id = card.id!;
         delete card.id;
 
-        const { data: response, error } = await this.client.from("pl_flashcards_cards").insert(card).select("id").single();
+        const { data: response, error } = await this.client.from("cards").insert(card).select("id").single();
         if (error) {
             throw new Error(error.message);
         }
@@ -144,7 +144,7 @@ export default class FlashcardController {
         this.cards[result.index] = this.f.next(result.card, new Date(), grade, ({ card }) => card as unknown as Flashcard);
 
         // this.client.dbUpdate("cards", { id: result.card.id }, this.cards[result.index]);
-        this.client.from("pl_flashcards_cards").update(this.cards[result.index] as any).eq("id", result.card.id);
+        this.client.from("cards").update(this.cards[result.index] as any).eq("id", result.card.id);
         this.sortCards();
     }
 

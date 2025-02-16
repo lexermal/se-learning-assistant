@@ -24,7 +24,7 @@ export default function SettingsPluginHandler({ plugin }: { plugin: Plugin }) {
 
             iframe.style.height = `${height}px`;
         });
-    }, [plugin]);
+    }, [plugin.id]);
 
     // {/* For the communication library to use it needs to have the div with the iframe inside!!! */}
     return (

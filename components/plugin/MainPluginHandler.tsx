@@ -47,7 +47,7 @@ export default function MainPluginHandler({ plugin, globalContextMenuActions }: 
         connection.subscribe("addContextMenuActions", (_id, actions: MenuEntry[]) => {
             setContextMenuActions([...actions, ...constextActions]);
         });
-    }, [plugin, hash]);
+    }, [plugin.id, hash]);
 
     //url hash changed
     useEffect(() => {
