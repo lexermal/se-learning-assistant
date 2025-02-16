@@ -216,7 +216,7 @@ function TrainingNavbar({ deckName, remaining }: { deckName: string, remaining: 
                 <Pomodoro />
             </div>
             <div className="gap-1 flex font-normal p-1 w-1/3 flex-row-reverse flex-grow-0">
-                <div className="mr-1 text-3xl cursor-pointer" onClick={() => {
+                <div className="mr-12 text-3xl cursor-pointer" onClick={() => {
                     triggerFullscreen(setFullscreen);
                 }}>{fullscreen ? <AiOutlineFullscreenExit /> : <AiOutlineFullscreen />}</div>
             </div>
