@@ -139,7 +139,7 @@ export class RimoriClient {
 
     public async getAIResponse(messages: Message[], tools?: Tool[]): Promise<string> {
         const token = await this.plugin.getToken();
-        return generateText(messages, tools || [], token);
+        return generateText(messages, tools || [], token).then(response => response.messages[0].content[0].text);
     }
 
     public async getAIResponseStream(messages: Message[], onMessage: OnLLMResponse, tools?: Tool[]) {

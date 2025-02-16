@@ -82,8 +82,8 @@ export async function getBasicWordInfo(word: string, targetLanguage: string, plu
 
 
     return await plugin.getAIResponse([
-        { role: 'system', content: prompt },
-        { role: 'user', content: "Look up the word or phrase: " + word }
+        { id: '1', role: 'system', content: prompt },
+        { id: '2', role: 'user', content: "Look up the word or phrase: " + word }
     ]).then(json => JSON.parse(json.split('\n').slice(1, -1).join('\n'))).then((json: any) => ({
         input: json.gramatically_corrected_input_text,
         language: json.detected_input_word_language,
@@ -221,8 +221,8 @@ Please ensure that all relevant fields are included to fit the Translation inter
 `;
 
     return await plugin.getAIResponse([
-        { role: 'system', content: prompt },
-        { role: 'user', content: `Get more details for the ${i.type}: ${i.input}(${i.language})` }
+        { id: '1', role: 'system', content: prompt },
+        { id: '2', role: 'user', content: `Get more details for the ${i.type}: ${i.input}(${i.language})` }
     ]).then((json: any) => JSON.parse(json.split('\n').slice(1, -1).join('\n')));
 }
 

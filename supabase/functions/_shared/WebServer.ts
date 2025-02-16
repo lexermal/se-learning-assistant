@@ -45,16 +45,13 @@ export function serve<T>(allowedMethods: string | string[], handler: Handler<T>)
                     headers: corsHeaders,
                 });
             }
-            const incomingToken = parts[1];
-
-            const payload = await verifyJWT(incomingToken);
 
             // Verify the incoming JWT using your Supabase JWT secret.
             // The verify() function will return the payload if the token is valid.
-            const originalPayload = payload;
+            const payload = await verifyJWT(parts[1]);
 
             // Ensure there's a sub (user id) claim
-            const userId = originalPayload.sub;
+            const userId = payload.sub;
             if (!userId) {
                 return new Response("Unauthorized: Missing user id in token", {
                     status: 401,
