@@ -42,3 +42,5 @@ $$;
 
 
 --- todo: add mermission mapping table
+
+--- Source: https://supabase.com/docs/guides/database/postgres/custom-claims-and-role-based-access-control-rbac?queryGroups=language&language=plpgsql
