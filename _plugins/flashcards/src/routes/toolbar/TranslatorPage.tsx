@@ -8,12 +8,12 @@ import { useChat, usePlugin, MarkdownEditor } from 'shared-components';
 export default function TranslationSidebar() {
     const [translation, setTranslation] = useState<Translation | null>(null);
     const [word, setWord] = useState("");
-    const { subscribe } = usePlugin();
+    const { request } = usePlugin();
     const [inputText, setInputText] = useState("");
     const { messages, setMessages, append } = useChat();
 
     useEffect(() => {
-        subscribe("toolAction", (_id: number, data: { action: string, text: string }) => {
+        request<{ action: string, text: string }>("getToolAction").then(data => {
             if (data.action !== 'translate') return;
             setWord(data.text);
         });

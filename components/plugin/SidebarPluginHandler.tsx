@@ -9,26 +9,20 @@ import { SupabaseClient } from "@/utils/supabase/client";
 
 function PluginSidebar({ plugin, contextMenuAction }: { plugin: Plugin, contextMenuAction: MenuEntry }) {
     const iframeRef = useRef<HTMLIFrameElement | null>(null);
-    const [parent, setParent] = useState<CommunicationHandler | null>(null);
     const supabase = SupabaseClient.getClient();
 
     useEffect(() => {
-        if (parent) {
-            parent.emit("toolAction", { action: contextMenuAction.action, text: contextMenuAction.text });
-        }
-    }, [contextMenuAction]);
-
-    useEffect(() => {
         const parent = new CommunicationHandler(supabase, plugin, iframeRef.current, contextMenuAction.url, ["h-full", "dark:bg-gray-920"], new Map([["applicationMode", "sidebar"]]));
-        setParent(parent);
         iframeRef.current!.style.opacity = "0";
 
-        parent.init().then(() => {
-            parent.emit("toolAction", { action: contextMenuAction.action, text: contextMenuAction.text });
+        parent.subscribe("getToolAction", () => {
+            parent.emit("getToolAction", { action: contextMenuAction.action, text: contextMenuAction.text });
+        });
 
+        parent.init().then(() => {
             iframeRef.current!.style.opacity = "1";
         });
-    }, [plugin, contextMenuAction]);
+    }, [plugin.id, contextMenuAction.url]);
 
     return (
         <div className="dark:bg-gray-920 w-full h-full border-l border-gray-600 pt-[50px]">

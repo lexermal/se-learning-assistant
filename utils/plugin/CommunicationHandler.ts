@@ -58,7 +58,7 @@ export default class CommunicationHandler {
     }
 
     private getUrl(endpoint: string, hash?: string, queryParams?: Map<string, string>) {
-        console.log({ endpoint, hash, queryParams })
+        // console.log({ endpoint, hash, queryParams })
         const fullEndpoint = endpoint + (hash || "");
 
         const url = new URL(fullEndpoint);
@@ -99,14 +99,6 @@ export default class CommunicationHandler {
 
     private call(topic: string, callId: number, data: any) {
         this.parent.get("triggerChild", { topic, data, _id: callId })
-    }
-
-    private getTable(table: string) {
-        return this.supabase.from(this.getTableName(table));
-    }
-
-    private getTableName(table: string) {
-        return `pl_${this.plugin.name}_${table}`;
     }
 
     async destroy() {

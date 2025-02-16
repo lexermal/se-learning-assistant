@@ -101,7 +101,7 @@ export class RimoriClient {
         this.plugin.subscribe(eventName, callback);
     }
 
-    public request<T>(eventName: string, data: any): Promise<T> {
+    public request<T>(eventName: string, data?: any): Promise<T> {
         return this.plugin.request(eventName, data);
     }
 
