@@ -21,8 +21,6 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
     const [settings, setSettings] = useState<FlashcardPluginSettings | null>(null);
     const [language, setLanguage] = useState<string | null>(null);
 
-    // console.log({ settings, basicInfo, language, additionalInfo: t });
-
     useEffect(() => {
         plugin.getSettings<FlashcardPluginSettings>({
             autoPlayForeignNewFlashcards: false
@@ -31,9 +29,6 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
         plugin.getSettings<UserSettings>({ motherTongue: "English", languageLevel: "A1" }, "user")
             .then(s => setLanguage(s.motherTongue));
 
-        // plugin.dbFetch('deck', "id, name, last_used")
-        //     .then(decks => decks.sort((a: any, b: any) => new Date(b.last_used).getTime() - new Date(a.last_used).getTime()))
-        //     .then(setDecks);
         plugin.from("deck").select("id, name, last_used").then(({ data }) => {
             setDecks(data!.sort((a: any, b: any) => new Date(b.last_used).getTime() - new Date(a.last_used).getTime()));
         });
@@ -62,7 +57,7 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
                 onTranslationComplete(moreInfo as Translation);
             });
         });
-    }, [word, settings]);
+    }, [word, settings, language]);
 
 
     const formattedOtherMeaning = getAlternativeMeaning(t as Translation);
