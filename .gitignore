@@ -40,3 +40,13 @@ public/plugins
 public/plugins/*
 
 /IDEA*
+
+# Playwright
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+.auth
+
+_plugins2/
