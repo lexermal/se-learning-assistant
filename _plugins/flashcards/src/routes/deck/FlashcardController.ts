@@ -87,20 +87,20 @@ export default class FlashcardController {
         this.addToDB({ ...card });
     }
 
-    edit(editCard: CrudCard) {
+    async edit(editCard: CrudCard) {
         this.cards[0].front = editCard.front;
         this.cards[0].back = editCard.back;
         this.cards[0].front_tags = editCard.frontTags;
         this.cards[0].back_tags = editCard.backTags;
 
         // this.client.dbUpdate("cards", { id: this.cards[0].id }, this.cards[0]);
-        this.client.from("cards").update(this.cards[0] as any).eq("id", this.cards[0].id);
+        await this.client.from("cards").update(this.cards[0] as any).eq("id", this.cards[0].id);
         this.sortCards();
     }
 
-    delete() {
+    async delete() {
         // this.client.dbDelete("cards", { id: this.cards[0].id });
-        this.client.from("cards").delete().eq("id", this.cards[0].id);
+        await this.client.from("cards").delete().eq("id", this.cards[0].id);
         this.cards.shift();
     }
 
@@ -138,13 +138,14 @@ export default class FlashcardController {
         // console.log("Sorting cards", this.cards);
     }
 
-    validate(id: string, grade: Grade) {
+    async validate(id: string, grade: Grade) {
         const result = this.getCard(id);
 
         this.cards[result.index] = this.f.next(result.card, new Date(), grade, ({ card }) => card as unknown as Flashcard);
-
+        console.log("validate", this.cards[result.index]);
         // this.client.dbUpdate("cards", { id: result.card.id }, this.cards[result.index]);
-        this.client.from("cards").update(this.cards[result.index] as any).eq("id", result.card.id);
+        await this.client.from("cards").update(this.cards[result.index] as any).eq("id", result.card.id);
+        console.log("finished update");
         this.sortCards();
     }
 
