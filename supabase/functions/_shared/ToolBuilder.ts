@@ -78,6 +78,21 @@ export default class ToolBuilder {
 
 }
 
+export function getToolkit(tools?: Tool[]) {
+  if (!tools) return undefined;
+
+  const toolBuilder = new ToolBuilder();
+  tools.forEach(tool => {
+    const builder = toolBuilder.addClientTool(tool.name, tool.description);
+    tool.parameters.forEach(parameter => {
+      builder.addParameter(parameter.name, parameter.type, parameter.description);
+    });
+    builder.build();
+  });
+
+  return toolBuilder.getTools();
+}
+
 // const toolBuilder = new ToolBuilder();
 
 // toolBuilder.addClientTool('getLocation', 'Get the user location. Always ask for confirmation before using this tool.')

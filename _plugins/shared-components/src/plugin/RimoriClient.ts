@@ -3,7 +3,8 @@ import { GenericSchema } from "@supabase/supabase-js/dist/module/lib/types";
 import { PostgrestQueryBuilder, PostgrestFilterBuilder } from "@supabase/postgrest-js";
 import { PluginController } from "./PluginController";
 import { LanguageLevel } from "../utils/difficultyConverter";
-import { streamChatGPT, Message, Tool, ToolInvocation, OnLLMResponse, generateText } from "./AIController";
+import { streamChatGPT, Message, Tool, OnLLMResponse, generateText } from "./AIController";
+import { generateObject as generateObjectFunction, ObjectRequest, ObjectTool } from "./ObjectController";
 
 export class RimoriClient {
     private static instance: RimoriClient;
@@ -27,6 +28,7 @@ export class RimoriClient {
         this.getSettings = this.getSettings.bind(this);
         this.setSettings = this.setSettings.bind(this);
         this.getAIResponse = this.getAIResponse.bind(this);
+        this.generateObject = this.generateObject.bind(this);
         this.getVoiceResponse = this.getVoiceResponse.bind(this);
         this.getAIResponseStream = this.getAIResponseStream.bind(this);
         this.getVoiceToTextResponse = this.getVoiceToTextResponse.bind(this);
@@ -153,6 +155,11 @@ export class RimoriClient {
 
     public getVoiceToTextResponse(file: Blob): Promise<string> {
         return this.plugin.request("getSTTResponse", file);
+    }
+
+    public async generateObject(request: ObjectRequest): Promise<any> {
+        const token = await this.plugin.getToken();
+        return generateObjectFunction(request, token);
     }
 }
 
