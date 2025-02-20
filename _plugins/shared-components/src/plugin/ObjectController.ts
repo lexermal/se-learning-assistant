@@ -24,18 +24,15 @@ export interface ObjectRequest {
      */
     tool: ObjectTool;
     /**
-     * The instructions for the AI to follow. 
-     * Example: "Act like a recipe writer. You will get a list of ingredients and you need to come up with a recipe based on the ingredients."
+     * High level instructions for the AI to follow. Behaviour, tone, restrictions, etc.
+     * Example: "Act like a recipe writer."
+     */
+    behaviour?: string;
+    /**
+     * The specific instruction for the AI to follow.
+     * Example: "Generate a recipe using chicken, rice and vegetables."
      */
     instructions: string;
-    /**
-     * Secondary instructions for the AI to follow.
-     * This is optional and can be used to provide additional context or instructions 
-     * line the data it should work with. 
-     * 
-     * Example: "The ingredients are: {ingredients}"
-     */
-    secondaryInstructions?: string;
 }
 
 export async function generateObject(request: ObjectRequest, token: string) {
@@ -44,8 +41,8 @@ export async function generateObject(request: ObjectRequest, token: string) {
         body: JSON.stringify({
             stream: false,
             tool: request.tool,
-            systemInstructions: request.instructions,
-            secondaryInstructions: request.secondaryInstructions,
+            behaviour: request.behaviour,
+            instructions: request.instructions,
         }),
         headers: { 'Authorization': `Bearer ${token}` }
     });
@@ -62,8 +59,8 @@ export async function streamObject(request: ObjectRequest, onResponse: OnLLMResp
         body: JSON.stringify({
             stream: true,
             tools: request.tool,
-            systemInstructions: request.instructions,
-            secondaryInstructions: request.secondaryInstructions,
+            systemInstructions: request.behaviour,
+            secondaryInstructions: request.instructions,
         }),
         headers: { 'Authorization': `Bearer ${token}` }
     });

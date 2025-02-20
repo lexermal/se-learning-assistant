@@ -49,4 +49,4 @@ node_modules/
 /playwright/.cache/
 .auth
 
-_plugins2/
+_plugins/rimori-plugin-writing

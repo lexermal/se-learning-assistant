@@ -1,11 +1,12 @@
-import { unstable_noStore as noStore } from 'next/cache';
+// import { unstable_noStore as noStore } from 'next/cache';
 
-noStore();
+// noStore();
 
 export type Env = typeof env;
 
 export const env = {
-    SUPABASE_URL: process.env.SUPABASE_URL || "https://pheptqdoqsdnadgoihvr.supabase.co",
+    // SUPABASE_URL: process?.env?.SUPABASE_URL || "https://pheptqdoqsdnadgoihvr.supabase.co",
+    SUPABASE_URL: "https://pheptqdoqsdnadgoihvr.supabase.co",
     // SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY,
 };
 

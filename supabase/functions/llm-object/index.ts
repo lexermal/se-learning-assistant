@@ -8,15 +8,15 @@ import { serve, WebServerResponse } from "../_shared/WebServer.ts";
 interface RequestBody {
     tool: ObjectTool;
     stream?: boolean;
-    systemInstructions: string;
-    secondaryInstructions?: string;
+    behaviour?: string;
+    instructions: string;
 }
 
 serve("POST", async (request: RequestBody) => {
-    const { systemInstructions, secondaryInstructions = undefined, stream = false, tool } = request;
+    const { behaviour, instructions, stream = false, tool } = request;
 
-    if (!systemInstructions) {
-        return new WebServerResponse({ error: "No system instructions provided" }, 400);
+    if (!instructions) {
+        return new WebServerResponse({ error: "No instructions provided" }, 400);
     }
 
     if (!tool) {
@@ -25,10 +25,10 @@ serve("POST", async (request: RequestBody) => {
 
     if (stream) {
         const result = streamObject({
-            system: systemInstructions,
-            prompt: secondaryInstructions,
+            system: behaviour,
+            prompt: instructions,
             onFinish: onFinish,
-            tools: getObjectToolkit(tool),
+            schema: getObjectToolkit(tool),
             model: openai("gpt-4o-mini", { apiKey: getEnv("OPENAI_API_KEY") }),
         });
         const headers: Record<string, string> = getCorsHeaders();
@@ -38,8 +38,8 @@ serve("POST", async (request: RequestBody) => {
     }
 
     const result = await generateObject({
-        system: systemInstructions,
-        prompt: secondaryInstructions,
+        system: behaviour,
+        prompt: instructions,
         onFinish: onFinish,
         schema: getObjectToolkit(tool),
         model: openai("gpt-4o-mini", { apiKey: getEnv("OPENAI_API_KEY") }),
