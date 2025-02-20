@@ -103,8 +103,8 @@ export async function GET() {
             description: "Learn vocabulary and grammar by reading stories.",
             version: "1.0.0",
             author: "lexermal",
-            endpoint: env.DEFAULT_PLUGIN_ENDPOINT + "/plugins/storytelling/",
-            endpointDev: "http://localhost:3002/plugins/storytelling/",
+            endpoint: env.DEFAULT_PLUGIN_ENDPOINT + "/plugins/storytelling/#",
+            endpointDev: "http://localhost:3002/plugins/storytelling/#",
             pluginRepo: "https://lexermal.github.io/se-learning-assistant/",
             pluginWebsite: "https://lexermal.github.io/se-learning-assistant/",
             iconUrl: "logo.png",
@@ -212,6 +212,30 @@ export async function GET() {
             ],
             settingsPage: "/settings",
             unmanaged: true,
+        },
+        {
+            id: "4",
+            name: "writing",
+            title: "Writing",
+            description: "Improve your writing skills by writing and getting feedback.",
+            version: "1.0.0",
+            author: "lexermal",
+            endpoint: env.DEFAULT_PLUGIN_ENDPOINT + "/plugins/writing/#",
+            endpointDev: "http://localhost:3004/plugins/writing/#",
+            pluginRepo: "https://lexermal.github.io/se-learning-assistant/",
+            pluginWebsite: "https://lexermal.github.io/se-learning-assistant/",
+            iconUrl: "logo.png",
+            pluginPages: [
+                {
+                    name: "Writing Assistant",
+                    url: "#/writing",
+                    description: "Practice writing with the writing assistant.",
+                    root: "Writing"
+                },
+            ],
+            contextMenuActions: [],
+            sidebarPages: [],
+            settingsPage: "/settings",
         },
     ];
 
