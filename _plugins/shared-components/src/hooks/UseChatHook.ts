@@ -1,6 +1,6 @@
 import React from "react";
 import { usePlugin } from "../providers/PluginProvider";
-import { ToolInvocation, Tool, Message } from "../plugin/AIController";
+import { ToolInvocation, Tool, Message } from "../controller/AIController";
 
 export function useChat(tools?: Tool[]) {
     const [messages, setMessages] = React.useState<Message[]>([]);

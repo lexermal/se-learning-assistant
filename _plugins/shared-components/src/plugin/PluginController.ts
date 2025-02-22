@@ -12,11 +12,12 @@ export class PluginController {
     private initialized = false;
     private supabase: SupabaseClient | null = null;
     private tablePrefix: string | null = null;
+    public pluginId: string | null = null;
     private accessTokenExpiration: Date | null = null;
     private token: string | null = null;
+
     private constructor() {
         // localStorage.debug = "*";
-
         this.plugin = new Child({
             triggerChild: ({ topic, data, _id }: any) => {
                 // console.log("trigger child with topic:" + topic + " and data: ", data);
@@ -25,7 +26,6 @@ export class PluginController {
                 this.listeners.get(topic)?.forEach((callback: any) => callback(_id, data));
             }
         });
-        // this.init();
 
         this.emit = this.emit.bind(this);
         this.onOnce = this.onOnce.bind(this);
@@ -47,9 +47,7 @@ export class PluginController {
     }
 
     async init() {
-        if (this.initialized) {
-            return;
-        }
+        if (this.initialized) return;
 
         // Wait for the plugin to be ready
         await this.plugin.handshake().then(() => this.initialized = true).catch((error: any) => {
@@ -68,14 +66,15 @@ export class PluginController {
         return this.communicationSecret;
     }
 
-    public async getClient(): Promise<{ supabase: SupabaseClient, tablePrefix: string }> {
+    public async getClient(): Promise<{ supabase: SupabaseClient, tablePrefix: string, pluginId: string }> {
         if (
             this.supabase &&
+            this.pluginId &&
             this.tablePrefix &&
             this.accessTokenExpiration &&
             this.accessTokenExpiration > new Date()
         ) {
-            return { supabase: this.supabase, tablePrefix: this.tablePrefix };
+            return { supabase: this.supabase, tablePrefix: this.tablePrefix, pluginId: this.pluginId };
         }
 
         const response = await this.request<{
@@ -83,7 +82,8 @@ export class PluginController {
             key: string,
             token: string,
             expiration: Date,
-            tablePrefix: string
+            tablePrefix: string,
+            pluginId: string
         }>("getSupabaseAccess");
 
         this.accessTokenExpiration = response.expiration;
@@ -93,7 +93,7 @@ export class PluginController {
             accessToken: () => Promise.resolve(this.getToken())
         });
 
-        return { supabase: this.supabase, tablePrefix: response.tablePrefix };
+        return { supabase: this.supabase, tablePrefix: response.tablePrefix, pluginId: response.pluginId };
     }
 
     public async getToken() {

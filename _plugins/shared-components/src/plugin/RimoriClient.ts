@@ -1,11 +1,19 @@
-import { SupabaseClient } from "@supabase/supabase-js";
-import { GenericSchema } from "@supabase/supabase-js/dist/module/lib/types";
-import { PostgrestQueryBuilder, PostgrestFilterBuilder } from "@supabase/postgrest-js";
 import { PluginController } from "./PluginController";
-import { LanguageLevel } from "../utils/difficultyConverter";
-import { streamChatGPT, Message, Tool, OnLLMResponse, generateText } from "./AIController";
-import { generateObject as generateObjectFunction, ObjectRequest } from "./ObjectController";
-import { v4 as uuidv4 } from 'uuid';
+import { SupabaseClient } from "@supabase/supabase-js";
+import { SettingsController } from "../controller/SettingsController";
+import { GenericSchema } from "@supabase/supabase-js/dist/module/lib/types";
+import { getSTTResponse, getTTSResponse } from "../controller/VoiceController";
+import { PostgrestQueryBuilder, PostgrestFilterBuilder } from "@supabase/postgrest-js";
+import { SharedContentController, BasicAssignment } from "../controller/SharedContentController";
+import { streamChatGPT, Message, Tool, OnLLMResponse, generateText } from "../controller/AIController";
+import { generateObject as generateObjectFunction, ObjectRequest } from "../controller/ObjectController";
+
+interface RimoriClientOptions {
+    pluginController: PluginController;
+    supabase: SupabaseClient;
+    tablePrefix: string;
+    pluginId: string;
+}
 
 export class RimoriClient {
     private static instance: RimoriClient;
@@ -13,14 +21,20 @@ export class RimoriClient {
     private plugin: PluginController;
     public functions: SupabaseClient["functions"];
     public storage: SupabaseClient["storage"];
+    public pluginId: string;
     public tablePrefix: string;
+    private settingsController: SettingsController;
+    private sharedContentController: SharedContentController;
 
-    private constructor(pluginController: PluginController, superbase: SupabaseClient, tablePrefix: string) {
-        this.superbase = superbase;
-        this.plugin = pluginController;
-        this.tablePrefix = tablePrefix;
+    private constructor(options: RimoriClientOptions) {
+        this.superbase = options.supabase;
+        this.pluginId = options.pluginId;
+        this.plugin = options.pluginController;
+        this.tablePrefix = options.tablePrefix;
         this.storage = this.superbase.storage;
         this.functions = this.superbase.functions;
+        this.settingsController = new SettingsController(options.supabase, options.pluginId);
+        this.sharedContentController = new SharedContentController(this);
         this.rpc = this.rpc.bind(this);
         this.from = this.from.bind(this);
         this.emit = this.emit.bind(this);
@@ -37,8 +51,8 @@ export class RimoriClient {
 
     public static async getInstance(pluginController: PluginController): Promise<RimoriClient> {
         if (!RimoriClient.instance) {
-            const { supabase, tablePrefix } = await pluginController.getClient();
-            RimoriClient.instance = new RimoriClient(pluginController, supabase, tablePrefix);
+            const { supabase, tablePrefix, pluginId } = await pluginController.getClient();
+            RimoriClient.instance = new RimoriClient({ pluginController, supabase, tablePrefix, pluginId });
         }
         return RimoriClient.instance;
     }
@@ -122,26 +136,12 @@ export class RimoriClient {
     * @param genericSettings The type of settings to get.
     * @returns The settings for the plugin. 
     */
-    public async getSettings<T>(defaultSettings: T, genericSettings?: "user" | "system"): Promise<T> {
-        const response = await this.plugin.request("get_settings", { genericSettings }) as T;
-        if (response === null) {
-            this.setSettings(defaultSettings, genericSettings);
-            return defaultSettings;
-            //if the settings are not the same, merge the settings
-        } else if (Object.keys(response as Partial<T>).length !== Object.keys(defaultSettings as Partial<T>).length) {
-            const existingKeys = Object.fromEntries(
-                Object.entries(response as object).filter(([k]) => k in (defaultSettings as object))
-            );
-            const mergedSettings = { ...defaultSettings, ...existingKeys };
-            console.warn("Settings mismatch", { response, defaultSettings, mergedSettings });
-            this.setSettings(mergedSettings, genericSettings);
-            return mergedSettings;
-        }
-        return response;
+    public async getSettings<T extends object>(defaultSettings: T, genericSettings?: "user" | "system"): Promise<T> {
+        return this.settingsController.getSettings<T>(defaultSettings, genericSettings);
     }
 
     public async setSettings(settings: any, genericSettings?: "user" | "system") {
-        await this.plugin.request("set_settings", { settings, genericSettings });
+        await this.settingsController.setSettings(settings, genericSettings);
     }
 
     public async getAIResponse(messages: Message[], tools?: Tool[]): Promise<string> {
@@ -155,11 +155,11 @@ export class RimoriClient {
     }
 
     public getVoiceResponse(text: string, voice = "alloy", speed = 1, language?: string): Promise<Blob> {
-        return this.plugin.request("getVoiceResponse", { text, voice, speed, language });
+        return getTTSResponse(text, voice, speed, language);
     }
 
     public getVoiceToTextResponse(file: Blob): Promise<string> {
-        return this.plugin.request("getSTTResponse", file);
+        return getSTTResponse(file);
     }
 
     public async generateObject(request: ObjectRequest): Promise<any> {
@@ -167,72 +167,37 @@ export class RimoriClient {
         return generateObjectFunction(request, token);
     }
 
+    /**
+     * Fetch new shared content.
+     * @param type The type of shared content to fetch. E.g. assignments, exercises, etc.
+     * @param generatorInstructions The instructions for the generator.
+     * @param filter The filter for the shared content.
+     * @returns The new shared content.
+     */
     public async fetchNewSharedContent<T, R = T & BasicAssignment>(
         type: string,
         generatorInstructions: (reservedTopics: string[]) => Promise<ObjectRequest> | ObjectRequest,
         filter?: { column: string, value: string | number | boolean },
     ): Promise<R[]> {
-        const queryParameter = { filter_column: filter?.column || null, filter_value: filter?.value || null, unread: true }
-        const { data: newAssignments } = await this.rpc(type + "_entries", queryParameter)
-        console.log('newAssignments:', newAssignments);
-
-        if ((newAssignments as any[]).length > 0) {
-            return newAssignments as R[];
-        }
-        // generate new assignments
-        const { data: oldAssignments } = await this.rpc(type + "_entries", { ...queryParameter, unread: false })
-        console.log('oldAssignments:', oldAssignments);
-        const reservedTopics = this.getReservedTopics(oldAssignments as BasicAssignment[]);
-
-        const request = await generatorInstructions(reservedTopics);
-        if (!request.tool.keywords || !request.tool.topic) {
-            throw new Error("topic or keywords not found in the request schema");
-        }
-        const instructions = await this.generateObject(request);
-        console.log('instructions:', instructions);
-
-        const preparedData = {
-            id: uuidv4(),
-            ...instructions,
-            keywords: this.purifyStringArray(instructions.keywords),
-        };
-        return await this.from(type).insert(preparedData).then(() => [preparedData] as R[]);
+        return this.sharedContentController.fetchNewSharedContent(type, generatorInstructions, filter);
     }
 
-    private getReservedTopics(oldAssignments: BasicAssignment[]) {
-        return oldAssignments.map(({ topic, keywords }) => {
-            const keywordTexts = this.purifyStringArray(keywords).join(',');
-            return `${topic}(${keywordTexts})`;
-        });
-    }
-
-    private purifyStringArray(array: { text: string }[]): string[] {
-        return array.map(({ text }) => text);
-    }
-
+    /**
+     * Get a shared content item by id.
+     * @param type The type of shared content to get. E.g. assignments, exercises, etc.
+     * @param id The id of the shared content item.
+     * @returns The shared content item.
+     */
     public async getSharedContent<T extends BasicAssignment>(type: string, id: string): Promise<T> {
-        return await this.from(type).select().eq('id', id).single() as unknown as T;
+        return this.sharedContentController.getSharedContent(type, id);
     }
 
+    /**
+     * Complete a shared content item.
+     * @param type The type of shared content to complete. E.g. assignments, exercises, etc.
+     * @param assignmentId The id of the shared content item to complete.
+     */
     public async completeSharedContent(type: string, assignmentId: string) {
-        await this.from(type + "_result").insert({ assignment_id: assignmentId });
+        return this.sharedContentController.completeSharedContent(type, assignmentId);
     }
-}
-
-export interface UserSettings {
-    motherTongue: string;
-    languageLevel: LanguageLevel;
-}
-
-export interface SystemSettings {
-    // TODO: add system settings
-}
-
-export interface BasicAssignment {
-    id: string;
-    createdAt: Date;
-    topic: string;
-    createdBy: string;
-    verified: boolean;
-    keywords: any;
 }

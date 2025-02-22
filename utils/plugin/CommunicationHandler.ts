@@ -40,9 +40,6 @@ export default class CommunicationHandler {
     private plugin: Plugin;
     private parent: Parent;
     private communicationSecret: string | null = null;
-    private voiceQueue: Array<{ callId: number; text: string; voice: string; speed: number; language?: string }> = [];
-    private activeVoiceRequests = 0;
-    private maxConcurrentVoiceRequests = 3;
     private initialized = false;
 
     constructor(supabase: SupabaseClient, plugin: Plugin, ref: any, hash?: string, classListArray?: string[], queryParams?: Map<string, string>) {
@@ -85,15 +82,11 @@ export default class CommunicationHandler {
         }
 
         // Extract the full-access token for authorization with the Edge Function
-        const { data, error } = await this.supabase.functions.invoke(
-            "plugin-token",
-        );
+        const { data, error } = await this.supabase.functions.invoke("plugin-token");
 
         if (error) {
-            console.error("Failed to get plugin token", error);
-            throw new Error("Failed to get plugin token");
+            throw new Error("Failed to get plugin token", { cause: error });
         }
-
         return data.token;
     }
 
@@ -125,99 +118,25 @@ export default class CommunicationHandler {
             const token = await this.getPluginToken();
             this.call("getSupabaseAccess", callId, {
                 token,
+                pluginId: this.plugin.id,
                 url: env.SUPABASE_URL,
                 key: env.SUPABASE_ANON_KEY,
                 tablePrefix: "pl_" + this.plugin.name,
                 expiration: new Date(Date.now() + 1000 * 60 * 60 * 1.5), // 1.5 hours
             });
         });
-
-        const getSettingsId = (genericSettings?: string) => {
-            return ["user", "system"].includes(genericSettings || "") ? genericSettings : this.plugin.id;
-        }
-
-        // get settings
-        this.subscribe("get_settings", async (callId, { genericSettings }: { genericSettings?: string }) => {
-            console.log(`Plugin ${this.plugin.name} wants to get settings.`);
-
-            const id = getSettingsId(genericSettings);
-
-            const { data } = await this.supabase.from("plugin_settings").select("*").eq("plugin_id", id);
-            console.log("fetched Settings", data);
-            this.call("get_settings", callId, data?.length ? data[0].settings : null);
-        });
-
-        // set settings
-        this.subscribe("set_settings", async (callId, { genericSettings, settings }: { genericSettings?: string, settings: any }) => {
-            console.log(`Plugin ${this.plugin.name} wants to set settings.`);
-
-            const id = getSettingsId(genericSettings);
-            await this.supabase.from("plugin_settings").upsert({ plugin_id: id, settings: settings });
-        });
-
-        // create voice response
-        this.subscribe("getVoiceResponse", async (callId, { text, voice = "openai_alloy", speed = 1, language = undefined }) => {
-            this.voiceQueue.push({ callId, text, voice, speed, language });
-            this.processVoiceQueue();
-        });
-
-        // get speech to text response
-        this.subscribe("getSTTResponse", async (callId, audio) => {
-            console.log(`Plugin ${this.plugin.name} wants to get STT response.`);
-
-            const formData = new FormData();
-            formData.append('file', audio);
-
-            fetch('/api/stt', { method: 'POST', body: formData })
-                .then(r => r.json())
-                .then(r => this.call("getSTTResponse", callId, r.text));
-        });
-    }
-
-    private processVoiceQueue() {
-        while (this.activeVoiceRequests < this.maxConcurrentVoiceRequests && this.voiceQueue.length) {
-            const { callId, text, voice, speed, language } = this.voiceQueue.shift()!;
-            this.activeVoiceRequests++;
-            this.handleGetVoiceResponse(callId, text, voice, speed, language)
-                .finally(() => {
-                    this.activeVoiceRequests--;
-                    this.processVoiceQueue();
-                });
-        }
-    }
-
-    private async handleGetVoiceResponse(callId: number, text: string, voice: string, speed: number, language?: string) {
-        try {
-            const response = await fetch('/api/speech', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ input: text, voice, speed, language }),
-            });
-            const blob = await response.blob();
-            this.call("getVoiceResponse", callId, blob);
-        } catch (error: any) {
-            console.error("Failed to create voice response", error.message);
-        }
+        // TODO: add subscribers for plugin-to-plugin communication
     }
 
     async subscribe(topic: string, callback: (callId: number, data: any) => void) {
         if (!this.initialized) {
             await this.init();
         }
-
-        this.parent.on(topic, (result: unknown) => {
-            const { secret, _id, data } = result as { secret: string, _id: number, data: any };
+        this.parent.on(topic, ({ secret, _id, data }: any) => {
             if (secret === this.communicationSecret) {
                 callback(_id, data);
-            } else {
-                console.debug(`The child secret ${secret} did not match the parent secret ${this.communicationSecret}. Ignoring the data request.`);
             }
         });
-    }
-
-    async getPluginProperty(prop: string) {
-        await this.init();
-        return await this.parent.get(prop);
     }
 
     async emit(topic: string, data: any) {

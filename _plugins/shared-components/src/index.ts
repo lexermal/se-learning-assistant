@@ -1,7 +1,7 @@
 export * from "./components/MarkdownEditor";
 export * from "./components/CRUDModal";
-export * from "./components/audio/Playbutton";
 export * from "./plugin/ThemeSetter";
+export * from "./components/audio/Playbutton";
 export * from "./providers/EventEmitterContext";
 export * from "./providers/PluginProvider";
 export * from "./providers/EventEmitter";
@@ -9,4 +9,6 @@ export * from "./components/Spinner";
 export * from "./hooks/UseChatHook";
 export * from "./utils/PluginUtils";
 export * from "./plugin/RimoriClient";
-export * from "./plugin/AIController";
+export * from "./controller/AIController";
+export * from "./controller/SharedContentController";
+export * from "./controller/SettingsController";
