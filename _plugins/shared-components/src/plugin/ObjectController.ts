@@ -4,18 +4,18 @@ type PrimitiveType = 'string' | 'number' | 'boolean';
 
 // This is the type that can appear in the `type` property
 type ObjectToolParameterType =
-  | PrimitiveType
-  | { [key: string]: ObjectToolParameter }  // for nested objects
-  | [{ [key: string]: ObjectToolParameter }];  // for arrays of objects (notice the tuple type)
+    | PrimitiveType
+    | { [key: string]: ObjectToolParameter }  // for nested objects
+    | [{ [key: string]: ObjectToolParameter }];  // for arrays of objects (notice the tuple type)
 
 interface ObjectToolParameter {
-  type: ObjectToolParameterType;
-  description?: string;
-  enum?: string[];
+    type: ObjectToolParameterType;
+    description?: string;
+    enum?: string[];
 }
 
 export type ObjectTool = {
-  [key: string]: ObjectToolParameter;
+    [key: string]: ObjectToolParameter;
 };
 
 export interface ObjectRequest {
@@ -36,7 +36,7 @@ export interface ObjectRequest {
 }
 
 export async function generateObject(request: ObjectRequest, token: string) {
-    const response = await fetch(`${env.SUPABASE_URL}/functions/v1/llm-object`, {
+    return await fetch(`${env.SUPABASE_URL}/functions/v1/llm-object`, {
         method: 'POST',
         body: JSON.stringify({
             stream: false,
@@ -45,10 +45,9 @@ export async function generateObject(request: ObjectRequest, token: string) {
             instructions: request.instructions,
         }),
         headers: { 'Authorization': `Bearer ${token}` }
-    });
-
-    return await response.json();
+    }).then(response => response.json());
 }
+
 // TODO adjust stream to work with object
 export type OnLLMResponse = (id: string, response: string, finished: boolean, toolInvocations?: any[]) => void;
 
