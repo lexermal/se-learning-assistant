@@ -1,13 +1,14 @@
-import { env } from "@/utils/constants";
-import { LanguageCode, PollyClient, SynthesizeSpeechCommand, VoiceId } from "@aws-sdk/client-polly";
-import { NextResponse } from "next/server";
+import { getEnv } from "../../_shared/Env.ts";
+import { PollyClient, SynthesizeSpeechCommand, VoiceId } from "npm:@aws-sdk/client-polly";
+import { Buffer } from "node:buffer";
+import { getCorsHeaders } from "../../_shared/Cors.ts";
 
 export async function awsTTS(text: string, language: string, voiceId?: string) {
     const polly = new PollyClient({
         region: 'eu-west-1',
         credentials: {
-            accessKeyId: env.AWS_ACCESS_KEY_ID,
-            secretAccessKey: env.AWS_SECRET_ACCESS_KEY,
+            accessKeyId: getEnv('AWS_ACCESS_KEY_ID'),
+            secretAccessKey: getEnv('AWS_SECRET_ACCESS_KEY'),
         },
     });
 
@@ -17,17 +18,20 @@ export async function awsTTS(text: string, language: string, voiceId?: string) {
         Text: text,
         OutputFormat: 'mp3',
         LanguageCode: langCode,
-        VoiceId: getVoiceId(langCode,voiceId),
+        VoiceId: getVoiceId(langCode, voiceId),
     });
 
     const response = await polly.send(command);
     const audioStream = await streamToBuffer(response.AudioStream);
-    return new NextResponse(audioStream, {
-        headers: { 'Content-Type': 'audio/mpeg' },
+    return new Response(audioStream, {
+        headers: {
+            'Content-Type': 'audio/mpeg',
+            ...getCorsHeaders(),
+        }
     });
 }
 
-async function streamToBuffer(stream: any): Promise<Buffer> {
+function streamToBuffer(stream: any): Promise<Buffer> {
     const chunks: Buffer[] = [];
     return new Promise((resolve, reject) => {
         stream.on('data', (chunk: Buffer) => chunks.push(chunk));
@@ -36,13 +40,13 @@ async function streamToBuffer(stream: any): Promise<Buffer> {
     });
 }
 
-function getVoiceId(langCode: string, voiceId?: string) : VoiceId {
+function getVoiceId(langCode: string, voiceId?: string): VoiceId {
     const voiceIds = voices[langCode.substring(0, 2) as keyof typeof voices];
 
-    if(voiceId && voiceId !== 'default' && !voiceIds.includes(voiceId)) {
+    if (voiceId && voiceId !== 'default' && !voiceIds.includes(voiceId)) {
         throw new Error(`Voice ${voiceId} not found for language ${langCode}`);
     }
-    
+
     return (voiceId && voiceId !== 'default' ? voiceId : voiceIds[0]) as VoiceId;
 }
 
@@ -54,7 +58,7 @@ function getLanguageCode(language: string) {
         case 'swedish':
         case 'sv':
             return 'sv-SE';
-        case 'german': 
+        case 'german':
         case 'de':
             return 'de-DE';
         case 'spanish':
@@ -110,10 +114,10 @@ const voices = {
     cmn: ["Zhiyu"],
     da: ["Naja", "Mads", "Sofie"],
     en: [
-      "Nicole", "Olivia", "Russell", "Amy", "Emma", "Brian", "Arthur", "Aditi", 
-      "Raveena", "Kajal", "Niamh", "Aria", "Ayanda", "Danielle", "Gregory", 
-      "Ivy", "Joanna", "Kendra", "Kimberly", "Salli", "Joey", "Justin", "Kevin", 
-      "Matthew", "Ruth", "Stephen", "Patrick", "Geraint"
+        "Nicole", "Olivia", "Russell", "Amy", "Emma", "Brian", "Arthur", "Aditi",
+        "Raveena", "Kajal", "Niamh", "Aria", "Ayanda", "Danielle", "Gregory",
+        "Ivy", "Joanna", "Kendra", "Kimberly", "Salli", "Joey", "Justin", "Kevin",
+        "Matthew", "Ruth", "Stephen", "Patrick", "Geraint"
     ],
     fi: ["Suvi"],
     fr: ["Celine", "Lea", "Mathieu", "Remi", "Isabelle", "Chantal", "Gabrielle", "Liam"],
@@ -132,5 +136,4 @@ const voices = {
     sv: ["Astrid", "Elin"],
     tr: ["Filiz", "Burcu"],
     cy: ["Gwyneth"]
-  };
-  
+};

@@ -2,6 +2,15 @@ import { Child } from "ibridge-flex";
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import { RimoriClient } from "./RimoriClient";
 
+interface SupabaseInfo {
+    url: string,
+    key: string,
+    token: string,
+    expiration: Date,
+    tablePrefix: string,
+    pluginId: string
+}
+
 export class PluginController {
     private static instance: PluginController;
     private static client: RimoriClient;
@@ -11,10 +20,7 @@ export class PluginController {
     private communicationSecret: string | null = null;
     private initialized = false;
     private supabase: SupabaseClient | null = null;
-    private tablePrefix: string | null = null;
-    public pluginId: string | null = null;
-    private accessTokenExpiration: Date | null = null;
-    private token: string | null = null;
+    private supabaseInfo: SupabaseInfo | null = null;
 
     private constructor() {
         // localStorage.debug = "*";
@@ -69,44 +75,44 @@ export class PluginController {
     public async getClient(): Promise<{ supabase: SupabaseClient, tablePrefix: string, pluginId: string }> {
         if (
             this.supabase &&
-            this.pluginId &&
-            this.tablePrefix &&
-            this.accessTokenExpiration &&
-            this.accessTokenExpiration > new Date()
+            this.supabaseInfo &&
+            this.supabaseInfo.expiration > new Date()
         ) {
-            return { supabase: this.supabase, tablePrefix: this.tablePrefix, pluginId: this.pluginId };
+            return { supabase: this.supabase, tablePrefix: this.supabaseInfo.tablePrefix, pluginId: this.supabaseInfo.pluginId };
         }
 
-        const response = await this.request<{
-            url: string,
-            key: string,
-            token: string,
-            expiration: Date,
-            tablePrefix: string,
-            pluginId: string
-        }>("getSupabaseAccess");
+        this.supabaseInfo = await this.request<SupabaseInfo>("getSupabaseAccess");
 
-        this.accessTokenExpiration = response.expiration;
-        this.token = response.token;
-
-        this.supabase = createClient(response.url, response.key, {
+        this.supabase = createClient(this.supabaseInfo.url, this.supabaseInfo.key, {
             accessToken: () => Promise.resolve(this.getToken())
         });
 
-        return { supabase: this.supabase, tablePrefix: response.tablePrefix, pluginId: response.pluginId };
+        return { supabase: this.supabase, tablePrefix: this.supabaseInfo.tablePrefix, pluginId: this.supabaseInfo.pluginId };
     }
 
     public async getToken() {
-        if (this.token && this.accessTokenExpiration && this.accessTokenExpiration > new Date()) {
-            return this.token;
+        if (this.supabaseInfo && this.supabaseInfo.expiration && this.supabaseInfo.expiration > new Date()) {
+            return this.supabaseInfo.token;
         }
 
         const response = await this.request<{ token: string, expiration: Date }>("getSupabaseAccess");
 
-        this.token = response.token;
-        this.accessTokenExpiration = response.expiration;
+        if (!this.supabaseInfo) {
+            throw new Error("Supabase info not found");
+        }
 
-        return this.token;
+        this.supabaseInfo.token = response.token;
+        this.supabaseInfo.expiration = response.expiration;
+
+        return this.supabaseInfo.token;
+    }
+
+    public getSupabaseUrl() {
+        if (!this.supabaseInfo) {
+            throw new Error("Supabase info not found");
+        }
+
+        return this.supabaseInfo.url;
     }
 
     public emit(eventName: string, data?: any) {

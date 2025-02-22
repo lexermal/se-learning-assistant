@@ -154,12 +154,16 @@ export class RimoriClient {
         streamChatGPT(messages, tools || [], onMessage, token);
     }
 
-    public getVoiceResponse(text: string, voice = "alloy", speed = 1, language?: string): Promise<Blob> {
-        return getTTSResponse(text, voice, speed, language);
+    public async getVoiceResponse(text: string, voice = "alloy", speed = 1, language?: string): Promise<Blob> {
+        return getTTSResponse(
+            this.plugin.getSupabaseUrl(),
+            { input: text, voice, speed, language },
+            await this.plugin.getToken()
+        );
     }
 
     public getVoiceToTextResponse(file: Blob): Promise<string> {
-        return getSTTResponse(file);
+        return getSTTResponse(this.superbase, file);
     }
 
     public async generateObject(request: ObjectRequest): Promise<any> {

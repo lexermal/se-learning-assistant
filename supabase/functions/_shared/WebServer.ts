@@ -5,7 +5,7 @@ import { serve as denoServe } from "https://deno.land/std@0.140.0/http/server.ts
 
 export type JWTPayload = DenoJWTPayload
 
-type Handler<T> = (reqData: T, payload: JWTPayload) => Promise<WebServerResponse | Response>;
+type Handler<T> = (reqData: T | FormData, payload: JWTPayload, req: Request) => Promise<WebServerResponse | Response>;
 
 export function serve<T>(allowedMethods: string | string[], handler: Handler<T>) {
     if (typeof allowedMethods === "string") {
@@ -59,8 +59,9 @@ export function serve<T>(allowedMethods: string | string[], handler: Handler<T>)
                 });
             }
 
-            let query = await parseRequestBody(req);
-            const response = await handler(query, payload);
+            const query = await parseRequestBody(req);
+            console.log("Ready to handle request");
+            const response = await handler(query, payload, req);
 
             if (response instanceof Response) {
                 return response;
@@ -87,17 +88,33 @@ export function serve<T>(allowedMethods: string | string[], handler: Handler<T>)
     });
 }
 
-async function parseRequestBody(req: Request): Promise<any> {
-    const text = await req.text();
-    if (text) {
-        return JSON.parse(text);
+async function parseRequestBody(req: Request): Promise<FormData | any> {
+    const contentType = req.headers.get('content-type')?.toLowerCase() || '';
+
+    if (contentType.includes('multipart/form-data')) {
+        return await req.formData();
     }
-    return {};
+
+    if (contentType.includes('application/json')) {
+        const text = await req.text();
+        console.log("JSON Text:", text);
+        return text ? JSON.parse(text) : {};
+    }
+
+    // Default to raw text if content-type is not specified
+    const text = await req.text();
+    console.log("Raw Text:", text);
+    return text || {};
 }
 
-type ResponseType = "json" | "text" | "stream";
+type ResponseType = "json" | "text" | "stream" | "audio";
 
 export class WebServerResponse {
+    public status: number;
+    private response: any;
+    private responseType: ResponseType;
+    private headers: Record<string, string>;
+
     constructor(response: any, status = 200, responseType: ResponseType = "json", headers: Record<string, string> = {}) {
         this.response = response;
         this.status = status;
@@ -105,20 +122,16 @@ export class WebServerResponse {
         this.headers = headers;
     }
 
-    response: any;
-    status: number;
-    responseType: ResponseType;
-    headers: Record<string, string>;
-
-    getBody() {
+    public getBody() {
         return this.responseType === "json" ? JSON.stringify(this.response) : this.response;
     }
 
-    getHeaders() {
+    public getHeaders() {
         const eventTypeMap = {
             "text": "text/plain",
             "json": "application/json",
-            "stream": "text/event-stream"
+            "stream": "text/event-stream",
+            "audio": "audio/mpeg"
         }
 
         return {
@@ -145,4 +158,6 @@ export enum WebErrorKey {
     InvalidAuthorizationHeader = "invalid_authorization_header",
     MissingUserIdInToken = "missing_user_id_in_token",
     InvalidJWT = "invalid_jwt",
+    NoFileUploaded = "no_file_uploaded",
+    ErrorWhenConvertingVoiceIntoAudio = "error_when_converting_voice_into_audio",
 }
