@@ -8,6 +8,7 @@ type AudioPlayerProps = {
     text: string;
     voice?: string;
     language?: string;
+    hide?: boolean;
     playOnMount?: boolean;
     initialSpeed?: number;
     enableSpeedAdjustment?: boolean;
@@ -23,6 +24,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
     text,
     voice,
     language,
+    hide,
     playListenerEvent,
     initialSpeed = 1.0,
     playOnMount = false,
@@ -94,9 +96,9 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
     return (
         <div className="group relative">
             <div className='flex flex-row items-end'>
-                <button className="text-gray-500" onClick={togglePlayback} disabled={isLoading}>
+                {!hide && <button className="text-gray-500" onClick={togglePlayback} disabled={isLoading}>
                     {isLoading ? <Spinner /> : isPlaying ? <FaStopCircle size={"25px"} /> : <FaPlayCircle size={"25px"} />}
-                </button>
+                </button>}
                 {enableSpeedAdjustment && (
                     <div className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-row text-sm text-gray-500">
                         <span className='pr-1'>Speed: </span>

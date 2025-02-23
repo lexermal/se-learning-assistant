@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Instructions } from './ReadingPromptProvider';
-import { getStoryInspiration } from "./RandomStoryTopic";
+import { getStoryInspiration, getRandomStoryPerspective } from "./RandomStoryTopic";
 import { usePlugin, UserSettings } from "shared-components";
 import { GiPerspectiveDiceSixFacesRandom } from "react-icons/gi";
 import { getDifficultyLevel } from "shared-components/dist/utils/difficultyConverter";
@@ -46,7 +46,7 @@ export function StartScreen(props: { onStart: (i: Instructions) => void }) {
             </div>
 
             <button className="right-0 p-3 mt-4 bg-blue-500 rounded text-xl"
-                onClick={() => props.onStart({ topic, length: storyLength[length] as any, difficulty })}
+                onClick={() => props.onStart({ topic, length: storyLength[length] as any, difficulty, perspective: getRandomStoryPerspective() })}
             >Start</button>
         </div>
     );

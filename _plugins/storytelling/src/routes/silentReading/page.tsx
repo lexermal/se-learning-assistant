@@ -42,7 +42,7 @@ export default function SilentReading() {
                     h1: ({ node, ...props }) => (
                         <div className='border-b dark:border-gray-600 mt-8 pb-1 mb-2 flex-row flex flex-wrap items-end'>
                             <h1 className="text-3xl font-bold dark:text-gray-500 min-w-fit mr-1" {...props} />
-                            {!(isLoading && i === ms.length - 1) && <AudioPlayer text={m.content} initialSpeed={readingSpeed ?? 1} />}
+                            <AudioPlayer hide={isLoading && i === ms.length - 1} text={m.content} initialSpeed={readingSpeed ?? 1} />
                         </div>
                     ),
                     p: ({ node, ...props }) => (

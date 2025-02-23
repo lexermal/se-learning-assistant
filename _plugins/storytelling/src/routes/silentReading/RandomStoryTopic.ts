@@ -1,20 +1,20 @@
 export function getStoryInspiration(): string {
     const genres = [
-        'Horror',
-        'Adventure',
-        'Mystery',
-        'Romance',
-        'Science Fiction',
-        'Fantasy',
-        'Thriller',
-        'Comedy',
-        'Historical Fiction',
-        'Memoir',
-        'Crime',
-        'Drama',
-        'Biography',
-        'Historical',
-        'True'
+        'A horror',
+        'An adventure',
+        'A mystery',
+        'A romance',
+        'A science fiction',
+        'A fantasy',
+        'A thriller',
+        'A comedy',
+        'A historical fiction',
+        'A memoir',
+        'A crime',
+        'A drama',
+        'A biography',
+        'A historical',
+        'A true'
     ];
     const actors = [
         'an old man with gray hair and a hat',
@@ -51,11 +51,11 @@ export function getStoryInspiration(): string {
         'achieves a lifelong dream'
     ];
     const places = [
-        'a mansion in America',
-        'an abandoned castle',
-        'a remote island',
-        'a futuristic city',
-        'a small village',
+        'in a mansion in America',
+        'in an abandoned castle',
+        'on a remote island',
+        'in a futuristic city',
+        'in a small village',
         'in a parallel universe',
         'on a distant planet',
         'in the heart of a jungle',
@@ -83,29 +83,33 @@ export function getStoryInspiration(): string {
         'during a war',
         'in the early 2000s',
         'in the near future',
-        '', // this keeps the the time of the setting open
-        '', // this keeps the the time of the setting open
-        '', // this keeps the the time of the setting open
     ];
 
+    const genre = getRandomElement(genres);
+    const actor = getRandomElement(actors);
+    const subordinate = getRandomElement(subordinates);
+    const place = getRandomElement(places);
+    const century = getRandomElement(centuries, 0.1, true);
+    return `${genre} story about ${actor} who ${subordinate} ${place}${century}.`;
+}
+
+function getRandomElement(array: string[], nothingChance: number = 0, addSpace: boolean = false) {
+    if (Math.random() < nothingChance) {
+        return '';
+    }
+    const space = addSpace ? ' ' : '';
+    return space + array[Math.floor(Math.random() * array.length)];
+}
+
+export function getRandomStoryPerspective(): string {
     const perspectives = [
-        'told through their own eyes (first-person perspective)',
-        'narrated directly to the reader (second-person perspective)', 
-        'observed by an outside narrator (third-person perspective)',
-        'from multiple characters\' viewpoints (multiple perspectives)',
-        'through diary entries and letters (epistolary perspective)',
-        'as an omniscient observer who knows all (third-person omniscient)',
-        'focusing closely on one character\'s thoughts (third-person limited)',
-        '', // this keeps the perspective open
-        '', // this keeps the perspective open
-        '', // this keeps the perspective open
+        'first-person perspective (told through their own eyes)',
+        'second-person perspective (narrated directly to the reader)',
+        'third-person perspective (observed by an outside narrator)',
+        'multiple perspectives (from multiple characters\' viewpoints)',
+        'epistolary perspective (through diary entries and letters)',
+        'third-person omniscient (as an omniscient observer who knows all)',
+        'third-person limited (focusing closely on one character\'s thoughts)',
     ];
-
-    const genre = genres[Math.floor(Math.random() * genres.length)];
-    const actor = actors[Math.floor(Math.random() * actors.length)];
-    const subordinate = subordinates[Math.floor(Math.random() * subordinates.length)];
-    const place = places[Math.floor(Math.random() * places.length)];
-    const century = centuries[Math.floor(Math.random() * centuries.length)];
-    const perspective = perspectives[Math.floor(Math.random() * perspectives.length)];
-    return `${genre} story about ${actor} who ${subordinate} at ${place} ${century} ${perspective}.`;
+    return getRandomElement(perspectives);
 }
