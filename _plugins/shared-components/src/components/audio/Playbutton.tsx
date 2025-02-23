@@ -40,6 +40,13 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
         emitter.on(playListenerEvent, () => togglePlayback());
     }, [playListenerEvent]);
 
+    useEffect(() => {
+        audioUrl && setAudioUrl(null);
+        return () => {
+            audioUrl && URL.revokeObjectURL(audioUrl);
+        }
+    }, [text]);
+
     // Function to generate audio from text using API
     const generateAudio = async () => {
         setIsLoading(true);
@@ -66,7 +73,6 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
 
         return () => {
             audio.pause();
-            URL.revokeObjectURL(audioUrl);
         };
     }, [audioUrl, isPlaying, speed]);
 
