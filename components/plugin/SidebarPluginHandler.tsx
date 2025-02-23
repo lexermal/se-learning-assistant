@@ -6,10 +6,18 @@ import { useEventEmitter } from "@/utils/providers/EventEmitterContext";
 import { Plugin, SidebarPage } from "../../utils/plugin/CommunicationHandler";
 import CommunicationHandler from "../../utils/plugin/CommunicationHandler";
 import { SupabaseClient } from "@/utils/supabase/client";
+import { CgMaximizeAlt } from "react-icons/cg";
+import { TbArrowsMinimize } from "react-icons/tb";
 
 function PluginSidebar({ plugin, contextMenuAction }: { plugin: Plugin, contextMenuAction: MenuEntry }) {
     const iframeRef = useRef<HTMLIFrameElement | null>(null);
     const supabase = SupabaseClient.getClient();
+    const [isMaximized, setIsMaximized] = useState(false);
+
+    function handleMaximize() {
+        document.body.style.overflow = isMaximized ? "auto" : "hidden";
+        setIsMaximized(!isMaximized);
+    }
 
     useEffect(() => {
         const parent = new CommunicationHandler(supabase, plugin, iframeRef.current, contextMenuAction.url, ["h-full", "dark:bg-gray-920"], new Map([["applicationMode", "sidebar"]]));
@@ -27,7 +35,10 @@ function PluginSidebar({ plugin, contextMenuAction }: { plugin: Plugin, contextM
     return (
         <div className="dark:bg-gray-920 w-full h-full border-l border-gray-600 pt-[50px]">
             {/* For the communication library to use it needs to have the div with the iframe inside!!! */}
-            <div ref={iframeRef} className="w-full h-full" style={{ opacity: 0 }}>
+            <button className="absolute p-1 right-0 text-gray-400 hover:text-gray-200 text-2xl z-20" onClick={handleMaximize}>
+                {isMaximized ? <TbArrowsMinimize /> : <CgMaximizeAlt />}
+            </button>
+            <div ref={iframeRef} className={"w-full h-full " + (isMaximized ? "fixed left-0" : "")} style={{ opacity: 0 }}>
                 <iframe className="w-full" style={{ height: "calc(100vh - 50px)" }} allow="microphone; autoplay; fullscreen" src={plugin.endpoint} />
             </div>
         </div>
