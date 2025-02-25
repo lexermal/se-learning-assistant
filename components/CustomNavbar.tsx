@@ -68,16 +68,11 @@ export default function CustomNavbar() {
         const rootMap = new Map<string, MenuItem[]>();
 
         plugins.forEach(plugin => {
-            plugin.pluginPages.forEach(page => {
-                const menuItem = {
-                    name: page.name,
-                    url: `/plugin/${plugin.name}${page.url}`
-                };
-
-                if (!rootMap.has(page.root)) {
-                    rootMap.set(page.root, []);
+            plugin.pluginPages.forEach(({ name, url, root }) => {
+                if (!rootMap.has(root)) {
+                    rootMap.set(root, []);
                 }
-                rootMap.get(page.root)!.push(menuItem);
+                rootMap.get(root)!.push({ name, url: `/plugin/${plugin.name}#${url}` });
             });
         });
 
