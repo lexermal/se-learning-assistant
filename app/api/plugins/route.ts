@@ -210,7 +210,7 @@ export async function GET() {
                 //     iconUrl: "logo.png",
                 // },
             ],
-            settingsPage: "/settings",
+            settingsPage: "",
             unmanaged: true,
         },
         {
@@ -235,7 +235,7 @@ export async function GET() {
             ],
             contextMenuActions: [],
             sidebarPages: [],
-            settingsPage: "#/settings",
+            settingsPage: "",
         },
     ];
 
