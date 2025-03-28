@@ -1,4 +1,4 @@
-import { RimoriClient } from "shared-components";
+import { RimoriClient } from "@rimori/client";
 import { BasicWordInfo, Translation } from "../types/translation";
 
 export async function getBasicWordInfo(word: string, targetLanguage: string, plugin: RimoriClient): Promise<BasicWordInfo> {

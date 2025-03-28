@@ -1,5 +1,5 @@
 import { Card, createEmptyCard, FSRS, fsrs, generatorParameters, Grade, State } from "ts-fsrs";
-import { RimoriClient } from "shared-components";
+import { RimoriClient } from "@rimori/client";
 // import { Deck } from "../DeckOverviewPage";
 
 interface Deck extends Record<string, unknown> {

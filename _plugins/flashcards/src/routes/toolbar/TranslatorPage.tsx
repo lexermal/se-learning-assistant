@@ -3,7 +3,7 @@ import { RiRobot3Fill } from "react-icons/ri";
 import { FaUserCircle } from "react-icons/fa";
 import TranslationEntry from './TranslationEntry';
 import { Translation } from '../../types/translation';
-import { useChat, usePlugin, MarkdownEditor } from 'shared-components';
+import { useChat, usePlugin, MarkdownEditor } from '@rimori/client';
 
 export default function TranslationSidebar() {
     const [translation, setTranslation] = useState<Translation | null>(null);

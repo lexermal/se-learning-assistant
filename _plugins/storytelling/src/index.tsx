@@ -2,12 +2,12 @@ import React, { lazy } from 'react';
 // import App from './routes/App';
 import ReactDOM from 'react-dom/client';
 import reportWebVitals from './reportWebVitals';
-import { PluginProvider, setTheme } from 'shared-components';
+import { PluginProvider, setTheme } from '@rimori/client';
 import { HashRouter, Route, Routes } from "react-router-dom";
 import './index.css';
 // import AddCard from './routes/toolbar/AddCard';
 // import SilentReading from './routes/silentReading/page';
-import 'shared-components/dist/style.css';
+import '@rimori/client/dist/style.css';
 
 setTheme();
 

@@ -2,7 +2,7 @@ import { useEffect, useMemo } from 'react';
 import VoiceRecorder from './EmbeddedAssistent/VoiceRecoder';
 import MessageSender from './EmbeddedAssistent/TTS/MessageSender';
 import CircleAudioAvatar from './EmbeddedAssistent/CircleAudioAvatar';
-import { usePlugin, EmitterSingleton, Tool, useChat } from 'shared-components';
+import { usePlugin, EmitterSingleton, Tool, useChat } from '@rimori/client';
 
 interface Props {
     task: string;

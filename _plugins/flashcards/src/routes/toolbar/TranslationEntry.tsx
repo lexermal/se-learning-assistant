@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { AudioPlayer } from "shared-components";
-import { usePlugin, UserSettings } from "shared-components";
+import { AudioPlayer } from "@rimori/client";
+import { usePlugin, UserSettings } from "@rimori/client";
 import AddToDeckButton from "../../components/DropDownButton";
 import { FlashcardPluginSettings } from "../settings/SettingsPage";
 import { Translation, BasicWordInfo } from "../../types/translation";

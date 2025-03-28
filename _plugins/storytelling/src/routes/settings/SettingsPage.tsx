@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useEffect } from "react";
-import { AudioPlayOptions, AudioPlayOptionType, usePlugin } from "shared-components";
+import { AudioPlayOptions, AudioPlayOptionType, usePlugin } from "@rimori/client";
 
 export interface FlashcardPluginSettings {
     readingSpeed: AudioPlayOptionType

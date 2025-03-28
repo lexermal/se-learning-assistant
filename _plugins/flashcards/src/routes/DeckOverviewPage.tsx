@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { MdDelete, MdModeEdit } from 'react-icons/md';
 import React, { ReactElement, useEffect } from 'react';
-import { usePlugin, CRUDModal } from 'shared-components';
+import { usePlugin, CRUDModal } from '@rimori/client';
 
 export interface Deck {
   id: string;

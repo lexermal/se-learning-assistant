@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaPauseCircle, FaPlayCircle, FaStopCircle } from 'react-icons/fa';
-import { useEventEmitter } from 'shared-components';
+import { useEventEmitter } from '@rimori/client';
 
 interface Session {
   type: 'Study' | 'Relax';

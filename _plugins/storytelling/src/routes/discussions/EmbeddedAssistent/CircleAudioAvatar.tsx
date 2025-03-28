@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { EmitterSingleton } from 'shared-components';
+import { EmitterSingleton } from '@rimori/client';
 
 interface CircleAudioAvatarProps {
     width?: string;

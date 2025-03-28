@@ -6,7 +6,7 @@ interface SpinnerProps {
     className?: string;
 }
 
-const Spinner: React.FC<SpinnerProps> = ({ text, className, size = "30px" }) => {
+export const Spinner: React.FC<SpinnerProps> = ({ text, className, size = "30px" }) => {
     return (
         <div className={"flex items-center space-x-2 " + className}>
             <svg
@@ -20,5 +20,3 @@ const Spinner: React.FC<SpinnerProps> = ({ text, className, size = "30px" }) => 
         </div>
     );
 };
-
-export default Spinner;

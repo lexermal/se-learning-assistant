@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useState } from 'react';
 import Markdown from 'react-markdown'
-import { AudioPlayer, AudioPlayOptionType, useChat, usePlugin } from 'shared-components';
+import { AudioPlayer, AudioPlayOptionType, useChat, usePlugin } from '@rimori/client';
 import getSilentReadingPrompt from './ReadingPromptProvider';
 import { StartScreen } from './StartScreen';
 import { FlashcardPluginSettings } from '../settings/SettingsPage';

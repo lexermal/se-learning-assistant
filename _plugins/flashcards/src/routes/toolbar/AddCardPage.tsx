@@ -1,8 +1,8 @@
 import { Deck } from '../DeckOverviewPage';
 import { useState, useEffect } from 'react';
-import { usePlugin } from 'shared-components';
-import { CRUDModal } from 'shared-components';
-import { MarkdownEditor } from 'shared-components';
+import { usePlugin } from '@rimori/client';
+import { CRUDModal } from '@rimori/client';
+import { MarkdownEditor } from '@rimori/client';
 import FlashcardController from '../deck/FlashcardController';
 
 export default function AddCard() {

@@ -2,7 +2,7 @@ import { State } from "ts-fsrs";
 import { Flashcard } from "./FlashcardController";
 import TagInput from "../../components/form/TagInput";
 import { FlashcardEdit } from "./FlashcardTrainingPage";
-import { MarkdownEditor, AudioPlayer } from "shared-components";
+import { MarkdownEditor, AudioPlayer } from "@rimori/client";
 
 interface FlashcardProps {
     card: Flashcard,

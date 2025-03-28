@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { Instructions } from './ReadingPromptProvider';
 import { getStoryInspiration, getRandomStoryPerspective } from "./RandomStoryTopic";
-import { usePlugin, UserSettings } from "shared-components";
+import { usePlugin, UserSettings } from "@rimori/client";
 import { GiPerspectiveDiceSixFacesRandom } from "react-icons/gi";
-import { getDifficultyLevel } from "shared-components/dist/utils/difficultyConverter";
+import { getDifficultyLevel } from "@rimori/client";
 
 const storyLength = {
     short: 5,

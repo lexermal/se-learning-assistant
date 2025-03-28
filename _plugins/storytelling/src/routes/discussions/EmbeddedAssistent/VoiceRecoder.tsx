@@ -1,6 +1,6 @@
 import { useState, useRef, forwardRef, useImperativeHandle } from 'react';
 import { FaMicrophone } from 'react-icons/fa6';
-import { usePlugin } from 'shared-components';
+import { usePlugin } from '@rimori/client';
 
 interface Props {
   iconSize?: string;

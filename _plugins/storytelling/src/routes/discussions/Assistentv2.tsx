@@ -2,8 +2,8 @@ import React, { useEffect, useMemo } from 'react';
 import CircleAudioAvatar from './EmbeddedAssistent/CircleAudioAvatar';
 import AudioInputField from './EmbeddedAssistent/AudioInputField';
 import MessageSender from './EmbeddedAssistent/TTS/MessageSender';
-import { usePlugin, EmitterSingleton } from 'shared-components';
-import { useChat } from 'shared-components';
+import { usePlugin, EmitterSingleton } from '@rimori/client';
+import { useChat } from '@rimori/client';
 import Markdown from 'react-markdown';
 
 const emitter = EmitterSingleton;

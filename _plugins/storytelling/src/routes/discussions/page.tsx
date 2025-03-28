@@ -4,8 +4,8 @@ import Card from './components/Card';
 import { useEffect, useState } from 'react';
 import DiscussionPanel from './DiscussionPanel';
 import DiscussionPopup from './components/DiscussionPopup';
-import Spinner from 'shared-components/dist/components/Spinner';
-import { usePlugin, Tool } from 'shared-components';
+import { Spinner } from '@rimori/client';
+import { usePlugin, Tool } from '@rimori/client';
 
 interface RatingResult {
     examNr: number;

@@ -41,14 +41,14 @@ export async function GET() {
 
     let plugins: Plugin[] = [
         {
-            id: "1",
+            id: "pl454583483",
             name: "flashcards",
             title: "Flashcards",
             description: "Memorize words, phrases, and more with flashcards.",
             version: "1.0.0",
             author: "lexermal",
-            endpoint: env.DEFAULT_PLUGIN_ENDPOINT + "/plugins/flashcards/",
-            endpointDev: "http://localhost:3001/plugins/flashcards/",
+            endpoint: env.DEFAULT_PLUGIN_ENDPOINT + "/plugins/pl454583483/",
+            endpointDev: "http://localhost:3001/plugins/pl454583483/",
             pluginRepo: "https://github.com/lexermal/se-learning-assistant",
             pluginWebsite: "https://lexermal.github.io/se-learning-assistant/",
             iconUrl: "logo.png",
@@ -97,14 +97,14 @@ export async function GET() {
             settingsPage: "#/settings",
         },
         {
-            id: "2",
+            id: "pl976053336",
             name: "storytelling",
             title: "Storytelling",
             description: "Learn vocabulary and grammar by reading stories.",
             version: "1.0.0",
             author: "lexermal",
-            endpoint: env.DEFAULT_PLUGIN_ENDPOINT + "/plugins/storytelling/",
-            endpointDev: "http://localhost:3002/plugins/storytelling/",
+            endpoint: env.DEFAULT_PLUGIN_ENDPOINT + "/plugins/pl976053336/",
+            endpointDev: "http://localhost:3002/plugins/pl976053336/",
             pluginRepo: "https://lexermal.github.io/se-learning-assistant/",
             pluginWebsite: "https://lexermal.github.io/se-learning-assistant/",
             iconUrl: "logo.png",
@@ -127,7 +127,7 @@ export async function GET() {
             settingsPage: "#/settings",
         },
         {
-            id: "3",
+            id: "pl423940426",
             name: "resources",
             title: "Resources",
             description: "Useful resources to learn swedish.",
@@ -214,14 +214,14 @@ export async function GET() {
             unmanaged: true,
         },
         {
-            id: "4",
+            id: "pl595258785",
             name: "writing",
             title: "Writing",
             description: "Improve your writing skills by writing and getting feedback.",
             version: "1.0.0",
             author: "lexermal",
-            endpoint: env.DEFAULT_PLUGIN_ENDPOINT + "/plugins/writing/",
-            endpointDev: "http://localhost:3004/plugins/writing/",
+            endpoint: env.DEFAULT_PLUGIN_ENDPOINT + "/plugins/pl595258785/",
+            endpointDev: "http://localhost:3004/plugins/pl595258785/",
             pluginRepo: "https://lexermal.github.io/se-learning-assistant/",
             pluginWebsite: "https://lexermal.github.io/se-learning-assistant/",
             iconUrl: "logo.png",
@@ -240,10 +240,10 @@ export async function GET() {
     ];
 
     plugins = plugins.map(p => {
-        if (process.env.NODE_ENV !== "production") {
-            console.log("Using dev endpoint for plugin", p.name);
-            p.endpoint = p.endpointDev!;
-        }
+        // if (process.env.NODE_ENV !== "production") {
+        //     console.log("Using dev endpoint for plugin", p.name);
+        //     p.endpoint = p.endpointDev!;
+        // }
         delete p.endpointDev;
 
         p.iconUrl = p.endpoint + p.iconUrl;

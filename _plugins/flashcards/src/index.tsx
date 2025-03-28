@@ -1,14 +1,14 @@
 import React, { lazy } from 'react';
 import ReactDOM from 'react-dom/client';
 import reportWebVitals from './reportWebVitals';
-import { PluginProvider } from 'shared-components';
+import { PluginProvider } from '@rimori/client';
 import { HashRouter, Route, Routes } from "react-router-dom";
-import { EventEmitterProvider } from 'shared-components';
-import { setTheme } from 'shared-components/dist/utils/plugin/ThemeSetter';
+import { EventEmitterProvider } from '@rimori/client';
+// import { setTheme } from 'shared-components/dist/utils/plugin/ThemeSetter';
 import './index.css';
-import 'shared-components/dist/style.css';
+import '@rimori/client/dist/style.css';
 
-setTheme();
+// setTheme();
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement,

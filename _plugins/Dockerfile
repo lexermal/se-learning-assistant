@@ -4,29 +4,17 @@ FROM node:18-alpine AS builder
 # Set the working directory
 WORKDIR /app
 
-# Copy the package.json and yarn.lock files
-COPY package.json yarn.lock ./
+# Install necessary dependencies for build
+RUN apk add --no-cache bash grep
 
-# Copy all plugins
-COPY . ./
+# Copy all files
+COPY . .
 
-# Install dependencies
-RUN yarn install
+# Make build script executable
+RUN chmod +x build.sh
 
-# Build each React application
-RUN for dir in ./*/; do \
-    if [ -d "$dir" ] && [ "$(basename \"$dir\")" != "node_modules" ]; then \
-        APP_NAME=$(basename "$dir"); \
-        cd "$dir" || exit; \
-        export GENERATE_SOURCEMAP=false; \
-        yarn run build; \
-        cd - || exit; \
-        if [ "$APP_NAME" != "shared-components" ]; then \
-            mkdir -p "dist/$APP_NAME"; \
-            mv "$dir"build/* "dist/$APP_NAME/"; \
-        fi; \
-    fi; \
-done
+# Run the build script
+RUN ./build.sh
 
 # Stage 2: Create the final image
 FROM nginx:alpine

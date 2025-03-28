@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useEffect } from "react";
-import { usePlugin } from "shared-components";
+import { usePlugin } from "@rimori/client";
 
 export interface FlashcardPluginSettings {
     autoPlayForeignNewFlashcards: boolean;

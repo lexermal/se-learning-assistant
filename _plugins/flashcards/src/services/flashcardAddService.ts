@@ -1,4 +1,4 @@
-import { RimoriClient } from "shared-components";
+import { RimoriClient } from "@rimori/client";
 import FlashcardController from "../routes/deck/FlashcardController";
 import { Translation } from "../types/translation";
 
