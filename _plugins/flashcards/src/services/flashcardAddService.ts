@@ -15,10 +15,9 @@ export function addFlashcard(plugin: RimoriClient, t: Translation, id: string, l
 }
 
 export function getFrontPage(t: Partial<Translation>) {
-    const isEtt = t.en_ett_word === "ett";
     const targetTranslation = t.translation_noun_singular || t.translation || [];
 
-    return (isEtt ? "a/an " : "") + targetTranslation.join(", ") + getAlternativeMeaning(t);
+    return targetTranslation.join(", ") + getAlternativeMeaning(t);
 }
 
 
