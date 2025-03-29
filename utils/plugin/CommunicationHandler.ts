@@ -6,40 +6,37 @@ import { env } from "../client-constants";
 export interface SidebarPage {
     name: string;
     url: string;
-    iconUrl: string;
+    icon_url: string;
     description: string;
 }
 
 export interface Plugin {
     id: string;
-    name: string;
     title: string;
     description: string;
-    pluginRepo: string;
-    pluginWebsite: string;
-    iconUrl: string;
+    git_repository: string;
+    website: string;
+    icon_url: string;
     version: string;
     author: string;
     endpoint: string;
-    contextMenuActions: MenuEntry[];
-    isMainPlugin: boolean;
-    isSidebarPlugin: boolean;
-    pluginPages: {
+    context_menu_actions: MenuEntry[];
+    plugin_pages: {
         name: string;
         url: string;
         description: string;
         root: string;
     }[];
-    sidebarPages: SidebarPage[];
-    settingsPage: string;
-    unmanaged?: boolean;
+    sidebar_pages: SidebarPage[];
+    settings_page: string;
+    unmanaged: boolean;
 }
 
 export default class CommunicationHandler {
     private supabase: SupabaseClient;
     private plugin: Plugin;
     private parent: Parent;
-    private communicationSecret: string | null = null;
+    private communicationSecret: string;
     private initialized = false;
 
     constructor(supabase: SupabaseClient, plugin: Plugin, ref: any, hash?: string, classListArray?: string[], queryParams?: Map<string, string>) {
@@ -60,12 +57,13 @@ export default class CommunicationHandler {
 
         const url = new URL(fullEndpoint);
 
-        if (!this.plugin.unmanaged) {
-            url.searchParams.append("secret", this.communicationSecret!);
-        }
+        // if (!this.plugin.unmanaged) {
+        url.searchParams.append("secret", this.communicationSecret);
+        // }
 
-        if (!url.href.startsWith(endpoint)) {
+        if (!this.plugin.unmanaged && !url.href.startsWith(endpoint)) {
             console.error("The url does not start with the endpoint. External pages are not supported.", url.href, fullEndpoint);
+            return endpoint;
         }
 
         if (queryParams) {
@@ -99,7 +97,7 @@ export default class CommunicationHandler {
     }
 
     async init(): Promise<boolean> {
-        if (this.initialized || this.plugin.unmanaged) {
+        if (this.initialized) {
             return true;
         }
 
@@ -108,7 +106,7 @@ export default class CommunicationHandler {
             this.initialized = true;
             return true;
         }).catch((error: any) => {
-            console.error("Failed to initialize the plugin communication:", error);
+            console.warn("Could not initialize the communication with the plugin.", error);
             return false;
         });
     }
@@ -121,7 +119,7 @@ export default class CommunicationHandler {
                 pluginId: this.plugin.id,
                 url: env.SUPABASE_URL,
                 key: env.SUPABASE_ANON_KEY,
-                tablePrefix: "pl_" + this.plugin.name,
+                tablePrefix: this.plugin.id,
                 expiration: new Date(Date.now() + 1000 * 60 * 60 * 1.5), // 1.5 hours
             });
         });

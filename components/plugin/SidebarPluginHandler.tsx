@@ -46,7 +46,7 @@ function PluginSidebar({ plugin, contextMenuAction }: { plugin: Plugin, contextM
 }
 
 export function SidebarPluginHandler({ plugins }: { plugins: Plugin[] }) {
-    const sidebarPlugins = plugins.flatMap((plugin) => plugin.sidebarPages.map(sp => ({ ...sp, pluginName: plugin.name }))) as (SidebarPage & { pluginName: string })[];
+    const sidebarPlugins = plugins.flatMap((plugin) => plugin.sidebar_pages.map(sp => ({ ...sp, pluginName: plugin.name }))) as (SidebarPage & { pluginName: string })[];
     const [openPlugin, setOpenPlugin] = useState<number>(-1);
     const [sidebarPlugin, setSidebarPlugin] = useState<Plugin | null>(null);
     const [pluginAction, setPluginAction] = useState<ContextMenuAction | undefined>(undefined);
@@ -90,7 +90,7 @@ export function SidebarPluginHandler({ plugins }: { plugins: Plugin[] }) {
                     style={{ width: isOpen ? (isMdScreen ? "100%" : "500px") : "40px" }}
                     className="fixed right-0 top-0 flex flex-row h-fgggull">
                     <div className="flex flex-col gap-1 w-0 pt-[4.3rem] h-fit" style={{ marginRight: "40px" }}>
-                        {sidebarPlugins.map(({ name, url, iconUrl, pluginName }, index) => {
+                        {sidebarPlugins.map(({ name, url, icon_url: iconUrl, pluginName }, index) => {
                             const plugin = plugins.find(p => p.name === pluginName)!;
                             return (
                                 <button
@@ -103,7 +103,7 @@ export function SidebarPluginHandler({ plugins }: { plugins: Plugin[] }) {
                                     }}
                                     className="flex flex-col items-center rounded-l-lg py-3 brightness-200 dark:brightness-100">
                                     <img
-                                        src={iconUrl || plugin.iconUrl}
+                                        src={iconUrl || plugin.icon_url}
                                         className="w-6 h-6 brightness-75"
                                         title={`${plugin.title} - ${name}`}
                                     />

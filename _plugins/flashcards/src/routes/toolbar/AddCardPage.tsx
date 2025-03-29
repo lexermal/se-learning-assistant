@@ -17,7 +17,7 @@ export default function AddCard() {
     useEffect(() => {
         // Fetch decks from an API or other source
         // plugin.dbFetch('deck').then(setDecks);
-        plugin.from("deck").select("name").then(({ data }) => {
+        plugin.from("decks").select("name").then(({ data }) => {
             setDecks(data as Deck[]);
         });
         plugin.subscribe("toolAction", (_id, data: { action: string, text: string }) => {

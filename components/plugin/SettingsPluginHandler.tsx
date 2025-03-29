@@ -13,8 +13,8 @@ export default function SettingsPluginHandler({ plugin }: { plugin: Plugin }) {
             return;
         }
         iframeRef.current!.style.opacity = "0";
-        
-        const connection = new CommunicationHandler(supabase, plugin, iframeRef.current, plugin.settingsPage, ["h-full", "bg-gray-950"]);
+
+        const connection = new CommunicationHandler(supabase, plugin, iframeRef.current, plugin.settings_page, ["h-full", "bg-gray-950"]);
         connection.init().then(() => {
             iframeRef.current!.style.opacity = "1";
         });

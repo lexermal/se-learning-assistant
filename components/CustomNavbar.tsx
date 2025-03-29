@@ -44,7 +44,7 @@ export default function CustomNavbar() {
         });
 
         // Fetch plugins and check if it failed
-        fetch(`/api/plugins`).then(res => res.ok ? res.json() : []).then(setPlugins)
+        SupabaseClient.getPlugins().then(setPlugins);
     }
 
     useEffect(() => {
@@ -68,11 +68,11 @@ export default function CustomNavbar() {
         const rootMap = new Map<string, MenuItem[]>();
 
         plugins.forEach(plugin => {
-            plugin.pluginPages.forEach(({ name, url, root }) => {
+            plugin.plugin_pages.forEach(({ name, url, root }) => {
                 if (!rootMap.has(root)) {
                     rootMap.set(root, []);
                 }
-                rootMap.get(root)!.push({ name, url: `/plugin/${plugin.name}#${url}` });
+                rootMap.get(root)!.push({ name, url: `/plugin/${plugin.id}#${url}` });
             });
         });
 

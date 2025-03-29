@@ -106,7 +106,7 @@ export default class FlashcardController {
 
     async getDeckName(): Promise<string> {
         if (!this.deckName) {
-            const response = await this.client.from("deck").select("name").eq("id", this.deck_id!).limit(1);
+            const response = await this.client.from("decks").select("name").eq("id", this.deck_id!).limit(1);
             if (response.error) {
                 throw new Error(response.error.message);
             }

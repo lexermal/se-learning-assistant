@@ -32,14 +32,14 @@ function App() {
       {
         decks.map((deck, index) => (
           <DeckRow key={index} deck={deck} onEdit={(id, name) => {
-            from("deck").update({ name }).eq("id", id).then(fetchDecks);
+            from("decks").update({ name }).eq("id", id).then(fetchDecks);
           }} onDelete={id => {
-            from("deck").delete().eq("id", id).then(fetchDecks);
+            from("decks").delete().eq("id", id).then(fetchDecks);
           }} />
         ))
       }
       <DeckCrudModal className='mt-6 block' buttonText='Add deck' onComplete={name => {
-        from("deck").insert({ name }).then(fetchDecks);
+        from("decks").insert({ name }).then(fetchDecks);
       }} />
     </div>
   );

@@ -5,6 +5,7 @@ import { Plugin } from "../../../utils/plugin/CommunicationHandler";
 import { SidebarPluginHandler } from '@/components/plugin/SidebarPluginHandler';
 import { useEventEmitter } from '@/utils/providers/EventEmitterContext';
 import { ContextMenuAction } from '@/components/plugin/ContextMenu';
+import { SupabaseClient } from '@/utils/supabase/client';
 
 const LandingPage = () => {
   const [plugins, setPlugins] = useState<Plugin[]>([]);
@@ -14,10 +15,7 @@ const LandingPage = () => {
   useEffect(() => {
     const fetchPlugins = async () => {
       try {
-        const response = await fetch('/api/plugins');
-        if (!response.ok) throw new Error('Failed to fetch plugins');
-        const data = await response.json();
-        setPlugins(data);
+        setPlugins(await SupabaseClient.getPlugins());
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -31,7 +29,9 @@ const LandingPage = () => {
   if (loading) return <div className="text-center mt-20"></div>;
   if (error) return <div className="text-center mt-20 text-red-500">Error: {error}</div>;
 
-  const sidebarPages = plugins.flatMap((plugin) => plugin.sidebarPages);
+  const sidebarPages = plugins.flatMap((plugin) => plugin.sidebar_pages);
+
+  console.log(sidebarPages, plugins);
 
   return (
     <div className="flex flex-row">
@@ -46,11 +46,11 @@ const LandingPage = () => {
         {/* Main Plugin Section */}
         {plugins.map((mainPlugin, index) => (
           <section key={index} className="mb-3 flex flex-col p-4 bg-slate-500 dark:bg-gray-900 rounded-lg">
-            <PluginDescription title={mainPlugin.title} description={mainPlugin.description} iconUrl={mainPlugin.iconUrl} />
+            <PluginDescription title={mainPlugin.title} description={mainPlugin.description} iconUrl={mainPlugin.icon_url} />
 
             <div className="flex flex-row flex-wrap gap-4">
-              {mainPlugin.pluginPages.map((page) => (
-                <PageButton key={page.url} url={`/plugin/${mainPlugin.name}#${page.url}`} name={page.name} description={page.description} />
+              {mainPlugin.plugin_pages.map((page) => (
+                <PageButton key={page.url} url={`/plugin/${mainPlugin.id}#${page.url}`} name={page.name} description={page.description} />
               ))}
             </div>
           </section>
@@ -62,7 +62,7 @@ const LandingPage = () => {
           <div className="flex flex-row flex-wrap gap-4 pt-2">
             {sidebarPages.map((page) => (
               console.log(page),
-              <SidebarButton key={page.url} url={page.url} name={page.name} description={page.description} iconUrl={page.iconUrl} />
+              <SidebarButton key={page.url} url={page.url} name={page.name} description={page.description} iconUrl={page.icon_url} />
             ))}
           </div>
         </div>
