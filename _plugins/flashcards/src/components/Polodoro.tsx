@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { FaPauseCircle, FaPlayCircle, FaStopCircle } from 'react-icons/fa';
 import { useEventEmitter } from '@rimori/client';
+import { useEffect, useState, useCallback } from 'react';
 
 interface Session {
   type: 'Study' | 'Relax';
@@ -13,159 +12,113 @@ const sessions: Session[] = [
   { type: 'Study', duration: 10 },
   { type: 'Relax', duration: 5 },
   { type: 'Study', duration: 10 },
-  { type: 'Relax', duration: 10 },
+  { type: 'Relax', duration: 5 },
 ];
 
 const Pomodoro: React.FC = () => {
-  const [currentSession, setCurrentSession] = useState<number>(0);
-  const [timeLeft, setTimeLeft] = useState<number>(sessions[0].duration * 60);
-  const [isPaused, setIsPaused] = useState<boolean>(true); // Start with timer paused
-  const [isCompleted, setIsCompleted] = useState<boolean>(false);
   const { on } = useEventEmitter();
+  const [currentSessionIndex, setCurrentSessionIndex] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(sessions[0].duration * 60); // in seconds
+  const [isActive, setIsActive] = useState(false);
 
-  // Add autostart timer ref
-  const autoStartTimerRef = React.useRef<NodeJS.Timeout | null>(null);
+  // Check if all sessions are completed
+  const isCompleted = currentSessionIndex >= sessions.length;
 
-  useEffect(() => {
-    const handlePomodoroStart = () => {
-      // console.log("pomodoro_start");
+  // Get current session or first session if completed
+  const currentSession = isCompleted ? sessions[0] : sessions[currentSessionIndex];
+  const currentSessionType = currentSession.type;
 
-      if (isCompleted) {
-        return;
-      }
-
-      if (sessions[currentSession].type === 'Relax') {
-        // Start the next Study session
-        const nextStudySessionIndex = sessions.findIndex(
-          (session, index) => session.type === 'Study' && index > currentSession
-        );
-
-        if (nextStudySessionIndex !== -1) {
-          setCurrentSession(nextStudySessionIndex);
-          setTimeLeft(sessions[nextStudySessionIndex].duration * 60);
-          setIsCompleted(false);
-          setIsPaused(false); // Start the timer immediately
-        } else {
-          // If no more Study sessions, reset the timer
-          resetTimer();
-        }
-      } else {
-        setIsPaused(false);
-      }
-    };
-
-    on("pomodoro_start", handlePomodoroStart);
-    on("pomodoro_stop", resetTimer);
-
-    // Cleanup the event listener on unmount
-    return () => {
-      // Assuming 'off' is available to remove the listener
-      // Replace with the correct method if different
-      // on.off("pomodoro_start", handlePomodoroStart);
-    };
-  }, [currentSession, isCompleted, on]);
-
-  // Add new effect to handle auto-starting breaks
-  useEffect(() => {
-    if (isCompleted && !isPaused && sessions[currentSession].type === 'Study') {
-      // Clear any existing timer
-      if (autoStartTimerRef.current) {
-        clearTimeout(autoStartTimerRef.current);
-      }
-
-      // Set new timer for auto-starting break
-      autoStartTimerRef.current = setTimeout(() => {
-        handleStartPause();
-      }, 60000); // 1 minute
-    }
-
-    return () => {
-      if (autoStartTimerRef.current) {
-        clearTimeout(autoStartTimerRef.current);
-      }
-    };
-  }, [isCompleted, currentSession]);
-
-  const playSound = () => {
-    const audio = new Audio('/plugins/flashcards/pomodoro.wav');
+  const playSound = useCallback(() => {
+    const audio = new Audio('pomodoro.wav');
     audio.play().catch(e => {
       console.warn("Error playing audio:", e);
     });
-  };
+  }, []);
 
+  const resetSession = useCallback(() => {
+    setCurrentSessionIndex(0);
+    setTimeLeft(sessions[0].duration * 60);
+    setIsActive(true);
+  }, []);
+
+  const moveToNextSession = useCallback((sound: boolean = true) => {
+    sound && playSound();
+    const nextIndex = currentSessionIndex + 1;
+    setCurrentSessionIndex(nextIndex);
+
+    // If we've reached the end, stop the timer
+    if (nextIndex >= sessions.length) {
+      setIsActive(false);
+    } else {
+      setTimeLeft(sessions[nextIndex].duration * 60);
+    }
+  }, [currentSessionIndex, playSound]);
+
+  const handleStartPause = useCallback(() => {
+    if (isCompleted) {
+      resetSession();
+    } else {
+      setIsActive(!isActive);
+    }
+  }, [isActive, isCompleted, resetSession]);
+
+  // Timer logic
   useEffect(() => {
-    let timer: NodeJS.Timeout | undefined;
-    if (!isPaused && !isCompleted && timeLeft > 0) {
-      timer = setInterval(() => {
-        setTimeLeft((prevTime) => {
+    let interval: NodeJS.Timeout | null = null;
+
+    if (isActive && !isCompleted) {
+      interval = setInterval(() => {
+        setTimeLeft(prevTime => {
           if (prevTime <= 1) {
-            clearInterval(timer);
-            setIsCompleted(true);
-            playSound();
-            return 0;
+            moveToNextSession();
+            return 0; // Will be updated by moveToNextSession if needed
           }
           return prevTime - 1;
         });
-      }, 1000);
+      }, 1000); // Update every second
+    } else if (interval) {
+      clearInterval(interval);
     }
-    return () => clearInterval(timer);
-  }, [isPaused, isCompleted, timeLeft]);
 
-  const handleStartPause = () => {
-    if (isCompleted) {
-      // Start next session
-      if (currentSession < sessions.length - 1) {
-        const nextSession = currentSession + 1;
-        console.log({ nextSession, obj: sessions[nextSession] })
-        setCurrentSession(nextSession);
-        setTimeLeft(sessions[nextSession].duration * 60);
-        setIsCompleted(false);
-        setIsPaused(false); // Start the timer immediately
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isActive, moveToNextSession, isCompleted]);
+
+  // Event emitter handlers
+  useEffect(() => {
+    on("pomodoro_start", () => {
+      if (isCompleted) {
+        resetSession();
       } else {
-        // All sessions completed
-        resetTimer();
+        if (currentSessionType === "Relax") {
+          moveToNextSession(false);
+        }
+        setIsActive(true);
       }
-    } else {
-      // Toggle pause state
-      setIsPaused((prevIsPaused) => !prevIsPaused);
-    }
-  };
+    });
 
-  const resetTimer = () => {
-    setCurrentSession(0);
-    setTimeLeft(sessions[0].duration * 60);
-    setIsPaused(true);
-    setIsCompleted(false);
-  };
+    on("pomodoro_stop", () => setIsActive(false));
 
-  const currentSessionType = sessions[currentSession].type;
-  const isStudySession = currentSessionType === 'Study';
+    return () => {
+      // Cleanup if needed
+    };
+  }, [on, currentSessionType, moveToNextSession, isCompleted, resetSession]);
+
+  let displayText = `${currentSessionType} ${Math.ceil(timeLeft / 60)} min`;
+
+  if (isCompleted) {
+    displayText = "New study session?";
+  } else if (!isActive) {
+    displayText = "Continue?";
+  }
 
   return (
-    <div className={`rounded-t-md flex flex-row flex-wrap items-center p-1 md:border border-b-0 border-gray-800 dark:opacity-80 hover:opacity-100`}>
+    <div className={`rounded-t-md flex flex-row flex-wrap items-center p-1 md:border border-b-0
+     border-gray-800 dark:opacity-80 hover:opacity-100 ${(!isActive || isCompleted) ? 'animate-pulse' : ''}`}>
       <h2 className="text-sm md:text-xl mr-1 cursor-pointer" onClick={handleStartPause}>
-        {isCompleted ? (
-          <span className="animate-pulse">
-            {isStudySession ? 'Time for a Break!' : 'Time to Study!'}
-          </span>
-        ) : (
-          `${currentSessionType} ${Math.ceil(timeLeft / 60)} min`
-        )}
+        {displayText}
       </h2>
-      <div className="flex space-x-1 items-center">
-        <div onClick={handleStartPause} className="cursor-pointer">
-          {isCompleted ? (
-            <FaPlayCircle size="20px" />
-          ) : isPaused ? (
-            <FaPlayCircle size="20px" />
-          ) : (
-            <FaPauseCircle size="20px" />
-          )}
-        </div>
-        <div onClick={resetTimer} className="cursor-pointer">
-          <FaStopCircle size="20px" />
-        </div>
-      </div>
     </div>
   );
 };
