@@ -204,4 +204,8 @@ export class RimoriClient {
     public async completeSharedContent(type: string, assignmentId: string) {
         return this.sharedContentController.completeSharedContent(type, assignmentId);
     }
+
+    public triggerSidebarAction(pluginId: string, actionKey: string, text?: string) {
+        this.emit("triggerSidebarAction", { pluginId, actionKey, text });
+    }
 }
