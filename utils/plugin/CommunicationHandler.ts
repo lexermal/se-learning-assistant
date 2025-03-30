@@ -8,6 +8,7 @@ export interface SidebarPage {
     url: string;
     icon_url: string;
     description: string;
+    actionKey: string;
 }
 
 export interface Plugin {

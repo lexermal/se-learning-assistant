@@ -9,7 +9,7 @@ import { SupabaseClient } from "@/utils/supabase/client";
 import { CgMaximizeAlt } from "react-icons/cg";
 import { TbArrowsMinimize } from "react-icons/tb";
 
-function PluginSidebar({ plugin, contextMenuAction }: { plugin: Plugin, contextMenuAction: MenuEntry }) {
+function PluginSidebar({ plugin, contextMenuAction, url }: { plugin: Plugin, contextMenuAction: MenuEntry, url: string }) {
     const iframeRef = useRef<HTMLIFrameElement | null>(null);
     const supabase = SupabaseClient.getClient();
     const [isMaximized, setIsMaximized] = useState(false);
@@ -20,17 +20,17 @@ function PluginSidebar({ plugin, contextMenuAction }: { plugin: Plugin, contextM
     }
 
     useEffect(() => {
-        const parent = new CommunicationHandler(supabase, plugin, iframeRef.current, contextMenuAction.url, ["h-full", "dark:bg-gray-920"], new Map([["applicationMode", "sidebar"]]));
+        const parent = new CommunicationHandler(supabase, plugin, iframeRef.current, url, ["h-full", "dark:bg-gray-920"], new Map([["applicationMode", "sidebar"]]));
         iframeRef.current!.style.opacity = "0";
 
         parent.subscribe("getToolAction", () => {
-            parent.emit("getToolAction", { action: contextMenuAction.action, text: contextMenuAction.text });
+            parent.emit("getToolAction", { action: contextMenuAction.actionKey, text: contextMenuAction.text });
         });
 
         parent.init().then(() => {
             iframeRef.current!.style.opacity = "1";
         });
-    }, [plugin.id, contextMenuAction.url]);
+    }, [plugin.id, contextMenuAction.actionKey]);
 
     return (
         <div className="dark:bg-gray-920 w-full h-full border-l border-gray-600 pt-[50px]">
@@ -46,10 +46,10 @@ function PluginSidebar({ plugin, contextMenuAction }: { plugin: Plugin, contextM
 }
 
 export function SidebarPluginHandler({ plugins }: { plugins: Plugin[] }) {
-    const sidebarPlugins = plugins.flatMap((plugin) => plugin.sidebar_pages.map(sp => ({ ...sp, pluginName: plugin.name }))) as (SidebarPage & { pluginName: string })[];
+    const sidebarPlugins = plugins.flatMap((plugin) => plugin.sidebar_pages.map(sp => ({ ...sp, pluginId: plugin.id }))) as (SidebarPage & { pluginId: string })[];
     const [openPlugin, setOpenPlugin] = useState<number>(-1);
     const [sidebarPlugin, setSidebarPlugin] = useState<Plugin | null>(null);
-    const [pluginAction, setPluginAction] = useState<ContextMenuAction | undefined>(undefined);
+    const [pluginAction, setPluginAction] = useState<ContextMenuAction & { url: string } | undefined>(undefined);
     const [windowWidth, setWindowWidth] = useState<number>(typeof window !== 'undefined' ? window.innerWidth : 0);
     const { on } = useEventEmitter();
 
@@ -61,21 +61,28 @@ export function SidebarPluginHandler({ plugins }: { plugins: Plugin[] }) {
 
     const isMdScreen = windowWidth <= 900;
 
+    function getContextMenuAction(pluginId: string, actionKey: string, text: string): ContextMenuAction & { url: string } {
+        const result = sidebarPlugins.filter((p) =>
+            p.pluginId === pluginId && p.actionKey === actionKey
+        );
+        return { pluginId, text, actionKey, url: result[0].url };
+    }
+
     useEffect(() => {
-        on("contextMenuAction", ({ pluginName, action, text, url }: ContextMenuAction) => {
-            // console.log("Trigger context menu action:", pluginName, action, text, url);
+        on("contextMenuAction", ({ pluginId, text, actionKey }: ContextMenuAction) => {
+            console.log("Trigger context menu action:", { pluginId, actionKey, text });
 
             const result = sidebarPlugins.filter((p) =>
-                p.pluginName === pluginName && p.url === url
+                p.pluginId === pluginId && p.actionKey === actionKey
             );
 
             if (result.length === 0) {
-                console.log("No plugin found for action", pluginName, action);
+                console.log("No plugin found for action", pluginId, actionKey);
                 return;
             }
-            setSidebarPlugin(plugins.find(p => p.name === pluginName) || null);
+            setSidebarPlugin(plugins.find(p => p.id === pluginId) || null);
             setOpenPlugin(sidebarPlugins.indexOf(result[0]));
-            setPluginAction({ pluginName, action, text, url });
+            setPluginAction(getContextMenuAction(pluginId, actionKey, text ?? ""));
         });
     }, []);
 
@@ -90,8 +97,8 @@ export function SidebarPluginHandler({ plugins }: { plugins: Plugin[] }) {
                     style={{ width: isOpen ? (isMdScreen ? "100%" : "500px") : "40px" }}
                     className="fixed right-0 top-0 flex flex-row h-fgggull">
                     <div className="flex flex-col gap-1 w-0 pt-[4.3rem] h-fit" style={{ marginRight: "40px" }}>
-                        {sidebarPlugins.map(({ name, url, icon_url: iconUrl, pluginName }, index) => {
-                            const plugin = plugins.find(p => p.name === pluginName)!;
+                        {sidebarPlugins.map(({ name, icon_url: iconUrl, pluginId, actionKey }, index) => {
+                            const plugin = plugins.find(p => p.id === pluginId)!;
                             return (
                                 <button
                                     key={name}
@@ -99,7 +106,7 @@ export function SidebarPluginHandler({ plugins }: { plugins: Plugin[] }) {
                                     onClick={() => {
                                         setOpenPlugin(index === openPlugin ? -1 : index);
                                         setSidebarPlugin(plugin);
-                                        setPluginAction({ pluginName, action: url, text: "", url });
+                                        setPluginAction(getContextMenuAction(pluginId, actionKey, ""));
                                     }}
                                     className="flex flex-col items-center rounded-l-lg py-3 brightness-200 dark:brightness-100">
                                     <img
@@ -112,7 +119,7 @@ export function SidebarPluginHandler({ plugins }: { plugins: Plugin[] }) {
                         })}
                     </div>
                     {sidebarPlugin && pluginAction && openPlugin > -1 && (
-                        <PluginSidebar plugin={sidebarPlugin} contextMenuAction={pluginAction} />
+                        <PluginSidebar plugin={sidebarPlugin} contextMenuAction={pluginAction} url={pluginAction.url} />
                     )}
                 </div>
             </div>

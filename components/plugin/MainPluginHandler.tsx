@@ -6,6 +6,7 @@ import { SupabaseClient } from "@/utils/supabase/client";
 import ContextMenu, { ContextMenuInfo, MenuEntry } from "./ContextMenu";
 import CommunicationHandler, { Plugin } from "../../utils/plugin/CommunicationHandler";
 import { useTheme } from "next-themes";
+import { useEventEmitter } from "@/utils/providers/EventEmitterContext";
 
 export default function MainPluginHandler({ plugin, globalContextMenuActions }: { plugin: Plugin, globalContextMenuActions: MenuEntry[] }) {
     const [contextMenu, setContextMenu] = useState<ContextMenuInfo>({ x: 0, y: 0, open: false, text: "" });
@@ -13,6 +14,7 @@ export default function MainPluginHandler({ plugin, globalContextMenuActions }: 
     const iframeRef = useRef(null as HTMLDivElement | null);
     const [hash, setHash] = useState<string | null>(null);
     const supabase = SupabaseClient.getClient();
+    const { emit } = useEventEmitter();
     const router = useRouter();
     const theme = useTheme();
 
@@ -45,7 +47,13 @@ export default function MainPluginHandler({ plugin, globalContextMenuActions }: 
         });
 
         connection.subscribe("addContextMenuActions", (_id, actions: MenuEntry[]) => {
+            console.log("addContextMenuActions", actions);
             setContextMenuActions([...actions, ...constextActions]);
+        });
+
+        connection.subscribe("triggerSidebarAction", (_id, data: { actionKey: string, text: string, pluginId: string }) => {
+            console.log("triggerSidebarAction", data);
+            emit("contextMenuAction", { actionKey: data.actionKey, text: data.text, pluginId: data.pluginId });
         });
     }, [plugin.id, hash]);
 

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { Plugin } from "../../../utils/plugin/CommunicationHandler";
+import { Plugin, SidebarPage } from "../../../utils/plugin/CommunicationHandler";
 import { SidebarPluginHandler } from '@/components/plugin/SidebarPluginHandler';
 import { useEventEmitter } from '@/utils/providers/EventEmitterContext';
 import { ContextMenuAction } from '@/components/plugin/ContextMenu';
@@ -29,7 +29,7 @@ const LandingPage = () => {
   if (loading) return <div className="text-center mt-20"></div>;
   if (error) return <div className="text-center mt-20 text-red-500">Error: {error}</div>;
 
-  const sidebarPages = plugins.flatMap((plugin) => plugin.sidebar_pages);
+  const sidebarPages = plugins.flatMap((plugin) => plugin.sidebar_pages.map(page => ({ ...page, pluginId: plugin.id })));
 
   console.log(sidebarPages, plugins);
 
@@ -61,8 +61,7 @@ const LandingPage = () => {
           <p className="dark:text-gray-400">Quickly access tools from the sidebar at the top right.</p>
           <div className="flex flex-row flex-wrap gap-4 pt-2">
             {sidebarPages.map((page) => (
-              console.log(page),
-              <SidebarButton key={page.url} url={page.url} name={page.name} description={page.description} iconUrl={page.icon_url} />
+              <SidebarButton key={page.url} page={page} pluginId={page.pluginId} />
             ))}
           </div>
         </div>
@@ -93,13 +92,14 @@ function PageButton({ url, name, description }: { url: string, name: string, des
   </div>
 }
 
-function SidebarButton({ url, name, description, iconUrl }: { url: string, name: string, description: string, iconUrl: string }) {
+function SidebarButton(props: { page: SidebarPage, pluginId: string }) {
+  const { name, description, icon_url: iconUrl, actionKey } = props.page;
   const { emit } = useEventEmitter();
-  const action = url.split("/").slice(-1)[0];
 
-  return <div className="flex flex-row items-center p-2 pl-4 bg-gray-400 hover:bg-gray-500 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-lg shadow-sm w-full md:w-1/3 cursor-pointer" onClick={() => {
-    emit("contextMenuAction", { action, text: "", pluginName: "flashcards", url } as ContextMenuAction);
-  }}>
+  return <div className="flex flex-row items-center p-2 pl-4 bg-gray-400 hover:bg-gray-500 dark:bg-gray-800 dark:hover:bg-gray-700 
+  rounded-lg shadow-sm w-full md:w-1/3 cursor-pointer" onClick={() => {
+      emit("contextMenuAction", { actionKey, text: "", pluginId: props.pluginId } as ContextMenuAction);
+    }}>
     <img src={iconUrl} alt={name} className="w-14 h-14" />
     <div className="ml-3">
       <h3 className="text-2xl font-bold">{name}</h3>

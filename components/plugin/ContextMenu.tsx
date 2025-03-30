@@ -8,10 +8,9 @@ interface Props {
 
 export interface MenuEntry {
     text: string;
-    action: string;
-    pluginName: string;
+    pluginId: string;
+    actionKey: string;
     icon?: React.ReactNode;
-    url: string;
 }
 
 export interface ContextMenuInfo {
@@ -22,10 +21,9 @@ export interface ContextMenuInfo {
 }
 
 export interface ContextMenuAction {
-    url: string;
     text: string;
-    action: string;
-    pluginName: string;
+    pluginId: string;
+    actionKey: string
 }
 
 const ContextMenu = ({ actions, contextMenu }: Props) => {
