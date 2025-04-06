@@ -30,7 +30,7 @@ function PluginSidebar({ plugin, contextMenuAction, url }: { plugin: Plugin, con
         parent.init().then(() => {
             iframeRef.current!.style.opacity = "1";
         });
-    }, [plugin.id, contextMenuAction.actionKey]);
+    }, [plugin.id, contextMenuAction.actionKey, contextMenuAction.text]);
 
     return (
         <div className="dark:bg-gray-920 w-full h-full border-l border-gray-600 pt-[50px]">
