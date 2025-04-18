@@ -7,7 +7,7 @@ import FlashcardController from '../deck/FlashcardController';
 
 export default function AddCard() {
     const [decks, setDecks] = useState<Deck[]>([]);
-    const [selectedDeck, setSelectedDeck] = useState('');
+    const [selectedDeckId, setSelectedDeckId] = useState('');
     const [question, setQuestion] = useState('');
     const [answer, setAnswer] = useState('');
     const [initValue, setInitValue] = useState<string | undefined>("");
@@ -17,7 +17,7 @@ export default function AddCard() {
     useEffect(() => {
         // Fetch decks from an API or other source
         // plugin.dbFetch('deck').then(setDecks);
-        plugin.from("decks").select("name").then(({ data }) => {
+        plugin.from("decks").select("id,name").then(({ data }) => {
             setDecks(data as Deck[]);
         });
         plugin.subscribe("toolAction", (_id, data: { action: string, text: string }) => {
@@ -27,12 +27,11 @@ export default function AddCard() {
     }, []);
 
     const handleAddCard = () => {
-        // console.log('Adding card:', { selectedDeck, question, answer });
         const controller = new FlashcardController(plugin);
         controller.add({
             front: question.trim(),
             back: answer.trim(),
-            deckId: selectedDeck,
+            deckId: selectedDeckId,
             frontTags: [],
             backTags: []
         });
@@ -49,7 +48,7 @@ export default function AddCard() {
             text: "Submit",
             onClick: () => plugin.from("decks").insert({ name: deckName }).select("id,name").single().then(({ data }) => {
                 setDecks([...decks, data as Deck]);
-                setSelectedDeck(data!.id as string);
+                setSelectedDeckId(data!.id as string);
             })
         }]}>
             <input className='w-full border-0 border-b p-0 border-gray-400' placeholder="Name..." onChange={e => setDeckName(e.target.value)} />
@@ -59,11 +58,11 @@ export default function AddCard() {
     return (
         <div className="p-1 w-full">
             <h1 className="text-xl font-bold my-5 text-center">Flashcard - Quick Add</h1>
-            {selectedDeck === 'new' && <DeckModal />}
+            {selectedDeckId === 'new' && <DeckModal />}
             <select
-                value={selectedDeck}
+                value={selectedDeckId}
                 className="w-full p-2 mb-4 border-0 rounded bg-gray-300 dark:bg-gray-800"
-                onChange={e => setSelectedDeck(e.target.value)}>
+                onChange={e => setSelectedDeckId(e.target.value)}>
 
                 {decks.map(deck => (
                     <option key={deck.id} value={deck.id}>

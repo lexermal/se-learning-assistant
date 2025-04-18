@@ -107,10 +107,10 @@ export default function Training() {
         emit("pomodoro_start");
     }, [showAnswer]);
 
-    function handleKnowledgeButtonClick(action: Grade) {
+    function handleKnowledgeButtonClick(grade: Grade) {
         setShowAnswer(false);
         if (!card) return;
-        cardController.validate(card.id, action);
+        cardController.validate(card.id, grade);
         getNext();
     }
 
@@ -169,9 +169,10 @@ export default function Training() {
                         {!!editedCard ? <FaSave /> : <MdModeEdit />}
                     </div>
                     <div className="text-2xl cursor-pointer" onClick={() => {
-                        cardController.delete();
-                        setShowAnswer(false);
-                        getNext();
+                        cardController.delete().then(() => {
+                            setShowAnswer(false);
+                            getNext();
+                        });
                     }}><MdDelete /></div>
                 </div>
             </div>

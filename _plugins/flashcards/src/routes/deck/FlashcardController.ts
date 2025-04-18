@@ -1,11 +1,6 @@
 import { Card, createEmptyCard, FSRS, fsrs, generatorParameters, Grade, State } from "ts-fsrs";
 import { RimoriClient } from "@rimori/client";
-// import { Deck } from "../DeckOverviewPage";
-
-interface Deck extends Record<string, unknown> {
-    id: string;
-    name: string;
-}
+import { PostgrestQueryBuilder } from "@supabase/postgrest-js";
 
 export interface Flashcard extends Omit<Card, "due" | "last_review" | "state"> {
     id: string;
@@ -36,12 +31,14 @@ interface CrudCard {
 export default class FlashcardController {
     private f: FSRS;
     private client: RimoriClient;
+    private cardDB: PostgrestQueryBuilder<any, any, "cards">;
     private cards: Flashcard[] = [];
     private deck_id: string | undefined;
     private deckName: string | undefined;
 
     constructor(client: RimoriClient) {
         this.client = client;
+        this.cardDB = client.from("cards");
         this.f = fsrs(generatorParameters({ enable_fuzz: true, enable_short_term: true }));
     }
 
@@ -94,13 +91,12 @@ export default class FlashcardController {
         this.cards[0].back_tags = editCard.backTags;
 
         // this.client.dbUpdate("cards", { id: this.cards[0].id }, this.cards[0]);
-        await this.client.from("cards").update(this.cards[0] as any).eq("id", this.cards[0].id);
+        await this.cardDB.update(this.cards[0].id as any).eq("id", this.cards[0].id);
         this.sortCards();
     }
 
     async delete() {
-        // this.client.dbDelete("cards", { id: this.cards[0].id });
-        await this.client.from("cards").delete().eq("id", this.cards[0].id);
+        await this.cardDB.delete().eq("id", this.cards[0].id);
         this.cards.shift();
     }
 
@@ -119,7 +115,7 @@ export default class FlashcardController {
         const id = card.id!;
         delete card.id;
 
-        const { data: response, error } = await this.client.from("cards").insert(card).select("id").single();
+        const { data: response, error } = await this.cardDB.insert(card).select("id").single();
         if (error) {
             throw new Error(error.message);
         }
@@ -135,17 +131,18 @@ export default class FlashcardController {
 
     private sortCards() {
         this.cards = this.cards.sort((a, b) => a.due.getTime() - b.due.getTime());
-        // console.log("Sorting cards", this.cards);
     }
 
     async validate(id: string, grade: Grade) {
         const result = this.getCard(id);
 
+        if (!result.card) {
+            console.log("card not found", id, this.cards);
+            return;
+        }
+
         this.cards[result.index] = this.f.next(result.card, new Date(), grade, ({ card }) => card as unknown as Flashcard);
-        console.log("validate", this.cards[result.index]);
-        // this.client.dbUpdate("cards", { id: result.card.id }, this.cards[result.index]);
-        await this.client.from("cards").update(this.cards[result.index] as any).eq("id", result.card.id);
-        console.log("finished update");
+        await this.cardDB.update(this.cards[result.index] as any).eq("id", result.card.id);
         this.sortCards();
     }
 
@@ -158,6 +155,7 @@ export default class FlashcardController {
     }
 
     getNext(): { card: Flashcard, remaining: FlashcardRemaining } {
+        this.sortCards();
         return {
             card: this.getTodayCards()[0],
             remaining: {
