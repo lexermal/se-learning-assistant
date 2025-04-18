@@ -24,6 +24,15 @@ export const PluginProvider: React.FC<PluginProviderProps> = ({ children }) => {
         PluginController.getInstance().then(setPlugin);
     }, []);
 
+    //detect page height change
+    useEffect(() => {
+        const body = document.body;
+        const handleResize = () => plugin?.emit('heightAdjustment', body.clientHeight);
+        body.addEventListener('resize', handleResize);
+        handleResize();
+        return () => body.removeEventListener('resize', handleResize);
+    }, [plugin]);
+
     //context menu
     useEffect(() => {
         let isOpen = false;
