@@ -36,7 +36,7 @@ export default function SilentReading() {
     }
 
     return (
-        <div className="flex flex-col w-full max-w-xl py-8 pb-20 mx-auto stretch pl-1">
+        <div className="flex flex-col w-full max-w-2xl py-8 pb-20 mx-auto stretch pl-1">
             {messages.filter((m, i) => i > 1 && m.role === "assistant").map((m, i, ms) => (
                 <Markdown key={m.id} components={{
                     h1: ({ node, ...props }) => (
