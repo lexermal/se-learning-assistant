@@ -110,7 +110,7 @@ const Pomodoro: React.FC = () => {
   if (isCompleted) {
     displayText = "New study session?";
   } else if (!isActive) {
-    displayText = "Continue?";
+    displayText = `Continue to ${currentSessionType.toLowerCase()}?`;
   }
 
   return (
