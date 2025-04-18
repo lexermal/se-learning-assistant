@@ -27,7 +27,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <main className="min-h-screen flex flex-col items-center dark:bg-gray-950">
                 <div className="flex-1 w-full flex flex-col items-center">
                   <CustomNavbar />
-                  <div className="w-full">
+                  <div className="w-full mt-12">
                     {children}
                   </div>
                 </div>

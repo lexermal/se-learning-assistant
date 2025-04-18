@@ -84,7 +84,8 @@ export default function CustomNavbar() {
     };
 
     return (
-        <nav className="flex items-center justify-between flex-wrap border-b border-b-gray-500 z-30 bg-white dark:bg-gray-950 w-full">
+        <nav className="fixed flex items-center justify-between flex-wrap border-b border-b-gray-500 z-30
+         bg-white dark:bg-gray-950 w-full">
             <div className="flex flex-shrink-0 text-white mr-1 items-end cursor-pointer" onClick={() => router.push("/dashboard")}>
                 <img src="/logo.svg" alt="Rimori" className="h-12 w-36 p-1 px-2 rounded dark:invert" />
             </div>
