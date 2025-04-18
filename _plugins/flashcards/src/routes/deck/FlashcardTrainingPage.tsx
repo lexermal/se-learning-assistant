@@ -35,6 +35,7 @@ export default function Training() {
 
     React.useEffect(() => {
         getSettings<FlashcardPluginSettings>({
+            autoAddToDeck: true,
             autoPlayForeignNewFlashcards: true,
         }).then(settings => {
             if (!settings.autoPlayForeignNewFlashcards) return;

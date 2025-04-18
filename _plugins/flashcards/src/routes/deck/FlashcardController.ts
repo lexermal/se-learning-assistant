@@ -63,6 +63,7 @@ export default class FlashcardController {
 
     add(newCard: CrudCard) {
         const deck_id = newCard.deckId || this.deck_id;
+
         function cardAfterHandler(card: Card): Flashcard {
             return {
                 ...card,
@@ -76,12 +77,19 @@ export default class FlashcardController {
             } as Flashcard;
         }
 
-        const card = createEmptyCard(new Date(), cardAfterHandler);
+        this.cardDB.select("*").eq("front", newCard.front).eq("deck_id", deck_id).then(res => {
+            if (res.data?.length) {
+                console.log("card already exists", res.data);
+                return;
+            }
 
-        this.cards.push(card);
-        this.sortCards();
+            const card = createEmptyCard(new Date(), cardAfterHandler);
 
-        this.addToDB({ ...card });
+            this.cards.push(card);
+            this.sortCards();
+
+            this.addToDB({ ...card });
+        });
     }
 
     async edit(editCard: CrudCard) {

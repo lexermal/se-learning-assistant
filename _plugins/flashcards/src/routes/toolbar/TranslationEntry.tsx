@@ -23,7 +23,8 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
 
     useEffect(() => {
         plugin.getSettings<FlashcardPluginSettings>({
-            autoPlayForeignNewFlashcards: false
+            autoPlayForeignNewFlashcards: false,
+            autoAddToDeck: true
         }).then(setSettings);
 
         plugin.getSettings<UserSettings>({ motherTongue: "English", languageLevel: "A1" }, "user")
@@ -62,6 +63,14 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
 
     const formattedOtherMeaning = getAlternativeMeaning(t as Translation);
     const isLoaded = !!basicInfo && !!t.explanation;
+
+
+    useEffect(() => {
+        // add to flashcard
+        if (isLoaded && language && settings?.autoAddToDeck) {
+            addFlashcard(plugin, t as Translation, decks[0].id, language);
+        }
+    }, [isLoaded]);
 
     return (
         <div className="flex flex-col w-full max-w-3xl pt-6 mx-auto stretch dark:text-gray-200">
@@ -105,10 +114,10 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
                     {!!t.example_sentence?.mother_tongue && <div className="whitespace-pre-wrap">{highlightBoldText(t.example_sentence.mother_tongue)}</div>}
                 </div>
             </> : ""}
-            {isLoaded ? <AddToDeckButton options={decks} onSelect={id => {
+            {isLoaded ? (!settings?.autoAddToDeck && <AddToDeckButton options={decks} onSelect={id => {
                 addFlashcard(plugin, t as Translation, id, language as string);
                 onAddedToFlashcard();
-            }} /> : <TranslationSkeleton />}
+            }} />) : <TranslationSkeleton />}
             {/* for mobile view */}
             {isLoaded ? <button className="sm:hidden mt-2 bg-blue-300 dark:bg-gray-700 p-1 px-2 rounded-lg" onClick={() => onAddedToFlashcard()}>
                 New Search
