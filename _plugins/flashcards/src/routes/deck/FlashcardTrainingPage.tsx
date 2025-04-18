@@ -39,7 +39,7 @@ export default function Training() {
             autoPlayForeignNewFlashcards: true,
         }).then(settings => {
             if (!settings.autoPlayForeignNewFlashcards) return;
-            getSettings<UserSettings>({ languageLevel: "A1", motherTongue: "English" }, "user").then(settings => {
+            getSettings<UserSettings>({ languageLevel: "A1", motherTongue: "English", contextMenuOnSelect: false }, "user").then(settings => {
                 setMotherTongue(settings.motherTongue);
             });
         });

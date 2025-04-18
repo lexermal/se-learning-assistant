@@ -27,7 +27,7 @@ export default function TranslationEntry({ onTranslationComplete, word, onAddedT
             autoAddToDeck: true
         }).then(setSettings);
 
-        plugin.getSettings<UserSettings>({ motherTongue: "English", languageLevel: "A1" }, "user")
+        plugin.getSettings<UserSettings>({ motherTongue: "English", languageLevel: "A1", contextMenuOnSelect: false }, "user")
             .then(s => setLanguage(s.motherTongue));
 
         plugin.from("decks").select("id, name, last_used").then(({ data }) => {

@@ -16,7 +16,7 @@ const SettingsPage = () => {
 
     const entries = [{ id: "general", title: "General" }].concat(plugins);
     return (
-        <div className="flex sm:h-screen flex-wrap">
+        <div className="flex sm:min-h-screen flex-wrap">
             <div className="sm:ml-5 pt-4 sm:border-r border-gray-600 w-full sm:w-1/4 border-b sm:border-b-0">
                 <ul>
                     {entries.map((plugin, index) => (

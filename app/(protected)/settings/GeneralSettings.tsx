@@ -5,10 +5,12 @@ import LanguageLevelDisplay from './components/LanguageLevels';
 import { useDebounce } from '@/utils/hooks/useDebounce';
 import { getUserSettings, setUserSettings } from './settings.service';
 import LanguageSelector, { Language } from './components/LanguageSelector';
+import ContextMenuTrigger from './components/ContextMenuTrigger';
 
 interface UserSettings {
     motherTongue: Language;
     languageLevel: string;
+    contextMenuOnSelect: boolean;
 }
 
 export function GeneralSettings() {
@@ -22,7 +24,7 @@ export function GeneralSettings() {
 
     const debouncedSetUserSettings = useDebounce(setUserSettings, 2000);
 
-    const handleSetSettings = (key: string, value: any) => {
+    const handleSetSettings = (key: keyof UserSettings, value: any) => {
         const newSettings = { ...settings, [key]: value } as UserSettings;
         setSettingState(newSettings);
         debouncedSetUserSettings(newSettings);
@@ -39,6 +41,7 @@ export function GeneralSettings() {
             <ResetPassword searchParams={params} />
             <LanguageSelector initLang={settings?.motherTongue} setLanguage={(lang) => handleSetSettings("motherTongue", lang)} />
             <LanguageLevelDisplay initialLevel={settings?.languageLevel} setSettings={values => handleSetSettings("languageLevel", values)} />
+            <ContextMenuTrigger initialValue={settings?.contextMenuOnSelect} setSettings={(value) => handleSetSettings("contextMenuOnSelect", value)} />
         </div>
     );
 } 

@@ -1,6 +1,8 @@
 import React, { createContext, useContext, ReactNode, useEffect, useState } from 'react';
 import { PluginController } from '../plugin/PluginController';
 import { RimoriClient } from '../plugin/RimoriClient';
+import { UserSettings } from '../controller/SettingsController';
+
 interface PluginProviderProps {
     children: ReactNode;
 }
@@ -10,6 +12,8 @@ const PluginContext = createContext<RimoriClient | null>(null);
 
 export const PluginProvider: React.FC<PluginProviderProps> = ({ children }) => {
     const [plugin, setPlugin] = useState<RimoriClient | null>(null);
+    const [contextMenuOnSelect, setContextMenuOnTextSelection] = useState(false);
+
     //route change
     useEffect(() => {
         let lastHash = window.location.hash;
@@ -24,6 +28,20 @@ export const PluginProvider: React.FC<PluginProviderProps> = ({ children }) => {
         PluginController.getInstance().then(setPlugin);
     }, []);
 
+    //check if context menu opens on text selection
+    useEffect(() => {
+        if (!plugin) return;
+        plugin.getSettings<UserSettings>({
+            languageLevel: "A1",
+            motherTongue: "English",
+            contextMenuOnSelect: false,
+        }, "user").then((settings) => {
+            setContextMenuOnTextSelection(settings.contextMenuOnSelect);
+        }).catch(error => {
+            console.error('Error fetching settings:', error);
+        });
+    }, [plugin]);
+
     //detect page height change
     useEffect(() => {
         const body = document.body;
@@ -35,29 +53,60 @@ export const PluginProvider: React.FC<PluginProviderProps> = ({ children }) => {
 
     //context menu
     useEffect(() => {
-        let isOpen = false;
+        let lastMouseX = 0;
+        let lastMouseY = 0;
+        let isSelecting = false;
+
+        // Track mouse position
+        const handleMouseMove = (e: MouseEvent) => {
+            lastMouseX = e.clientX;
+            lastMouseY = e.clientY;
+        };
+
         const handleContextMenu = (e: MouseEvent) => {
             const selection = window.getSelection()?.toString().trim();
             if (selection) {
                 e.preventDefault();
-                // console.log('context menu', selection);
+                // console.log('context menu handled', selection);
                 plugin?.emit('contextMenu', { text: selection, x: e.clientX, y: e.clientY, open: true });
-                isOpen = true;
             }
         };
 
-        // Hide the menu on click outside
-        const handleClick = () => isOpen && plugin?.emit('contextMenu', { text: '', x: 0, y: 0, open: false });
-
-        document.addEventListener("click", handleClick);
-        document.addEventListener('contextmenu', handleContextMenu);
-        return () => {
-            document.removeEventListener("click", handleClick);
-            document.removeEventListener('contextmenu', handleContextMenu);
+        const handleSelectionChange = () => {
+            // if (triggerOnTextSelection) {
+            const selection = window.getSelection()?.toString().trim();
+            const open = !!selection && isSelecting;
+            // console.log('Selection change, contextMenuOnSelect:', contextMenuOnSelect);
+            plugin?.emit('contextMenu', { text: selection, x: lastMouseX, y: lastMouseY, open });
+            // }
         };
-    }, [plugin]);
+        const handleMouseUpDown = (e: MouseEvent) => {
+            if (e.type === 'mousedown') {
+                isSelecting = false;
+            } else if (e.type === 'mouseup') {
+                isSelecting = true;
+                // console.log('mouseup, contextMenuOnSelect:', contextMenuOnSelect);
+                if (contextMenuOnSelect) {
+                    handleSelectionChange();
+                }
+            }
+        };
 
-    if(!plugin){
+        document.addEventListener('contextmenu', handleContextMenu);
+        document.addEventListener('selectionchange', handleSelectionChange);
+        document.addEventListener("mousemove", handleMouseMove);
+        document.addEventListener('mousedown', handleMouseUpDown);
+        document.addEventListener('mouseup', handleMouseUpDown);
+        return () => {
+            document.removeEventListener("mousemove", handleMouseMove);
+            document.removeEventListener('contextmenu', handleContextMenu);
+            document.removeEventListener('selectionchange', handleSelectionChange);
+            document.removeEventListener('mousedown', handleMouseUpDown);
+            document.removeEventListener('mouseup', handleMouseUpDown);
+        };
+    }, [plugin, contextMenuOnSelect]);
+
+    if (!plugin) {
         return ""
     }
 

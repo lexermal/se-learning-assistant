@@ -6,6 +6,7 @@ type SettingsType = "user" | "system" | "plugin";
 export interface UserSettings {
     motherTongue: string;
     languageLevel: LanguageLevel;
+    contextMenuOnSelect: boolean;
 }
 
 export interface SystemSettings {

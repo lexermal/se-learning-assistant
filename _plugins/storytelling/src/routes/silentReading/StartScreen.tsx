@@ -20,7 +20,7 @@ export function StartScreen(props: { onStart: (i: Instructions) => void }) {
     const plugin = usePlugin();
 
     useEffect(() => {
-        plugin.getSettings<UserSettings>({ motherTongue: "English", languageLevel: "A1" }, "user")
+        plugin.getSettings<UserSettings>({ motherTongue: "English", languageLevel: "A1", contextMenuOnSelect: false }, "user")
             .then(s => setDifficulty(getDifficultyLevel(s.languageLevel)));
     }, []);
 
