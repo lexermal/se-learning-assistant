@@ -46,9 +46,9 @@ start_server() {
 
 # Start development servers with colored logs
 start_server "./" "yarn dev" "Main" "$BLUE" &
-start_server "./_plugins/flashcards" "yarn dev" "Flashcards" "$GREEN" &
-start_server "./_plugins/storytelling" "yarn dev" "Storytelling" "$PURPLE" &
-start_server "./_plugins/rimori-plugin-writing" "yarn dev" "Writing" "$CYAN" &
+start_server "./_plugins/rimori-plugin-flashcards" "yarn dev" "Flashcards" "$GREEN" &
+# start_server "./_plugins/storytelling" "yarn dev" "Storytelling" "$PURPLE" &
+# start_server "./_plugins/rimori-plugin-writing" "yarn dev" "Writing" "$CYAN" &
 start_server "./_plugins/shared-components" "yarn dev" "Shared-Components" "$YELLOW" &
 start_server "./_plugins/shared-components" "yarn css-dev" "Shared-Components" "$YELLOW" &
 

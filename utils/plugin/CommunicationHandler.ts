@@ -6,7 +6,7 @@ import { env } from "../client-constants";
 export interface SidebarPage {
     name: string;
     url: string;
-    icon_url: string;
+    iconUrl: string;
     description: string;
     actionKey: string;
 }

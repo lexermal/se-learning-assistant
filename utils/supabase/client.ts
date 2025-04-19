@@ -54,7 +54,7 @@ export class SupabaseClient {
         }
 
         p.sidebar_pages = p.sidebar_pages.map(sp => {
-          sp.icon_url = p.endpoint + sp.icon_url;
+          sp.iconUrl = p.endpoint + sp.iconUrl;
           return sp;
         });
 

@@ -49,6 +49,6 @@ node_modules/
 /playwright/.cache/
 .auth
 
-_plugins/rimori-plugin-writing
+# _plugins/rimori-plugin-writing
 
 dist

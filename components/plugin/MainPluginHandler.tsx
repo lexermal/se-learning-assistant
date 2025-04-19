@@ -26,8 +26,9 @@ export default function MainPluginHandler({ plugin, globalContextMenuActions }: 
 
         const connection = new CommunicationHandler(supabase, plugin, iframeRef.current, hash, [], new Map([["rm_theme", theme.theme || "light"]]));
         connection.init().then(() => {
-            iframeRef.current!.style.opacity = "1";
-            const iframe = (iframeRef.current?.children[0] as HTMLIFrameElement);
+            if (!iframeRef.current) return;
+            iframeRef.current.style.opacity = "1";
+            const iframe = (iframeRef.current.children[0] as HTMLIFrameElement);
             iframe.style.minHeight = `calc(100vh - 50px)`;
             // iframeRef.current!.style.height = `calc(100vh - 80px)`;
         });
