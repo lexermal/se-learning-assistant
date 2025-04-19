@@ -53,7 +53,7 @@ _plugins/rimori-plugin-writing
 _plugins/rimori-plugin-flashcards
 _plugins/rimori-plugin-storytelling
 _plugins/rimori-plugin-*
-_plugins/shared-components
+_plugins/rimori-client
 
 
 dist

@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+cd repos
+
 # Create dist directory if it doesn't exist
 mkdir -p dist
 
