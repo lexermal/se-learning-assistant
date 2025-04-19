@@ -10,8 +10,16 @@ export $(cat .env | xargs)
 
 # Install dependencies for the main project and plugins
 echo "Installing dependencies..."
-yarn install --cwd ./
-yarn install --cwd ./_plugins/
+
+if ! yarn install --cwd ./; then
+  echo "Error: Failed to install main dependencies."
+  exit 1
+fi
+
+if ! yarn install --cwd ./_plugins/; then
+  echo "Error: Failed to install plugin dependencies."
+  exit 1
+fi
 
 echo "Dependencies installed."
 
@@ -47,7 +55,7 @@ start_server() {
 # Start development servers with colored logs
 start_server "./" "yarn dev" "Main" "$BLUE" &
 start_server "./_plugins/rimori-plugin-flashcards" "yarn dev" "Flashcards" "$GREEN" &
-# start_server "./_plugins/storytelling" "yarn dev" "Storytelling" "$PURPLE" &
+start_server "./_plugins/rimori-plugin-storytelling" "yarn dev" "Storytelling" "$PURPLE" &
 # start_server "./_plugins/rimori-plugin-writing" "yarn dev" "Writing" "$CYAN" &
 start_server "./_plugins/shared-components" "yarn dev" "Shared-Components" "$YELLOW" &
 start_server "./_plugins/shared-components" "yarn css-dev" "Shared-Components" "$YELLOW" &

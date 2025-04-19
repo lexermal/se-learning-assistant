@@ -49,6 +49,11 @@ node_modules/
 /playwright/.cache/
 .auth
 
-# _plugins/rimori-plugin-writing
+_plugins/rimori-plugin-writing
+_plugins/rimori-plugin-flashcards
+_plugins/rimori-plugin-storytelling
+_plugins/rimori-plugin-*
+_plugins/shared-components
+
 
 dist
