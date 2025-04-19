@@ -4,7 +4,7 @@ export async function getSTTResponse(supabase: SupabaseClient, audio: Blob) {
     const formData = new FormData();
     formData.append('file', audio);
 
-    return await supabase.functions.invoke('speech', { method: 'POST', body: formData }).then((r: any) => r.text);
+    return await supabase.functions.invoke('speech', { method: 'POST', body: formData }).then(({ data }) => data.text);
 }
 
 export async function getTTSResponse(supabaseUrl: string, request: TTSRequest, token: string) {
