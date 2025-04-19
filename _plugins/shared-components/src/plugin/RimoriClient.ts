@@ -7,6 +7,7 @@ import { PostgrestQueryBuilder, PostgrestFilterBuilder } from "@supabase/postgre
 import { SharedContentController, BasicAssignment } from "../controller/SharedContentController";
 import { streamChatGPT, Message, Tool, OnLLMResponse, generateText } from "../controller/AIController";
 import { generateObject as generateObjectFunction, ObjectRequest } from "../controller/ObjectController";
+import { getPlugins, Plugin } from "../controller/SidePluginController";
 
 interface RimoriClientOptions {
     pluginController: PluginController;
@@ -164,6 +165,14 @@ export class RimoriClient {
 
     public getVoiceToTextResponse(file: Blob): Promise<string> {
         return getSTTResponse(this.superbase, file);
+    }
+
+    /**
+     * Fetches all installed plugins.
+     * @returns A promise that resolves to an array of plugins
+     */
+    public async getPlugins(): Promise<Plugin[]> {
+        return getPlugins(this.superbase);
     }
 
     public async generateObject(request: ObjectRequest): Promise<any> {
